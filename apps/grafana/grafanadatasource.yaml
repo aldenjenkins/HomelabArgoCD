@@ -1,0 +1,47 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: grafana-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: grafana-redis
+    type: redis-datasource
+    url: redis://grafana-redis.grafana.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: 2.2.0
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: grafana-alerting-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: grafana-alerting-redis
+    type: redis-datasource
+    url: redis://grafana-alerting-redis.grafana.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: 2.2.0

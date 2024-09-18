@@ -1,0 +1,9 @@
+resources:
+  - grafanafolder.yaml
+  - grafanadatasource.yaml
+  - cloudwatch
+  - dynamodb
+  - s3
+  - billing
+generators:
+  - sopsgenerator.yaml

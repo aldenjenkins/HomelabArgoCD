@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+    spec:
+      containers:
+        - name: postgres-exporter
+          image: prometheuscommunity/postgres-exporter:latest
+          ports:
+            - containerPort: 9187
+          env:
+            - name: DATA_SOURCE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-exporter-secret
+                  key: database_url
+          args:
+            - '--collector.database'
+            - '--collector.database_wraparound'
+            - '--collector.long_running_transactions'
+            - '--collector.postmaster'
+            - '--collector.stat_activity_autovacuum'
+            - '--collector.process_idle'
+            - '--collector.replication'
+            - '--collector.replication_slot'
+            - '--collector.stat_bgwriter'
+            - '--collector.stat_database'
+            - '--collector.statio_user_tables'
+            - '--collector.statio_user_indexes'
+            - '--collector.xlog_location'
+            - '--collector.stat_statements'
+            - '--collector.stat_user_tables'
+            - '--collector.stat_wal_receiver'

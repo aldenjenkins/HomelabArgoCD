@@ -1,0 +1,13 @@
+namespace: opencost
+resources:
+  - namespace.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - virtualservice.yaml
+  - servicemonitor.yaml
+  - authorizationpolicy.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

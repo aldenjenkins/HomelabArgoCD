@@ -1,0 +1,7 @@
+creation_rules:
+  - unencrypted_regex: "^(apiVersion|metadata|kind|type)$"
+    # Specify kms/pgp/etc encryption key
+    # Optionally you can configure to use a providers key store
+    # kms: XXXXXX
+    # gcp_kms: XXXXXX
+    age: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka

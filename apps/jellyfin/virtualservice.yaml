@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: jellyfin-virtualservice
+spec:
+  hosts:
+    - jellyfin.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: jellyfin.jellyfin.svc.cluster.local
+            port:
+              number: 8096

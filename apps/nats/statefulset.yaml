@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nats-jetstream
+  labels:
+    app: nats-jetstream
+spec:
+  serviceName: nats-jetstream
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: nats-jetstream
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: nats-jetstream
+          image: nats:latest
+          imagePullPolicy: Always
+          args:
+            - -D
+            - --jetstream
+            - --port=4222
+            - --config=/etc/nats-jetstream/jetstream.conf
+          # Required to be able to define an environment variable
+          # that refers to other environment variables.  This env var
+          # is later used as part of the configuration file.
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CLUSTER_ADVERTISE
+              value: $(POD_NAME).nats-io.$(POD_NAMESPACE).svc
+          ports:
+            - containerPort: 7422
+              name: leafnodes
+            - containerPort: 6222
+              name: cluster
+            - containerPort: 8080
+              name: ws-client
+              protocol: TCP
+            - containerPort: 4222
+              name: tcp-client
+              protocol: TCP
+            - containerPort: 8222
+              name: monitoring
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data/nats-server
+              name: nats-data
+            - mountPath: /etc/nats-jetstream/
+              name: config-volume
+          resources:
+            requests:
+              cpu: "250m"
+            limits:
+              memory: "1G"
+        #################################
+        #                               #
+        #  NATS Prometheus Exporter     #
+        #                               #
+        #################################
+        - name: nats-exporter
+          image: natsio/prometheus-nats-exporter:latest
+          args:
+            - -varz
+            - -jsz=all
+            - http://localhost:8222/
+          ports:
+            - containerPort: 7777
+              name: metrics
+      volumes:
+        - configMap:
+            name: nats-jetstream
+          name: config-volume
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/hostname: node12
+  volumeClaimTemplates:
+    - metadata:
+        name: nats-data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        storageClassName: local-storage
+        resources:
+          requests:
+            storage: "10Gi"

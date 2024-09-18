@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: alertmanager
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager
+      app.kubernetes.io/part-of: kube-prometheus
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - alertmanager.home.alden.ai

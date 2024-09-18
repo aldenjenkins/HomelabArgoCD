@@ -1,0 +1,6 @@
+namespace: kube-system
+resources:
+  - service.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+  - grafanadashboard.yaml

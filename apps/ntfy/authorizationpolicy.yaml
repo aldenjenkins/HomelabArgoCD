@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: ntfy
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app: ntfy
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - ntfy.home.alden.ai

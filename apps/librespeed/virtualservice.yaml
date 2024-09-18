@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: librespeed
+  namespace: librespeed
+spec:
+  hosts:
+    - librespeed.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: librespeed.librespeed.svc.cluster.local
+            port:
+              number: 80

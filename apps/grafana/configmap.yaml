@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-provisioning
+  labels:
+    name: grafana
+data:
+  redis-app-provisioning-app.yaml: |-
+    apiVersion: 1
+    apps:
+      - type: redis-app
+        disabled: false

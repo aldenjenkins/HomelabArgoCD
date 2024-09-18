@@ -1,0 +1,145 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  labels:
+    dashboards: grafana
+  name: grafana
+spec:
+  version: 12.2.0-16818804881
+  service:
+    metadata:
+      labels:
+        app: grafana
+  persistentVolumeClaim:
+    metadata:
+      annotations:
+        nfs.io/storage-path: "grafana/"
+    spec:
+      storageClassName: nfs-appdata-retain
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 500Gi
+  deployment:
+    spec:
+      replicas: 3
+      template:
+        metadata:
+          labels:
+            sidecar.istio.io/inject: "true"
+        spec:
+          containers:
+            - name: grafana
+              # change to Always if using `main` version above, but we should pin since we use HA
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: GF_SECURITY_ADMIN_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: GF_SECURITY_ADMIN_USER
+                      name: grafana-admin-credentials
+                - name: GF_SECURITY_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: GF_SECURITY_ADMIN_PASSWORD
+                      name: grafana-admin-credentials
+                - name: GF_DATABASE_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: GF_DATABASE_USER
+                      name: grafana-database-credentials
+                - name: GF_DATABASE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: GF_DATABASE_PASSWORD
+                      name: grafana-database-credentials
+                - name: GF_DATABASE_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      key: GF_DATABASE_HOST
+                      name: grafana-database-credentials
+              securityContext:
+                # I think this should fix the "Error checking server process execution privilege. error: could not get current OS user to detect process privileges" errors on startup. Update, it didn't.
+                allowPrivilegeEscalation: true
+                readOnlyRootFilesystem: false
+              readinessProbe:
+                failureThreshold: 3
+              volumeMounts:
+                - mountPath: /etc/grafana/provisioning/plugins
+                  name: app-provisioning
+          # Maybe *this* will fix the above comment's suggested error after all...? Let's tru!
+          securityContext:
+            fsGroup: 472
+            supplementalGroups:
+              - 0
+          volumes:
+            - configMap:
+                name: app-provisioning
+              name: app-provisioning
+            # The operator looks for this name keyword and volumeMounts to the "grafana" container automatically at /var/lib/grafana.
+            - name: grafana-data
+              persistentVolumeClaim:
+                # The operator automatically creates this pvc via the Grafana resource's `<metadata.name>-pvc` naming convention if the spec.persistentVolumeClaim definition exists.
+                claimName: grafana-pvc
+  client:
+    preferIngress: false
+  config:
+    auth.anonymous:
+      enabled: "false"
+    auth:
+      # disable_login_form: "true"
+      disable_login_form: "false"
+      # auto_login: "true"
+      disable_signout_menu: "false"
+      signout_redirect_url: https://auth.home.alden.ai/logout
+    auth.basic:
+      enabled: "true"
+    auth.proxy:
+      enabled: "true"
+      enable_login_token: "true"
+      # enable_login_token: "false"
+      header_property: "username"
+      header_name: "Remote-User"
+      auto_sign_up: "true"
+      headers: "Name:Remote-Name Groups:Remote-Groups Email:Remote-Email"
+    analytics:
+      reporting_enabled: "false"
+      enabled: "false"
+    live:
+      ha_engine: "redis"
+      ha_engine_address: "grafana-redis.grafana.svc.cluster.local:6379"
+    log:
+      mode: console
+    database:
+      type: postgres
+      name: grafana
+      log_queries: "false"
+    plugins:
+      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,pierosavi-imageit-panel,grafana-clock-panel"
+      preinstall: "redis-app,redis-datasource,grafana-pyroscope-app,grafana-lokiexplore-app"
+    tracing.opentelemetry.otlp:
+      address: "trace-collector.observability.svc.cluster.local:4317"
+    users:
+      # allow_sign_up: "True"
+      # allow_sign_up: "false"
+      auto_assign_org: "true"
+    security:
+      allow_embedding: "true"
+      allow_unsafe_plugins: "true"  # Bypass plugin signature check for all plugins
+      cookie_secure: "true"
+      strict_transport_security: "true"
+      angular_support_enabled: "true"
+    server:
+      domain: "grafana.home.alden.ai"
+      root_url: "https://grafana.home.alden.ai"
+    remote_cache:
+      type: "redis"
+      connstr: "addr=grafana-redis.grafana.svc.cluster.local:6379,pool_size=100,db=1,ssl=false"
+    feature_management:
+      allow_editing: "true"
+    feature_toggles:
+      enable: "traceToMetrics,alertingListViewV2,featureToggleAdminPage"
+    unified_alerting:
+      enabled: "true"
+      ha_redis_address: grafana-alerting-redis.grafana.svc.cluster.local:6379

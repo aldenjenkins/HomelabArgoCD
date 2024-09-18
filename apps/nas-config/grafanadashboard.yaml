@@ -1,0 +1,1794 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: nas-cadvisor
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 10m
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  folderRef: nas
+  url: https://grafana.com/api/dashboards/11600/revisions/1/download
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: zfs-utilization
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 10m
+  datasources:
+    - inputName: "DS_LXD-HOSTS"
+      datasourceName: "prometheus"
+  folderRef: zfs
+  json: |-
+    {
+      "__inputs": [
+        {
+          "name": "DS_LXD-HOSTS",
+          "label": "lxd-hosts",
+          "description": "",
+          "type": "datasource",
+          "pluginId": "prometheus",
+          "pluginName": "Prometheus"
+        }
+      ],
+      "__elements": {},
+      "__requires": [
+        {
+          "type": "panel",
+          "id": "gauge",
+          "name": "Gauge",
+          "version": ""
+        },
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "9.5.2"
+        },
+        {
+          "type": "panel",
+          "id": "piechart",
+          "name": "Pie chart",
+          "version": ""
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        },
+        {
+          "type": "panel",
+          "id": "stat",
+          "name": "Stat",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "timeseries",
+          "name": "Time series",
+          "version": ""
+        }
+      ],
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": true,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 15,
+          "panels": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "Space available on selected pools",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "links": [],
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "size"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "dark-red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "gridPos": {
+                "h": 11,
+                "w": 12,
+                "x": 0,
+                "y": 1
+              },
+              "id": 2,
+              "links": [],
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "pluginVersion": "8.4.6",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "exemplar": true,
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}",
+                  "interval": "",
+                  "legendFormat": "available",
+                  "range": true,
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "exemplar": true,
+                  "expr": "zfs_dataset_used_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "used",
+                  "range": true,
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "exemplar": true,
+                  "expr": "zfs_pool_size_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\"}",
+                  "hide": false,
+                  "interval": "",
+                  "legendFormat": "size",
+                  "range": true,
+                  "refId": "C"
+                }
+              ],
+              "title": "Capacity (zpool: default)",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "decimals": 0,
+                  "displayName": "$pool_name",
+                  "mappings": [],
+                  "max": 100,
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 80
+                      },
+                      {
+                        "color": "red",
+                        "value": 90
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 4,
+                "x": 12,
+                "y": 1
+              },
+              "id": 3,
+              "options": {
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showThresholdLabels": false,
+                "showThresholdMarkers": true
+              },
+              "pluginVersion": "9.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "exemplar": false,
+                  "expr": "((zfs_pool_allocated_bytes{instance=\"$instance:9134\",pool=\"$pool_name\"} * 100) / zfs_pool_size_bytes{instance=\"$instance:9134\",job=\"nas\", pool=\"$pool_name\"})",
+                  "instant": true,
+                  "interval": "",
+                  "legendFormat": "{{pool}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "Allocated disk in pool",
+              "type": "gauge"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "This shows a total summary of all datasets used disk space on a specific host and pool.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 4,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 7,
+                "w": 8,
+                "x": 16,
+                "y": 1
+              },
+              "id": 5,
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "timezone": [
+                  "Europe/Stockholm"
+                ],
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "zfs_dataset_used_bytes{instance=\"$instance:9134\", pool=\"$pool_name\"}",
+                  "legendFormat": "{{name}}",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "Total Dataset disk usage at $instance in $pool_name pool",
+              "type": "timeseries"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "[ONLINE]\n    The device or virtual device is in normal working order. Although some transient errors might still occur, the device is otherwise in working order.\n\n[DEGRADED]\n    The virtual device has experienced a failure but can still function. This state is most common when a mirror or RAID-Z device has lost one or more constituent devices. The fault tolerance of the pool might be compromised, as a subsequent fault in another device might be unrecoverable.\n\n[FAULTED]\n    The device or virtual device is completely inaccessible. This status typically indicates total failure of the device, such that ZFS is incapable of sending data to it or receiving data from it. If a top-level virtual device is in this state, then the pool is completely inaccessible.\n\n[OFFLINE]\n    The device has been explicitly taken offline by the administrator.\n\n[UNAVAIL]\n    The device or virtual device cannot be opened. In some cases, pools with UNAVAIL devices appear in DEGRADED mode. If a top-level virtual device is UNAVAIL, then nothing in the pool can be accessed.\n\n[REMOVED]\n    The device was physically removed while the system was running. Device removal detection is hardware-dependent and might not be supported on all platforms.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "index": 0,
+                          "text": "ONLINE"
+                        },
+                        "1": {
+                          "color": "red",
+                          "index": 1,
+                          "text": "DEGRADED"
+                        },
+                        "2": {
+                          "color": "red",
+                          "index": 2,
+                          "text": "FAULTED"
+                        },
+                        "3": {
+                          "color": "red",
+                          "index": 3,
+                          "text": "OFFLINE"
+                        },
+                        "4": {
+                          "color": "red",
+                          "index": 4,
+                          "text": "UNAVAIL"
+                        },
+                        "5": {
+                          "color": "red",
+                          "index": 5,
+                          "text": "REMOVED"
+                        },
+                        "6": {
+                          "color": "red",
+                          "index": 6,
+                          "text": "SUSPENDED"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 1
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 12,
+                "y": 5
+              },
+              "id": 4,
+              "links": [],
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "text": {
+                  "valueSize": 24
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "9.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "exemplar": false,
+                  "expr": "zfs_pool_health{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\"}",
+                  "instant": true,
+                  "interval": "",
+                  "legendFormat": "pool: {{pool}}",
+                  "refId": "A"
+                }
+              ],
+              "title": "zfs_pool_health",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "dark-red",
+                        "value": null
+                      },
+                      {
+                        "color": "dark-green",
+                        "value": 60
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 4,
+                "w": 12,
+                "x": 12,
+                "y": 8
+              },
+              "id": 14,
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "textMode": "auto"
+              },
+              "pluginVersion": "9.5.2",
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0)",
+                  "legendFormat": "100%",
+                  "range": true,
+                  "refId": "A"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.95",
+                  "hide": false,
+                  "legendFormat": "95%",
+                  "range": true,
+                  "refId": "B"
+                },
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.9",
+                  "hide": false,
+                  "legendFormat": "90%",
+                  "range": true,
+                  "refId": "C"
+                }
+              ],
+              "title": "Days until fillup percentage",
+              "type": "stat"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "This shows memory used delta of all datasets over the past 2h on all hosts and $pool_name pool.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  "mappings": [],
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 16,
+                "w": 12,
+                "x": 0,
+                "y": 12
+              },
+              "id": 13,
+              "options": {
+                "displayLabels": [
+                  "percent"
+                ],
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true,
+                  "values": [
+                    "percent",
+                    "value"
+                  ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "topk(10, delta(zfs_dataset_used_bytes{name=~\"$pool_name/.*\", pool=\"$pool_name\"}[2h]))",
+                  "legendFormat": "{{name}}",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "TOP 10 Datasets used delta the past 2h",
+              "transformations": [
+                {
+                  "id": "renameByRegex",
+                  "options": {
+                    "regex": ".*\\/(.*)",
+                    "renamePattern": "$1"
+                  }
+                }
+              ],
+              "type": "piechart"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "This shows the top 5 container with the highest write rate in past 4 hours on all hosts and $pool_name pool.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "pattern": ".*\\/(.*)",
+                        "result": {
+                          "index": 0,
+                          "text": "$1"
+                        }
+                      },
+                      "type": "regex"
+                    }
+                  ],
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 12
+              },
+              "id": 11,
+              "options": {
+                "displayLabels": [
+                  "percent"
+                ],
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true,
+                  "sortBy": "Value",
+                  "sortDesc": true,
+                  "values": [
+                    "percent",
+                    "value"
+                  ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "topk(5, rate(zfs_dataset_written_bytes{name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[4h]))",
+                  "interval": "",
+                  "legendFormat": "{{name}}",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "TOP 5 Datasets with the highest write rate last 4h",
+              "transformations": [
+                {
+                  "id": "renameByRegex",
+                  "options": {
+                    "regex": ".*\\/(.*)",
+                    "renamePattern": "$1"
+                  }
+                }
+              ],
+              "type": "piechart"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "description": "This shows the top 5 datasets with the most used data rate in past 24 hours on all hosts and $pool_name pool.",
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  "mappings": [],
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 20
+              },
+              "id": 12,
+              "options": {
+                "displayLabels": [
+                  "percent"
+                ],
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true,
+                  "values": [
+                    "percent",
+                    "value"
+                  ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "targets": [
+                {
+                  "datasource": {
+                    "type": "prometheus",
+                    "uid": "${DS_LXD-HOSTS}"
+                  },
+                  "editorMode": "code",
+                  "expr": "topk(5, rate(zfs_dataset_used_bytes{name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[24h]))",
+                  "legendFormat": "{{name}}",
+                  "range": true,
+                  "refId": "A"
+                }
+              ],
+              "title": "TOP 5 Datasets with most used disk rate last 24h",
+              "transformations": [
+                {
+                  "id": "renameByRegex",
+                  "options": {
+                    "regex": ".*\\/(.*)",
+                    "renamePattern": "$1"
+                  }
+                }
+              ],
+              "type": "piechart"
+            }
+          ],
+          "title": "Overview",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 6,
+          "panels": [],
+          "title": "ZFS Datasets on $hostname that use $pool_name pool",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "This shows the top 10 datasets with the most used disk on $hostname and pool $pool_name.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 2
+          },
+          "id": 21,
+          "options": {
+            "displayLabels": [
+              "percent"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent",
+                "value"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "topk(10, zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"})",
+              "legendFormat": "{{name}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "TOP 10 containers with most used disk on $hostname",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\/(.*)",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "This shows the delta of used memory by all datasets over the past 2h on a specific host and pool.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 17,
+            "w": 12,
+            "x": 12,
+            "y": 2
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "delta(zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\"}[2h])",
+              "legendFormat": "{{name}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Datasets used delta the past 2h",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\/(.*)",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "This shows the top 5 datasets with the highest write rate in past 4 hours on a specific host and pool.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "pattern": ".*\\/(.*)",
+                    "result": {
+                      "index": 0,
+                      "text": "$1"
+                    }
+                  },
+                  "type": "regex"
+                }
+              ],
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 11
+          },
+          "id": 7,
+          "options": {
+            "displayLabels": [
+              "percent"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent",
+                "value"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "topk(5, rate(zfs_dataset_written_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[4h]))",
+              "interval": "",
+              "legendFormat": "{{name}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "TOP 5 with the highest write rate last 4h",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\/(.*)",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "This shows the top 5 datasets with the most used data rate in past 24 hours on a specific host and pool.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 19
+          },
+          "id": 8,
+          "options": {
+            "displayLabels": [
+              "percent"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent",
+                "value"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "topk(5, rate(zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[24h]))",
+              "legendFormat": "{{name}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "TOP 5 with most used disk rate last 24h",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\/(.*)",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 27
+          },
+          "id": 10,
+          "panels": [],
+          "title": "Disk usage statistics of $hostname",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Latency read (-) / write (+)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/.*Read.*/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.transform",
+                    "value": "negative-Y"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 12,
+            "x": 0,
+            "y": 28
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_disk_read_time_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])/irate(node_disk_reads_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m]) * 100",
+              "legendFormat": "{{device}} sec-per-Read-completed",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_disk_write_time_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])/irate(node_disk_writes_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m]) * 100",
+              "hide": false,
+              "legendFormat": "{{device}} sec-per-Write-completed",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Disk Latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 28
+          },
+          "id": 20,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.5.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "node_zfs_arc_size{instance=\"$instance:9100\", job=\"nas\"}",
+              "hide": false,
+              "legendFormat": "ARC Free",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "ARC size",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Sec Waiting (-) / Running (+)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/.*waiting.*/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.transform",
+                    "value": "negative-Y"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 12,
+            "x": 12,
+            "y": 32
+          },
+          "id": 19,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_schedstat_running_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "legendFormat": "CPU {{cpu}} - seconds spent by this CPU running a process",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_schedstat_waiting_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "hide": false,
+              "legendFormat": "CPU {{ cpu }} - seconds spent by processing waiting for this CPU",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Process schedule stats Running / Waiting",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_LXD-HOSTS}"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "IO read (-) / write (+)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "iops"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/.*Read.*/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.transform",
+                    "value": "negative-Y"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 38
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "min",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_disk_reads_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "legendFormat": "{{device}}-Reads Completed",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_LXD-HOSTS}"
+              },
+              "editorMode": "code",
+              "expr": "irate(node_disk_writes_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "hide": false,
+              "legendFormat": "{{device}}-writes Completed",
+              "range": true,
+              "refId": "B"
+            }
+          ],
+          "title": "Disk IOps Completed",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_LXD-HOSTS}"
+            },
+            "definition": "label_values(node_uname_info{nodename=\"$hostname\"},instance)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Instance",
+            "multi": false,
+            "name": "instance",
+            "options": [],
+            "query": {
+              "query": "label_values(node_uname_info{nodename=\"$hostname\"},instance)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "/(.+):\\d+$/",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_LXD-HOSTS}"
+            },
+            "definition": "label_values(pool)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Pool",
+            "multi": false,
+            "name": "pool_name",
+            "options": [],
+            "query": {
+              "query": "label_values(pool)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_LXD-HOSTS}"
+            },
+            "definition": "label_values(nodename)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Hostname",
+            "multi": false,
+            "name": "hostname",
+            "options": [],
+            "query": {
+              "query": "label_values(nodename)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-12h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "America/Chicago",
+      "title": "ZFS Utilization 2",
+      "uid": "ce763eb8-e547-4822-9ec6-c745edccfe8b",
+      "version": 13,
+      "weekStart": ""
+    }

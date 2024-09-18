@@ -1,0 +1,11 @@
+namespace: node-exporter
+resources:
+  - namespace.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - daemonset.yaml
+  - networkpolicy.yaml
+  - prometheusrule.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml

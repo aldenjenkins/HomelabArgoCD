@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  labels:
+    app: nats-jetstream
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-client
+      port: 4222
+      protocol: TCP
+      targetPort: tcp-client
+    - name: ws-client
+      port: 8080
+      protocol: TCP
+      targetPort: ws-client
+    - name: metrics
+      port: 7777
+      targetPort: 7777
+    - name: gateways
+      port: 7522
+    - name: leafnodes
+      port: 7422
+    - name: cluster
+      port: 6222
+  selector:
+    app: nats-jetstream
+  sessionAffinity: None

@@ -1,0 +1,126 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: kubernetes-events
+spec:
+  replicas: 1
+  mode: deployment
+  resources:
+    limits:
+      cpu: "1"
+      memory: 750Gi
+    requests:
+      cpu: "200m"
+      memory: 250Mi
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+  serviceAccount: otel-collector
+  image: otel/opentelemetry-collector-contrib:latest
+  imagePullPolicy: IfNotPresent
+  config:
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      # Exporter for sending Prometheus data to Mimir.
+      otlphttp/loki:
+        compression: gzip
+        endpoint: http://loki-gateway.loki/otlp
+        tls:
+          insecure: true
+
+    extensions:
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
+      pprof: {}
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 5s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+      resource/extra_structured_metadata:
+        attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: homelab-live
+          - action: upsert
+            key: service.name
+            value: kubernetes-events
+          - action: upsert
+            key: category
+            value: kubernetes_event
+          - action: upsert
+            key: job
+            value: "integrations/kubernetes/eventhandler"
+      # transform/add_homelab_attributes:
+      #   log_statements:
+      #     - context: log
+      #       statements:
+      #         - set(resource.attributes["category"], "kubernetes_event")
+      #         - set(resource.attributes["job"], "integrations/kubernetes/eventhandler")
+      # attributes/add-loki-labels:
+      #   actions:
+      #     - key: loki.attribute.labels
+      #       action: insert
+      #       value: "job"
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      k8s_events:
+        auth_type: serviceAccount
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+
+      # A pipeline can exist for each of the signals received.
+      pipelines:
+        logs/events:
+          exporters:
+            - otlphttp/loki
+          processors:
+            - resource/extra_structured_metadata
+            - batch
+          receivers:
+            - k8s_events
+
+      extensions:
+        - health_check
+        - pprof
+        - zpages
+
+      telemetry:
+        logs:
+          encoding: json
+          level: info
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true

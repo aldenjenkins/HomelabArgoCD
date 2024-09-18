@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: minio
+spec:
+  allowCrossNamespaceImport: true
+  uid: minio-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

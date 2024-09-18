@@ -1,0 +1,67 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+    name: minio-web
+    labels:
+        kubernetes.io/service-name: minio-web
+addressType: ENC[AES256_GCM,data:dJQp+w==,iv:ucUSgRv2ZBe8QBhvjxwVu9gqlcTHS7npt1y2OClFQ8A=,tag:d35Zu1E96FBAYj0sBrA8jA==,type:str]
+ports:
+    - name: ENC[AES256_GCM,data:450z,iv:QwR7GU/lJIzZzUK9qhSqqtFURQO0GAmGbqVHILd5qQ8=,tag:7gadNCte+hYJ7lWfLZVM0g==,type:str]
+      protocol: ENC[AES256_GCM,data:e85i,iv:bpvFAPeKZXhHALTUroVODUZaMwsrgnKQZfnHgv5wtWc=,tag:Ha9Lo8mTG7hCyN9yKq01KA==,type:str]
+      port: ENC[AES256_GCM,data:PkYNoA==,iv:4Dzsd4UVS89fzCEXPYeUsR1IVQjHaJczUfkg1QbiJPg=,tag:W9/U24FPoe221eurGZDmyw==,type:int]
+endpoints:
+    - addresses:
+        - ENC[AES256_GCM,data:QZDA9liOVKffigidI6zw,iv:4l+l/CEdljlv02RWx1mgmkYZh2i765g/vOKoc71QZKk=,tag:TeEaGneQDWs0xSUpMPcFmg==,type:str]
+      conditions:
+        ready: ENC[AES256_GCM,data:Fb9WJQ==,iv:uPiEFuBaWQAv1+0QiZv7i2cqOhsvXVdBfNU+vhiQegg=,tag:Feomf7UrMAkCNxQYuXCKXg==,type:bool]
+        serving: ENC[AES256_GCM,data:SOPQ0Q==,iv:0Y0ocZ2zmnX5SsmHqKbqsrvC7A75jFNXvxX+wm7uoP0=,tag:juGVYyQVtfT/77vEyU+fBg==,type:bool]
+        terminating: ENC[AES256_GCM,data:2HBNNro=,iv:GbjSjKIXoGX1b2tRtVYJS0eSy2xk8Tbj/CMIJuFyhJc=,tag:rjpSGIdvZgjyp5ACWP/fhQ==,type:bool]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCVHhRcmJySXVta1E1Tjh5
+            SXMrUFRubFpFTUZwL2FWV0ljYzJ1NmRWTzJNCjhPQzFNUnc4dHVINllTU09pV0Iz
+            UStYMHlmYlBTQldRQXFlOWhiVkRTZ00KLS0tIGd2YU5hRjFxYW1rQkVZVlFWNXM2
+            VEliWVBvTndVZGtlWlFaUG9kS2VZWncKIj8FkJ9gomTLABxKIR6smuO5PN43280t
+            OudY80Tz+IR3pEYB2+yEz/7xf+A6hh6T3hqzDIiFWceXuYlp1A3Mtw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-02T19:39:11Z"
+    mac: ENC[AES256_GCM,data:VmqtZMbs8Qe30KMKjTo8wQNp9gwYM+uwq+cIFSYaLdljOjztNY8bbgJNvbplgOyVppTLBvzavq/NdwPVUlvVvbYHk0GDR6KfI5VD+OjDGrwYQjC763Ns9RgdWVnBaWJ/W2IRdBxEubc50QJ5TpzDpoWLetpgx64R/vediYIQMrc=,iv:rvl5fkLeGaP+27BUTCV6Z3cxm4ghZpZHzzUiKNdB8IM=,tag:C7Rt5TX7wZRpWkcy9sdpDA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+    name: minio-api
+    labels:
+        kubernetes.io/service-name: minio-api
+addressType: ENC[AES256_GCM,data:gTFzoA==,iv:FNCVfGPdCKy8Kp26JIZQSG1DfN2awE4gC2CSkU/ISXc=,tag:lRlCBKh52GZIEkrQXUHpkg==,type:str]
+ports:
+    - name: ENC[AES256_GCM,data:rSVx,iv:k2qDRI7qQiYO4+LJ0/k9qR0FS80khILgJ7KeAlR6Tn0=,tag:jKav+87eHogApd/W27I3Lg==,type:str]
+      protocol: ENC[AES256_GCM,data:mK0s,iv:f46tBD5jT1+Sa7chH4mfT/f3FJpoiCVpuZWcY0ld5r4=,tag:cLE8hmvfIiAWvo5s7SPmTQ==,type:str]
+      port: ENC[AES256_GCM,data:FwyUfg==,iv:9ebxYPbStbgWKcqf7eXLYeY+KYWbwqMR6HphS6piX5w=,tag:EET+Fg2cDSBGfZZMCvL0gA==,type:int]
+endpoints:
+    - addresses:
+        - ENC[AES256_GCM,data:zg6+Gc+GmsDyeoYH6+u7,iv:5lcHznVK7lJmA/mCRO5c8PcDLQoMIJ2m/y0e+oY0h5A=,tag:T0JHIuC+ANnQjP6A30qByg==,type:str]
+      conditions:
+        ready: ENC[AES256_GCM,data:FmYu9g==,iv:Z0LS++Fi05igU4ps0L/OramnNhuMbpQZhzCXC6d08yE=,tag:lYkNJiZzE/lqvClXb9Ns4A==,type:bool]
+        serving: ENC[AES256_GCM,data:zFl4PA==,iv:XqHdE+oxN0SbPU/p9/CqTmQo1L7ySDUFvDwZpR+CD+I=,tag:wcpK/Ph2KXxw992JsKCusw==,type:bool]
+        terminating: ENC[AES256_GCM,data:e78oaA8=,iv:RvU2cp3RfhFTvLlyUOSdqA11w4CHKH9ixVN0Kp+S1Lo=,tag:tpu8Cyh6hj3c1G2XWqP20A==,type:bool]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCVHhRcmJySXVta1E1Tjh5
+            SXMrUFRubFpFTUZwL2FWV0ljYzJ1NmRWTzJNCjhPQzFNUnc4dHVINllTU09pV0Iz
+            UStYMHlmYlBTQldRQXFlOWhiVkRTZ00KLS0tIGd2YU5hRjFxYW1rQkVZVlFWNXM2
+            VEliWVBvTndVZGtlWlFaUG9kS2VZWncKIj8FkJ9gomTLABxKIR6smuO5PN43280t
+            OudY80Tz+IR3pEYB2+yEz/7xf+A6hh6T3hqzDIiFWceXuYlp1A3Mtw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-02T19:39:11Z"
+    mac: ENC[AES256_GCM,data:VmqtZMbs8Qe30KMKjTo8wQNp9gwYM+uwq+cIFSYaLdljOjztNY8bbgJNvbplgOyVppTLBvzavq/NdwPVUlvVvbYHk0GDR6KfI5VD+OjDGrwYQjC763Ns9RgdWVnBaWJ/W2IRdBxEubc50QJ5TpzDpoWLetpgx64R/vediYIQMrc=,iv:rvl5fkLeGaP+27BUTCV6Z3cxm4ghZpZHzzUiKNdB8IM=,tag:C7Rt5TX7wZRpWkcy9sdpDA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

@@ -1,0 +1,7 @@
+namespace: excalidraw
+resources:
+  - namespace.yaml
+  - virtualservice.yaml
+  - service.yaml
+  - deployment.yaml
+  - authorizationpolicy.yaml

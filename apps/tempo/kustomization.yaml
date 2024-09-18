@@ -1,0 +1,14 @@
+namespace: tempo
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - deployment.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - redis.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

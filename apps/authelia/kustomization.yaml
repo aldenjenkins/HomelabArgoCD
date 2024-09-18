@@ -1,0 +1,13 @@
+namespace: authelia
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - redis.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - servicemonitor.yaml
+  - grafanadatasource.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+generators:
+  - sopsgenerator.yaml

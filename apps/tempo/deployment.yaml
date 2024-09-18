@@ -1,0 +1,96 @@
+# Source: tempo/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "2.8.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+      app.kubernetes.io/instance: tempo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tempo
+        app.kubernetes.io/instance: tempo
+    spec:
+      serviceAccountName: tempo
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - -config.file=/conf/tempo.yaml
+            - -mem-ballast-size-mbs=1024
+          image: grafana/tempo:latest
+          imagePullPolicy: Always
+          name: tempo
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tempo-s3-credentials
+                  key: access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tempo-s3-credentials
+                  key: secret-key
+          ports:
+            - containerPort: 3100
+              name: prom-metrics
+            - containerPort: 6831
+              name: jaeger-thrift-c
+              protocol: UDP
+            - containerPort: 6832
+              name: jaeger-thrift-b
+              protocol: UDP
+            - containerPort: 14268
+              name: jaeger-thrift-h
+            - containerPort: 14250
+              name: jaeger-grpc
+            - containerPort: 9411
+              name: zipkin
+            - containerPort: 55680
+              name: otlp-legacy
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 55681
+              name: otlp-httplegacy
+            - containerPort: 4318
+              name: otlp-http
+            - containerPort: 55678
+              name: opencensus
+          resources: {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-conf
+        - args:
+            - -config=/conf/tempo-query.yaml
+          image: grafana/tempo-query:latest
+          imagePullPolicy: Always
+          name: tempo-query
+          ports:
+            - containerPort: 16686
+              name: jaeger-ui
+            - containerPort: 16687
+              name: jaeger-metrics
+          resources: {}
+          volumeMounts:
+            - mountPath: /conf
+              name: tempo-query-conf
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      volumes:
+        - configMap:
+            name: tempo-query
+          name: tempo-query-conf
+        - configMap:
+            name: tempo
+          name: tempo-conf

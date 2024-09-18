@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: nats
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/part-of: kube-prometheus
+  name: nats
+spec:
+  endpoints:
+    - interval: 15s
+      port: metrics
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+  selector:
+    matchLabels:
+      app: nats-jetstream

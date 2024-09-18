@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: prometheus-data
+    labels:
+        name: prometheus-data
+spec:
+    capacity:
+        storage: ENC[AES256_GCM,data:olYA,iv:e1+0i4JgkY/RoKWnPN3gU1MAEfqP/zwWAMY/sA0uYZk=,tag:btXfwxro4h55EEZRu6aOQg==,type:str]
+    #ENC[AES256_GCM,data:mzqfNHGATByNdTPydw==,iv:/5W1hhDoggdJr4EoInmX6Oyg6da+qwgSQddTdaHndCA=,tag:T0PNm3N1zZdtBcdzFkNnEQ==,type:comment]
+    storageClassName: ENC[AES256_GCM,data:2tUETLeje3z5Mw==,iv:xLujafbL4gr95XW+fh63DER+tPGW5TNQyhy+Dm9q2YU=,tag:TGRGmHi9eEY6R7p75c61Wg==,type:str]
+    accessModes:
+        - ENC[AES256_GCM,data:1vwBuQywcJzaMWZpVw==,iv:FHBeBiafGQSuWjEnhqbHs0J3w7UhSKpPlXtTDu0rN1I=,tag:jGCNxU6iU8fcxCsMqao/WA==,type:str]
+    nfs:
+        server: ENC[AES256_GCM,data:Mm1tlR5HudtR8RK9JrZG,iv:U16REPQ6A9WrZ4wc2c5qXP8NjsiVUkiMyhMGdeE9ozE=,tag:2ga/c8FrR02ByGzIPY9S9A==,type:str]
+        path: ENC[AES256_GCM,data:fr+cJRuBvLK01NhyG4qzf0QMeKb5iXsuZ0XAFoRL4cgyqF2f1iadjVxGT26NErHZwhpP,iv:c9JvTopBUEBCUSvgotM3XM/lJIno3fU/68r0Ko9VQuE=,tag:qcAF7LnaWIuHm+xsq0dUkA==,type:str]
+    mountOptions:
+        - ENC[AES256_GCM,data:LEFVEN1T17QY1xg=,iv:QsNU1bvLHFhbGiw1Ztg8kto+FN+XdZKyt6GF8FDnkQY=,tag:YMyT4JhGPFPsQ3NibSl33A==,type:str]
+    persistentVolumeReclaimPolicy: ENC[AES256_GCM,data:4p4C3hnV,iv:gVTsyZbpEUqgj8leDv/tdtz57iIo5cXooMjUAA5i9+E=,tag:aG7r5Lnxw7/7nRT8pSSHdQ==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5MlJWeW9TYnB4bHN4L3Vi
+            THdWc2RZa1J0M21XZCtFRWMrOS9RZys1SVRZCmJpRjgrSkw5bVZMWjZUL1BQeE4r
+            cjV6bWVCcThxQnVnK3oyTm1adis0UmcKLS0tIG5Wbm9XTy9URW5NY0dxNTFya2pm
+            MVRpakNMREpQa3UrKzBWZm9OQ1lPMjgKH6YCKGAiK4zj6S2GVTgrHZK8GQ52qEjy
+            fuWp3KX5vZn8hDid9nwIbMOMEoaG82nqculkz6dP9fYDfEPEhs5bCw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T00:36:18Z"
+    mac: ENC[AES256_GCM,data:rkg5dCU3RbTKzMgB4zh3jbeuDq+nyXhA3V42LDJxVhCWVot28ll1wqOdFYbnhWm2z4KSzPLgHLO4KirOYuPSYpciPQd1Cp/N+snr1OGDO3w0wksJS6ck2l1wmSS37VnkQDKcc7J8ErpqszXUU4XAWZhwEp8FINonJj9T0RY4XnI=,iv:8Ad5mSMnelNMQL0qDjeZFw4WmJs1zmrGfkXeiPE+1EQ=,tag:R2hVHI0mK4FN4EtbNjZYUw==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

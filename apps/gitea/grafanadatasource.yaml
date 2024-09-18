@@ -1,0 +1,23 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: gitea-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: gitea-redis
+    type: redis-datasource
+    url: redis://gitea-standalone.gitea.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: 2.2.0

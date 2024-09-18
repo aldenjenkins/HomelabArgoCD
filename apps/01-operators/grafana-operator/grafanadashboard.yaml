@@ -1,0 +1,15 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-operator
+  namespace: grafana
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  resyncPeriod: 30s
+  folderRef: grafana
+  datasources:
+    - inputName: DS_PROMETHEUS
+      datasourceName: prometheus
+  url: https://grafana.com/api/dashboards/22785/revisions/2/download 

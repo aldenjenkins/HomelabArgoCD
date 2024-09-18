@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pyroscope
+spec:
+  selector:
+    matchLabels:
+      app: pyroscope
+  endpoints:
+    - path: /metrics
+      port: http
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster

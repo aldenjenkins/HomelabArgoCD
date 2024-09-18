@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: loki-results-cache-monitor
+  labels:
+    podMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: "memcached-results-cache"
+  podMetricsEndpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  attachMetadata:
+    node: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: loki-chunks-cache-monitor
+  labels:
+    podMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: "memcached-chunks-cache"
+  podMetricsEndpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  attachMetadata:
+    node: true

@@ -1,0 +1,350 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: trace
+spec:
+  autoscaler:
+    maxReplicas: 3
+    minReplicas: 1
+    targetCPUUtilization: 75
+    targetMemoryUtilization: 90
+  mode: deployment
+  image: otel/opentelemetry-collector-contrib:latest
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+  resources:
+    limits:
+      cpu: "2"
+      memory: 1.5Gi
+    requests:
+      cpu: "1"
+      memory: 512Mi
+  serviceAccount: otel-collector
+  config:
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#connectors
+    connectors:
+      # The spanmetrics connector is used to output span metrics based on received trace spans.
+      spanmetrics:
+
+        namespace: traces.spanmetrics  # Prefix all metrics with `traces.spanmetrics` (this becomes `traces_spanmetrics`) because by default it's traces.span_metrics
+
+        histogram:
+          explicit:
+            buckets: [100us, 1ms, 5ms, 10ms, 20ms, 50ms, 100ms, 200ms,500ms, 1s, 2s, 5s, 10s, 15s]
+        # Defines additional label dimensions of the metrics from trace span attributes present.
+        dimensions:
+          - name: telemetry.sdk.language
+          - name: service.namespace
+          - name: k8s.cluster.name
+          - name: http.method
+            default: GET
+          - name: http.target
+          - name: http.status_code
+          - name: service.version
+
+        # Ensure exemplars are enabled and sent to the metrics store.
+        exemplars:
+          enabled: true
+        # dimensions_cache_size: 1000
+        aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"
+        # Explicitly flush metrics every 30 seconds. Note, this will double active series count for the `trace.spanmetrics`
+        # metric namespace.
+        metrics_flush_interval: 30s
+        metrics_expiration: 5m
+        # exclude_dimensions: ['status.code']
+        # events:
+        #   enabled: true
+        #   dimensions:
+        #     - name: exception.type
+        #     - name: exception.message
+        events:
+          enabled: false
+          # enabled: true
+        resource_metrics_key_attributes:
+          - service.name
+          - telemetry.sdk.language
+          - telemetry.sdk.name
+
+      # The servicegraph connector is used to output service node metrics based on received trace spans.
+      servicegraph:
+        # # Explicitly flush metrics every 60 seconds. Note, this will double active series count for the
+        # # `trace.servicegraph` metric namespace.
+        # metrics_flush_interval: 60s
+        # # Defines which exporter the processor will write metrics to.
+        # metrics_exporter: prometheusremotewrite
+        # dimensions:
+        #   - http.method
+        # latency_histogram_buckets:
+        #   - 1
+        #   - 2
+        #   - 3
+        #   - 4
+        #   - 5
+        # Defines additional label dimensions of the metrics from trace span attributes present.
+        store:  # Configuration for the in-memory store.
+          ttl: 2s  # Time to wait for an edge to be completed.
+          max_items: 200  # Number of edges that will be stored in the storeMap.
+        cache_loop: 2m  # The timeout used to clean the cache periodically.
+        store_expiration_loop: 10s  # The timeout used to expire old entries from the store periodically.
+        # Virtual node peer attributes allow server nodes to be generated where instrumentation isn't present (eg. where
+        # service client calls remotely to a service that does not include instrumentation).
+        # Service nodes/edges will be generated for any attribute defined.
+        virtual_node_peer_attributes:
+          - db.name
+
+      # exceptions:
+      #   dimensions:
+      #     - name: exception.type
+      #     - name: exception.message
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 5s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+      # Memory limiter to prevent OOM
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 20
+
+      probabilistic_sampler:
+        sampling_percentage: 1
+
+      resourcedetection:
+        detectors: [env, system]
+        timeout: 5s
+        override: false
+        attributes:
+          - k8s.cluster.name
+          - k8s.node.name
+
+      groupbyattrs:
+        keys:
+          - k8s_pod_name
+          - k8s_namespace_name
+          - k8s.pod.ip
+
+      k8sattributes:
+        auth_type: "serviceAccount"
+        passthrough: false
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 30s
+        # filter:
+          # node_from_env_var: KUBE_NODE_NAME
+        pod_association:
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.ip' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.ip
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.uid' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.uid
+          - sources:
+              # - from: resource_attribute
+                # name: k8s.node.name
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.cluster.name
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              # This rule will use the IP from the incoming connection from which the resource is received,
+              # and find the matching pod, based on the 'pod.status.podIP' of the observed pods
+              - from: connection
+        extract:
+          # The attributes provided in 'metadata' will be added to associated resources
+          metadata:  # extracted from the pod
+            - k8s.cronjob.name
+            - k8s.daemonset.name
+            - k8s.deployment.name
+            - k8s.job.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+            - k8s.statefulset.name
+            - service.name
+            - service.namespace
+        #   #labels:
+        #   # # This label extraction rule takes the value 'app.kubernetes.io/component' label and maps it to the 'app.label.component' attribute which will be added to the associated resources
+        #   # - tag_name: app.label.component
+        #   #   key: app.kubernetes.io/component
+        #   #   from: pod
+        #   labels:
+        #     - tag_name: app.label.component
+        #       key: app.kubernetes.io/component
+        #       from: pod
+        #     - tag_name: app.label.name
+        #       key: app.kubernetes.io/name
+        #       from: pod
+        #     - tag_name: app  # extracts value of label from pods with key `app` and inserts it as a tag with key `app`
+        #       key: app
+        #       from: pod
+        #
+
+      transform/set_match_resource_attributes:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"])
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
+
+      # The transform processor is used to rename the span metrics to match the Tempo naming convention.
+      transform/span_metrics:
+        # Only operate on metric statements.
+        metric_statements:
+          # Operate on the metric data.
+          - context: metric
+            statements:
+              # Rename the `traces.spanmetrics.duration` metric to `traces.spanmetrics.latency`.
+              - set(metric.name, "traces.spanmetrics.latency") where metric.name == "traces.spanmetrics.duration"
+              # Rename the `traces.spanmetrics.calls` metric to `traces.spanmetrics.calls.total` to pre-suffix name.
+              - set(metric.name, "traces.spanmetrics.calls.total") where metric.name == "traces.spanmetrics.calls"
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      # Configure receiving OTLP data via gRPC on port 4317 and HTTP on port 4318.
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+            keepalive:
+              server_parameters:
+                max_connection_age: 5s
+                max_connection_age_grace: 5s
+          http:
+            endpoint: 0.0.0.0:4318
+
+
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      otlp/cluster-local-metrics:
+        endpoint: http://otlp-collector.observability.svc.cluster.local:4317
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 30s
+        tls:
+          insecure: true
+
+      # Exporter for sending trace data to Tempo.
+      otlp/tempo:
+        endpoint: tempo.tempo.svc.cluster.local:4317
+        tls:
+          insecure: true
+        # sending_queue:
+        #   enabled: true
+        retry_on_failure:
+          enabled: false
+          max_elapsed_time: 30s
+
+    extensions:
+      pprof: {}
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+
+      # A pipeline can exist for each of the signals received.
+      pipelines:
+        # Define the trace pipeline.
+        traces/spanmetrics:
+          # Receive from the `otlp` receiver.
+          receivers:
+            - otlp
+          processors:
+            - batch
+          # Generate span metrics from within the OpenTelemetry Collector as well as exporting traces to Tempo.
+          exporters:
+            - spanmetrics
+            - servicegraph
+
+        traces/tempo:
+          receivers:
+            - otlp
+          processors:
+            - memory_limiter
+            - groupbyattrs
+            - k8sattributes
+            - probabilistic_sampler
+            - batch
+          exporters:
+            - otlp/tempo
+
+        # Define the metrics pipeline.
+        # metrics:
+        #   # Receive metrics from the `prometheus` receiver.
+        #   receivers: [otlp/internal_metrics]
+        #   processors: [resourcedetection, batch]
+        #   exporters: [prometheus]
+
+        # Define the metrics pipeline.
+        # metrics/spanmetrics:
+        metrics:
+          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, servicegraph, exceptions]
+          receivers: [spanmetrics, servicegraph]
+          # Use the `batch` processor to process received metrics, use the transform metric to ensure that spanmetric
+          # metrics are in the correct format for Grafana Cloud (doesn't take effect unless receivers above are used.)
+          processors: [transform/span_metrics, batch]
+          # Export to the `prometheusremtotewrite` exporter.
+          exporters: [otlp/cluster-local-metrics]
+
+      extensions:
+        - zpages
+        - health_check
+
+      telemetry:
+        logs:
+          encoding: json
+        # Push collector internal metrics to Prometheus
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true
+        # metrics:
+        #   level: detailed
+        #   readers:
+        #     - periodic:
+        #         interval: 10000
+        #         exporter:
+        #           otlp:
+        #             protocol: grpc
+        #             endpoint: localhost:14317
+        #             insecure: true
+
+

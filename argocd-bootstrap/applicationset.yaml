@@ -1,0 +1,135 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: 'git@github.com:aldenjenkins/HomelabArgoCD.git'
+        revision: HEAD
+        directories:
+          - path: 'apps/*'
+  template:
+    metadata:
+      name: '{{.path.basename}}'
+      annotations:
+        notifications.argoproj.io/subscribe.on-sync-succeeded.slack: "alertmanager"
+    spec:
+      project: default
+      source:
+        repoURL: 'git@github.com:aldenjenkins/HomelabArgoCD.git'
+        targetRevision: HEAD
+        # Path will be replaced for each subdirectory, e.g. 'apps/app1', 'apps/app2', etc.
+        path: 'apps/{{.path.basename}}'
+      destination:
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+      ignoreDifferences:
+        - group: apiextensions.k8s.io
+          kind: CustomResourceDefinition
+          name: bgppeers.metallb.io
+          jsonPointers:
+            - /spec/conversion/webhook/clientConfig/caBundle
+        - group: ""
+          kind: Namespace
+          name: knative-eventing
+          jsonPointers:
+            - /metadata/labels
+        - group: ""
+          kind: Namespace
+          name: knative-serving
+          jsonPointers:
+            - /metadata/labels
+        - group: ""
+          kind: ConfigMap
+          name: config-istio
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+        - group: ""
+          kind: Service
+          name: net-istio-webhook
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+        - group: ""
+          kind: Service
+          name: knative-local-gateway
+          jsonPointers:
+            - /status
+            - /metadata/labels
+        - group: security.istio.io
+          kind: PeerAuthentication
+          name: webhook
+          jsonPointers:
+            - /metadata/labels
+            - /metadata/ownerReferences
+        - group: security.istio.io
+          kind: PeerAuthentication
+          name: net-istio-webhook
+          jsonPointers:
+            - /metadata/labels
+            - /metadata/ownerReferences
+        - group: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: knative-serving-istio
+          jsonPointers:
+            - /metadata/labels
+        - group: networking.istio.io
+          kind: Gateway
+          name: knative-local-gateway
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+        - group: networking.istio.io
+          kind: Gateway
+          name: knative-ingress-gateway
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+        - group: ""
+          kind: Secret
+          name: net-istio-webhook-certs
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+        - group: admissionregistration.k8s.io
+          kind: MutatingWebhookConfiguration
+          name: webhook.istio.networking.internal.knative.dev
+          jsonPointers:
+            - /metadata/labels
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          name: istio-validator-istio-system
+          jsonPointers:
+            - /webhooks/0/failurePolicy
+            - /metadata/labels
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          name: config.webhook.istio.networking.internal.knative.dev
+          jsonPointers:
+            - /webhooks/0/failurePolicy
+        - group: "apps"
+          kind: Deployment
+          name: net-istio-controller
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+            - /spec/strategy
+            - /spec/template/metadata/creationTimestamp
+            - /status
+        - group: "apps"
+          kind: Deployment
+          name: net-istio-webhook
+          jsonPointers:
+            - /metadata/ownerReferences
+            - /metadata/labels
+            - /spec/strategy
+            - /spec/template/metadata/creationTimestamp
+            - /status

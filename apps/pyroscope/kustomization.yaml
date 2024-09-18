@@ -1,0 +1,10 @@
+namespace: pyroscope
+resources:
+  - namespace.yaml
+  - service.yaml
+  - deployment.yaml
+  - servicemonitor.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - python-fast-slow.yaml
+  - grafanadatasource.yaml

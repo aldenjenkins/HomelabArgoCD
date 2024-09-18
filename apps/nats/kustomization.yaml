@@ -1,0 +1,11 @@
+namespace: nats-io
+resources:
+  - namespace.yaml
+  - service.yaml
+  - persistentvolume.yaml
+  - statefulset.yaml
+  - virtualservice.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+generators:
+  - sopsgenerator.yaml

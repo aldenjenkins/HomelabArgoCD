@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: opencost
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opencost
+      app.kubernetes.io/part-of: opencost
+  endpoints:
+    - path: /metrics
+      port: http
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster

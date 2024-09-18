@@ -1,0 +1,57 @@
+# Source: kanboard/templates/deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kanboard
+  template:
+    metadata:
+      labels:
+        app: kanboard
+        sidecar.istio.io/inject: "true"
+    spec:
+      volumes:
+        - name: appdata
+          persistentVolumeClaim:
+            claimName: kanboard-data
+      containers:
+        - name: kanboard
+          image: kanboard/kanboard:nightly
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: appdata
+              mountPath: /var/www/app/data
+              subPath: data
+            - name: appdata
+              mountPath: /var/www/app/plugins
+              subPath: plugins
+            - name: appdata
+              mountPath: /etc/nginx/ssl
+              subPath: ssl
+          env:
+            - name: DEBUG
+              value: 'false'
+            - name: HIDE_LOGIN_FORM
+              value: 'true'
+            - name: DISABLE_LOGOUT
+              value: 'true'
+            - name: REVERSE_PROXY_AUTH
+              value: 'true'
+            - name: REVERSE_PROXY_USER_HEADER
+              value: 'HTTP_REMOTE_USER'
+            - name: ENABLE_XFRAME
+              value: 'false'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: kanboard
+                  key: db-connection-str
+          ports:
+            - containerPort: 80
+              name: kanboard-http
+            - containerPort: 443
+              name: kanboard-https

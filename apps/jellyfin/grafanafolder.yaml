@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: jellyfin
+spec:
+  allowCrossNamespaceImport: true
+  resyncPeriod: 1m
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

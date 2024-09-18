@@ -1,0 +1,567 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: opentelemetry
+spec:
+  image: otel/opentelemetry-collector-contrib:latest
+  serviceAccount: otel-collector
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+  mode: daemonset
+  # https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api/opentelemetrycollectors.md#opentelemetrycollectorspecobservability
+  # Want this false now since the metrics pipeline will handle the remote push of the metrics so that we don't need to scrape from prometheus.
+  # observability:
+  #   metrics:
+  #     enableMetrics: true
+  args:
+    "feature-gates": "service.profilesSupport"
+  # https://opentelemetry.io/docs/kubernetes/operator/target-allocator/
+  # targetAllocator:
+  #   allocationStrategy: per-node
+  #   enabled: true
+  #   serviceAccount: otel-collector-targetallocator
+  #   # Discover prometheus operator CR: PodMonitor and ServiceMonitor
+  #   prometheusCR:
+  #     enabled: true
+  env:
+    - name: KUBE_NODE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: KUBE_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: KUBE_CLUSTER_NAME
+      value: homelab-live
+
+  config:
+    # -------------
+    # Good example for grafana stack: https://github.com/grafana/intro-to-mltp/blob/14f8df4745b93a932cd2c4bf37e9ff1e8d3ad909/otel/otel.yml
+    # -------------
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 5s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+      # batch/logs:
+      #   timeout: 5s
+      #   send_batch_size: 512
+      #   send_batch_max_size: 1024
+
+      # Memory limiter to prevent OOM
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 20
+
+      resourcedetection:
+        detectors: [env, system]
+        timeout: 5s
+        override: false
+        attributes:
+          - k8s.cluster.name
+          - k8s.node.name
+
+      # Most of these below processors were taken from this: https://github.com/softwaremill/meerkat/blob/3d5d8590fac865d4d672210475019e8b7c330ae0/otel/jvm-collector.yaml#L87-L102
+      resource:
+        attributes:
+          - key: k8s.node.name
+            value: ${env:KUBE_NODE_NAME}
+            action: insert
+          - key: k8s.pod.name
+            value: ${env:KUBE_POD_NAME}
+            action: insert
+          - key: k8s.cluster.name
+            value: ${env:KUBE_CLUSTER_NAME}
+            action: insert
+      attributes:
+        actions:
+          - key: cluster
+            value: ${env:KUBE_CLUSTER_NAME}
+            action: insert
+      # https://github.com/PRODYNA/spring-boot-observability-demo/blob/1967d3b7da33ad9b035f9f4cf2bde483c9a6b0ab/terraform/2-kubernetes/manifest/opentelemetry-collector.yaml#L437
+      attributes/logs:
+        actions:
+          - action: insert
+            key: loki.resource.labels
+            value: event.domain,k8s.namespace.name,k8s.pod.name,container.image.name,container.image.tag,k8s.deployment.name,k8s.cronjob.name,k8s.statefulset.name,k8s.job.name,k8s.daemonset.name,k8s.node.name,k8s.start.time,log.file.path
+          - action: insert
+            key: loki.format
+            value: raw
+
+      attributes/copy-client-address:
+        actions:
+          - action: upsert
+            key: source.address
+            from_attribute: client.address
+
+      # k8sattributes:
+
+      # k8sattributes/2:
+
+      groupbyattrs:
+        keys:
+          - k8s_pod_name
+          - k8s_namespace_name
+
+      k8sattributes:
+        auth_type: "serviceAccount"
+        passthrough: false
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 15s
+        filter:
+          node_from_env_var: KUBE_NODE_NAME
+        pod_association:
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.ip' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.ip
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.uid' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.uid
+          - sources:
+              - from: resource_attribute
+                name: k8s.node.name
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.cluster.name
+          - sources:
+              # This rule will use the IP from the incoming connection from which the resource is received,
+              # and find the matching pod, based on the 'pod.status.podIP' of the observed pods
+              - from: connection
+        extract:
+          # The attributes provided in 'metadata' will be added to associated resources
+          metadata:  # extracted from the pod
+            - k8s.cronjob.name
+            - k8s.daemonset.name
+            - k8s.deployment.name
+            - k8s.job.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+            - k8s.statefulset.name
+          #labels:
+          # # This label extraction rule takes the value 'app.kubernetes.io/component' label and maps it to the 'app.label.component' attribute which will be added to the associated resources
+          # - tag_name: app.label.component
+          #   key: app.kubernetes.io/component
+          #   from: pod
+          labels:
+            - tag_name: app.label.component
+              key: app.kubernetes.io/component
+              from: pod
+            - tag_name: app.label.name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: app  # extracts value of label from pods with key `app` and inserts it as a tag with key `app`
+              key: app
+              from: pod
+
+      # transform/k8spreprocessor:
+      #   error_mode: ignore
+      #   trace_statements:
+      #     - context: span
+      #       statements:
+      #         - set(resource.attributes["k8s.pod.ip"], attributes["k8s.pod.ip"]) where resource.attributes["k8s.pod.ip"] == "nil"
+      #
+      # transform/loki:
+      #   error_mode: ignore
+      #   log_statements:
+      #     - context: log
+      #       statements:
+      #         #- merge_maps(cache, ParseJSON(body), "upsert") #where IsMatch(body, "^\\{")
+      #         #- set(cache["traceID"], trace_id.string)
+      #         #- set(cache["spanID"], span_id.string)
+      #         #- set(body, cache)
+      #         - set(resource.attributes["service.name"], attributes["service"]) where resource.attributes["service.name"] == "nil"
+      #         - set(resource.attributes["k8s.cluster.name"], attributes["cluster"]) where resource.attributes["k8s.cluster.name"] == "nil"
+      #         - set(resource.attributes["k8s.pod.name"], attributes["pod"]) where resource.attributes["k8s.pod.name"] == "nil"
+      #         - set(resource.attributes["k8s.namespace.name"], attributes["namespace"]) where resource.attributes["k8s.namespace.name"] == "nil"
+      #         - set(resource.attributes["k8s.pod.ip"], attributes["k8s.pod.ip"]) where resource.attributes["k8s.pod.ip"] == "nil"
+
+      # The tail sampler processor will only keep traces where spans match the defined policies.
+      tail_sampling:
+        decision_wait: 30s  # The time to wait for a decision to be made.
+        # The following policies follow a logical OR pattern, meaning that if any of the policies match,
+        # the trace will be kept. For logical AND, you can use the `and` policy. Every span of a trace is
+        # examined by each policy in turn. A match will cause a short-circuit.
+        policies:
+          # # This policy defines that traces that include spans that contain errors should be kept.
+          # - name: sample-erroring-traces  # Name of the policy.
+          #   type: status_code  # The type must match the type of policy to be used.
+          #   status_code:
+          #     status_codes: [ERROR]  # Only sample traces which have a span containing an error.
+
+          # This policy defines that traces that are over 200ms should be sampled.
+          - name: sample-long-traces  # Name of the policy.
+            type: latency  # The type must match the type of policy to be used.
+            latency:
+              # threshold_ms: 200  # Only sample traces which are longer than 200ms in duration.
+              threshold_ms: 10  # Only sample traces which are longer than 200ms in duration.
+
+      transform/set_match_resource_attributes:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"])
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
+
+      # The transform processor is used to rename the span metrics to match the Tempo naming convention.
+      transform/span_metrics:
+        # Only operate on metric statements.
+        metric_statements:
+          # Operate on the metric data.
+          - context: metric
+            statements:
+              # Rename the `traces.spanmetrics.duration` metric to `traces.spanmetrics.latency`.
+              - set(metric.name, "traces.spanmetrics.latency") where metric.name == "traces.spanmetrics.duration"
+              # Rename the `traces.spanmetrics.calls` metric to `traces.spanmetrics.calls.total` to pre-suffix name.
+              - set(metric.name, "traces.spanmetrics.calls.total") where metric.name == "traces.spanmetrics.calls"
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      # Collect metrics from Kubernetes
+      # https://github.com/softwaremill/meerkat/blob/3d5d8590fac865d4d672210475019e8b7c330ae0/otel/jvm-collector.yaml#L174-L182
+      kubeletstats:
+        collection_interval: 30s
+        auth_type: serviceAccount
+        endpoint: "${env:KUBE_NODE_NAME}:10250"
+        node: "${env:KUBE_NODE_NAME}"
+        insecure_skip_verify: true
+        extra_metadata_labels:
+          - container.id
+          - k8s.volume.type
+        metric_groups:
+          - node
+          - pod
+          - container
+          - volume
+        k8s_api_config:
+          auth_type: serviceAccount
+        metrics:
+          k8s.container.cpu.node.utilization:
+            enabled: true
+          k8s.pod.cpu.node.utilization:
+            enabled: true
+          k8s.container.memory.node.utilization:
+            enabled: true
+          k8s.pod.memory.node.utilization:
+            enabled: true
+
+      k8s_cluster:
+        auth_type: serviceAccount
+        collection_interval: 30s
+        node_conditions_to_report:
+          - Ready
+          - MemoryPressure
+        allocatable_types_to_report:
+          - cpu
+          - memory
+          - storage
+          - ephemeral-storage
+        resource_attributes:
+          container.id:
+            enabled: false
+
+      k8s_events: 
+        namespaces: []
+
+      # opencensus:
+      # endpoint: 0.0.0.0:55678
+
+      k8sobjects:
+        objects:
+          - name: pods
+            mode: pull
+          - name: events
+            mode: watch
+          - group: events.k8s.io
+            mode: watch
+            name: events
+
+      # Configure receiving OTLP data via gRPC on port 4317 and HTTP on port 4318.
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+            max_recv_msg_size_mib: 32
+          http:
+            endpoint: 0.0.0.0:4318
+
+      # # Internal telemetry metrics
+      otlp/internal_metrics:
+        protocols:
+          grpc:
+            endpoint: localhost:14317
+
+      # prometheus:
+      #   config:
+      #     scrape_configs:
+      #       - job_name: "otel-collector"
+      #         scrape_interval: 10s
+      #         static_configs:
+      #           - targets: ["0.0.0.0:8888"]
+      #         metric_relabel_configs:
+      #           - action: labeldrop
+      #             regex: (id|name)
+      #             replacement: $$1
+      #           - action: labelmap
+      #             regex: label_(.+)
+      #             replacement: $$1
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#connectors
+    connectors:
+      # The spanmetrics connector is used to output span metrics based on received trace spans.
+      spanmetrics:
+        namespace: traces.spanmetrics  # Prefix all metrics with `traces.spanmetrics` (this becomes `traces_spanmetrics`).
+
+        histogram:
+          explicit:
+            buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms, 1s, 5s, 10s]
+        # Defines additional label dimensions of the metrics from trace span attributes present.
+        dimensions:
+          - name: service.namespace
+          - name: k8s.cluster.name
+          - name: http.method
+            default: GET
+          - name: http.target
+          - name: http.status_code
+          - name: service.version
+          - name: span.status.code
+
+        # Ensure exemplars are enabled and sent to the metrics store.
+        exemplars:
+          enabled: true
+        dimensions_cache_size: 1000
+        aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"
+        # Explicitly flush metrics every 30 seconds. Note, this will double active series count for the `trace.spanmetrics`
+        # metric namespace.
+        metrics_flush_interval: 15s
+        metrics_expiration: 5m
+        exclude_dimensions: ['status.code']
+        events:
+          enabled: true
+          dimensions:
+            - name: exception.type
+            - name: exception.message
+        resource_metrics_key_attributes:
+          - service.name
+          - telemetry.sdk.language
+          - telemetry.sdk.name
+
+      # The servicegraph connector is used to output service node metrics based on received trace spans.
+      servicegraph:
+        # Explicitly flush metrics every 60 seconds. Note, this will double active series count for the
+        # `trace.servicegraph` metric namespace.
+        metrics_flush_interval: 60s
+        # Defines which exporter the processor will write metrics to.
+        metrics_exporter: prometheusremotewrite
+        dimensions:
+          - http.method
+        latency_histogram_buckets:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+        # Defines additional label dimensions of the metrics from trace span attributes present.
+        store:  # Configuration for the in-memory store.
+          ttl: 2s  # Time to wait for an edge to be completed.
+          max_items: 200  # Number of edges that will be stored in the storeMap.
+        cache_loop: 2m  # The timeout used to clean the cache periodically.
+        store_expiration_loop: 10s  # The timeout used to expire old entries from the store periodically.
+        # Virtual node peer attributes allow server nodes to be generated where instrumentation isn't present (eg. where
+        # service client calls remotely to a service that does not include instrumentation).
+        # Service nodes/edges will be generated for any attribute defined.
+        virtual_node_peer_attributes:
+          - db.name
+
+      exceptions:
+        dimensions:
+          - name: exception.type
+          - name: exception.message
+
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      # prometheus:
+      #   endpoint: "0.0.0.0:8889"
+      #   # Enable exemplars for metrics
+      #   enable_open_metrics: true
+      #   add_metric_suffixes: false
+      #   resource_to_telemetry_conversion:
+      #     enabled: true
+      #   #prometheusremotewrite:
+      #   #  endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      #   #  target_info:
+      #   #    enabled: true
+      #   #  tls:
+      #   #    insecure: true
+      #   metric_expiration: 5m
+      #   send_timestamps: true
+      #   # metric_relabeling:
+      #   #   - source_labels: [__name__]
+      #   #     regex: 'traces_spanmetrics_.*'
+      #   #     target_label: source
+      #   #     replacement: 'spanmetrics'
+
+      # Exporter for sending trace data to Tempo.
+      otlp/tempo:
+        endpoint: tempo.tempo:4317
+        tls:
+          insecure: true
+        sending_queue:
+          enabled: true
+        retry_on_failure:
+          enabled: true
+
+      otlphttp/pyroscope:
+        endpoint: pyroscope.pyroscope.svc:4040
+        tls:
+          insecure: true
+
+      otlphttp/loki:
+        compression: gzip
+        endpoint: "http://loki-gateway.loki/otlp"
+        tls:
+          insecure: true
+        timeout: 10s
+        retry_on_failure:
+          enabled: true
+          initial_interval: 1s
+          max_interval: 30s
+          max_elapsed_time: 300s
+
+    extensions:
+      pprof: {}
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+
+      # A pipeline can exist for each of the signals received.
+      pipelines:
+        logs:
+          receivers: [otlp, k8s_cluster, k8sobjects, k8s_events, exceptions]
+          processors: [memory_limiter, k8sattributes, resourcedetection, resource, attributes, attributes/logs, batch]  # batch/logs, transform/loki
+          exporters:
+            - otlphttp/loki
+            #- debug
+
+        # Define the trace pipeline.
+        traces:
+          # Receive from the `otlp` receiver.
+          receivers:
+            - otlp
+            # - opencensus
+          # Use the `batch` processor to process received trace spans.
+          processors:
+            - memory_limiter
+            - k8sattributes
+            - resourcedetection
+            - resource
+            - attributes
+            - attributes/copy-client-address
+            # - tail_sampling
+            - batch
+          # Generate span metrics from within the OpenTelemetry Collector as well as exporting traces to Tempo.
+          exporters:
+            - otlp/tempo
+            - spanmetrics
+            - servicegraph
+            - exceptions
+
+        # Define the metrics pipeline.
+        # metrics:
+        #   # Receive metrics from the `prometheus` receiver.
+        #   receivers: [otlp/internal_metrics]
+        #   processors: [resourcedetection, batch]
+        #   exporters: [prometheus]
+
+        # Define the metrics pipeline.
+        # metrics/spanmetrics:
+        metrics:
+          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, servicegraph, exceptions]
+          receivers: [otlp, otlp/internal_metrics, spanmetrics, servicegraph, exceptions]
+          # Use the `batch` processor to process received metrics, use the transform metric to ensure that spanmetric
+          # metrics are in the correct format for Grafana Cloud (doesn't take effect unless receivers above are used.)
+          processors: [transform/span_metrics, memory_limiter, resourcedetection, batch, groupbyattrs, transform/set_match_resource_attributes, k8sattributes]
+          # Export to the `prometheusremtotewrite` exporter.
+          exporters: [prometheusremotewrite]
+
+        profiles:
+          receivers: [otlp]  #, k8s_cluster, k8sobjects, filelog, k8s_events, exceptions]
+          #processors: [batch, memory_limiter] # filter
+          exporters: [otlphttp/pyroscope]
+
+      extensions:
+        - zpages
+        - health_check
+
+      telemetry:
+
+        #logs:
+        #  level: debug
+
+        logs:
+          encoding: json
+          level: info
+          initial_fields:
+            service: otel-collector
+
+        # Push collector internal metrics to Prometheus
+        metrics:
+          level: detailed
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true
+        # metrics:
+        #   level: detailed
+        #   readers:
+        #     - periodic:
+        #         interval: 10000
+        #         exporter:
+        #           otlp:
+        #             protocol: grpc
+        #             endpoint: localhost:14317
+        #             insecure: true
+
+

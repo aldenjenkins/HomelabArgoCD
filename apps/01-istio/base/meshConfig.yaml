@@ -1,0 +1,119 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  components:
+    ingressGateways:
+      - name: istio-ingressgateway
+        k8s:
+          service:
+            externalTrafficPolicy: Local
+            ports:
+              - port: 15021
+                targetPort: 15021
+                name: status-port
+              - port: 80
+                targetPort: 8080
+                name: http2
+              - port: 443
+                targetPort: 8443
+                name: https
+              - port: 31400
+                targetPort: 31400
+                name: tcp
+              - port: 15443
+                targetPort: 15443
+                name: tls
+              - targetPort: 3022
+                port: 22
+                name: ssh
+    cni:
+      enabled: true
+  values:
+    cni:
+      cniBinDir: /usr/libexec/cni
+  meshConfig:
+    enableTracing: true
+    defaultConfig:
+      tracing: {}
+      gatewayTopology:
+        numTrustedProxies: 0
+    defaultProviders:
+      accessLogging:
+        - otel-logs
+    # accessLogEncoding: JSON
+    # accessLogFormat: '{"start_time": "%START_TIME%","path_without_query":"%REQ(x-envoy-path-without-query)%", "client_ip":"%REQ(client-ip)%", "method": "%REQ(:METHOD)%", "request_id": "%REQ(X-REQUEST-ID)%","path":"%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%", "protocol": "%PROTOCOL%", "response_code": "%RESPONSE_CODE%", "response_flags": "%RESPONSE_FLAGS%", "bytes_received": "%BYTES_RECEIVED%", "bytes_sent": "%BYTES_SENT%", "duration": "%DURATION%", "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%","x_forwarded_for":"%REQ(X-FORWARDED-FOR)%", "downstream_local_address": "%DOWNSTREAM_LOCAL_ADDRESS%", "downstream_remote_address": "%DOWNSTREAM_REMOTE_ADDRESS%", "upstream_transport_failure_reason": "%UPSTREAM_TRANSPORT_FAILURE_REASON%", "route_name": "%ROUTE_NAME%", "upstream_cluster": "%UPSTREAM_CLUSTER%", "upstream_host": "%UPSTREAM_HOST%", "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%", "upstream_service_time": "%REQ(X-ENVOY-UPSTREAM-SERVICE-TIME)%", "requested_server_name": "%REQUESTED_SERVER_NAME%", "user_agent": "%REQ(USER-AGENT)%", "cookies": "%REQ(Cookie)%", "request_headers": "%REQ(REMOTE-USER)%", "connection_termination_details": "%CONNECTION_TERMINATION_DETAILS%", "ssl_version": "%DOWNSTREAM_TLS_VERSION%", "ssl_uri_san_peer_certificate": "%DOWNSTREAM_PEER_URI_SAN%", "ssl_subject_local_certificate": "%DOWNSTREAM_LOCAL_SUBJECT%", "ssl_subject_peer_certificate": "%DOWNSTREAM_PEER_SUBJECT%", "ssl_session_id": "%DOWNSTREAM_TLS_SESSION_ID%", "authorization": "%REQ(Authorization)%"}'
+    accessLogFile: "/dev/stdout"
+    disableEnvoyListenerLog: false
+    extensionProviders:
+      #      - name: jaeger
+      #        zipkin:
+      #          service: jaeger-collector.istio-system.svc.cluster.local
+      #          port: 9411
+      - name: otel-logs
+        envoyOtelAls:
+          service: logs-gateway-collector.observability.svc.cluster.local
+          port: 4317
+          logName: otel_envoy_accesslog
+          logFormat:
+            # text: '{"start_time": "%START_TIME%","path_without_query":"%REQ(x-envoy-path-without-query)%", "client_ip":"%REQ(client-ip)%", "method": "%REQ(:METHOD)%", "request_id": "%REQ(X-REQUEST-ID)%","path":"%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%", "protocol": "%PROTOCOL%", "response_code": "%RESPONSE_CODE%", "response_flags": "%RESPONSE_FLAGS%", "bytes_received": "%BYTES_RECEIVED%", "bytes_sent": "%BYTES_SENT%", "duration": "%DURATION%", "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%","x_forwarded_for":"%REQ(X-FORWARDED-FOR)%", "downstream_local_address": "%DOWNSTREAM_LOCAL_ADDRESS%", "downstream_remote_address": "%DOWNSTREAM_REMOTE_ADDRESS%", "upstream_transport_failure_reason": "%UPSTREAM_TRANSPORT_FAILURE_REASON%", "route_name": "%ROUTE_NAME%", "upstream_cluster": "%UPSTREAM_CLUSTER%", "upstream_host": "%UPSTREAM_HOST%", "upstream_local_address": "%UPSTREAM_LOCAL_ADDRESS%", "upstream_service_time": "%REQ(X-ENVOY-UPSTREAM-SERVICE-TIME)%", "requested_server_name": "%REQUESTED_SERVER_NAME%", "user_agent": "%REQ(USER-AGENT)%", "cookies": "%REQ(Cookie)%", "request_headers": "%REQ(REMOTE-USER)%", "connection_termination_details": "%CONNECTION_TERMINATION_DETAILS%", "ssl_version": "%DOWNSTREAM_TLS_VERSION%", "ssl_uri_san_peer_certificate": "%DOWNSTREAM_PEER_URI_SAN%", "ssl_subject_local_certificate": "%DOWNSTREAM_LOCAL_SUBJECT%", "ssl_subject_peer_certificate": "%DOWNSTREAM_PEER_SUBJECT%", "ssl_session_id": "%DOWNSTREAM_TLS_SESSION_ID%", "authorization": "%REQ(Authorization)%"}'
+            # labels:
+            #   k8s.pod.ip: "%ENVIRONMENT(INSTANCE_IP)%"
+            #   k8s.pod.name: "%ENVIRONMENT(POD_NAME)%"
+            #   k8s.namespace.name: "%ENVIRONMENT(POD_NAMESPACE)%"
+            #   k8s.cluster.name: "homelab"
+            #   cluster: "%ENVIRONMENT(ISTIO_META_CLUSTER_ID)%"
+            #   mesh: "%ENVIRONMENT(ISTIO_META_MESH_ID)%"
+            #   service_name: "%ENVIRONMENT(ISTIO_META_WORKLOAD_NAME)%.%ENVIRONMENT(POD_NAMESPACE)%"
+            #   http_status_code: "%RESPONSE_CODE%"
+            #   http_method: "%REQ(:METHOD)%"
+            #   message: "%LOCAL_REPLY_BODY%"
+            #   client.ip: "%REQ(client-ip)%"
+            text: '%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT% - - [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%" %RESPONSE_CODE% %BYTES_SENT%'
+            labels:
+              k8s.pod.ip: "%ENVIRONMENT(INSTANCE_IP)%"
+              k8s.pod.name: "%ENVIRONMENT(POD_NAME)%"
+              k8s.namespace.name: "%ENVIRONMENT(POD_NAMESPACE)%"
+              http.request.size: '%CEL(request.total_size)%'
+              http.request.method: '%CEL(request.method)%'
+              http.request.duration: '%CEL(request.duration.getMilliseconds())%'
+              http.response.size: '%CEL(response.total_size)%'
+              http.response.status_code: '%CEL(response.code)%'
+              http.request.header.x-forwarded-for: '%CEL(request.headers[X-FORWARDED-FOR])%'
+              http.request.header.x-request-id: '%CEL(request.id)%'
+              http.request.header.referer: '%CEL(request.referer)%'
+              url.scheme: '%CEL(request.scheme)%'
+              url.path: '%CEL(request.url_path)%'
+              url.query: '%CEL(request.query)%'
+              user_agent.original: '%CEL(request.useragent)%'
+              server.address: '%CEL(request.host)%'
+              server.port: '%CEL(xds.listener_direction==1?destination.port:upstream.port)%'
+              client.address: '%CEL(xds.listener_direction==1?source.address:upstream.local_address)%'
+              client.port: '%CEL(xds.listener_direction==1?source.port:nil)%'
+              http.direction: '%CEL(xds.listener_direction==1?"inbound":(xds.listener_direction==2?"outbound":nil))%'
+      - name: otel-tracing
+        opentelemetry:
+          port: 4317
+          service: trace-collector.observability.svc.cluster.local
+          resource_detectors:
+            environment: {}
+      - name: 'authelia'
+        envoyExtAuthzHttp:
+          service: 'authelia.authelia.svc.cluster.local'
+          port: 80
+          pathPrefix: '/api/authz/ext-authz/'
+          includeRequestHeadersInCheck:
+            - 'accept'
+            - 'cookie'
+            - 'authorization'
+            - 'proxy-authorization'
+            - 'x-request-id'
+          headersToUpstreamOnAllow:
+            - 'remote-*'
+            - 'authorization'
+            - 'authelia-*'
+          includeAdditionalHeadersInCheck:
+            X-Forwarded-Proto: '%REQ(:SCHEME)%'
+          headersToDownstreamOnDeny:
+            - 'set-cookie'
+          headersToDownstreamOnAllow:
+            - 'set-cookie'

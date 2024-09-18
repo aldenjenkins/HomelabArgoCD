@@ -1,0 +1,23 @@
+# Source: x509-certificate-exporter/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: x509-certificate-exporter
+  labels:
+    app.kubernetes.io/name: x509-certificate-exporter
+    app.kubernetes.io/instance: x509-certificate-exporter
+    app.kubernetes.io/version: "3.15.0"
+    serviceMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: x509-certificate-exporter
+      app.kubernetes.io/instance: x509-certificate-exporter
+  endpoints:
+    - port: metrics
+      interval: 60s
+      scrapeTimeout: 30s
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster

@@ -1,0 +1,18 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: grafana
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app: grafana
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            paths:
+              - "/login"
+            hosts:
+              - grafana.home.alden.ai

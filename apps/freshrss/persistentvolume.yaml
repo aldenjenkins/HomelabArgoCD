@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: freshrss
+    labels:
+        name: freshrss
+spec:
+    accessModes:
+        - ENC[AES256_GCM,data:F8871V5Gej5PMXgHcQ==,iv:SOzcqpyG1jHYsjl0qXXtg8RBQhfe7Uk5TrOY4M/qtFI=,tag:pr0CdPrTGFrBnXg6ZnX7SA==,type:str]
+    capacity:
+        storage: ENC[AES256_GCM,data:xXNRGQ==,iv:A1KNNVBcUbliMsjaumJbD+8XgaaaIrQEcevsRSNqqyA=,tag:AX2H06Y13kYu5Otba40j2w==,type:str]
+    mountOptions:
+        - ENC[AES256_GCM,data:NJLorNXdKCbLvLU=,iv:+XMbgnNz6wzcEPQOfE1oCvu0xeq161Hm3Hg1cFsV53o=,tag:571eiE0bfHfbHJzA3Q6VWg==,type:str]
+    nfs:
+        path: ENC[AES256_GCM,data:KFnvZhoBDkYkWIB7+q1dvFTgJGfhMp2NpOSpmzwYsdzqOdQRyQzm0yA=,iv:Qww7MPnLQzMFHx2tHv8o8rYuOhu0CyF1w/ZKsWHmsCw=,tag:mEjHh2/A93Mdz+yDGHlMbg==,type:str]
+        server: ENC[AES256_GCM,data:U135MMWkeF5BqLJUbgtg,iv:c/xrxcoWs62ZQ5hnBxFbTHv+URU1HAi9KjJIsUdGz6g=,tag:Iw52whpBB66WNjQT0yUjuw==,type:str]
+    persistentVolumeReclaimPolicy: ENC[AES256_GCM,data:2r8ISHvl,iv:o7JbwvhMiPcwZoD0zVxqfe8KhPTnX6Jvpy9mFQ4O5ZA=,tag:35y/7G76LQAlL+jCGyIj/Q==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBXQnJXaFA2NURNRWVKZXY2
+            eWRuUnR5ak1pNnYvSjZHdVpPbzFob1FDQ0h3Cnl4Ri9wa3ZXZ3ZNRHdyRjYwcEJO
+            U1J6VlpIRDA1SnBnTmZKK1k5QllnZkkKLS0tIEt5R1R2WjQvOXNXY2c4b08rQS9V
+            ZEpiRnkvSWtMSCtVQjVjZUExZUlFS3cKv0NfXiHdMsmhYqHmjREyYben7FJ7K4iZ
+            6S5OFiC+dtftzULUcp2w9xe7piox2lcpSbPM+zND3L+Kl2aLWjgshg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T01:51:16Z"
+    mac: ENC[AES256_GCM,data:MU54i1DWKlawf6o2Ckur8uHXOZuclzpKniR37kjkZAh35aZnNmtjCah65qLW1uZHHApOfp8gWRkBaAbWAKoIWwsH3d/MVOzj9oknczqwrMO0kcf6xQpbfC3E8HrKYgA/7xNZH8dPiLMKdYZzJzDmsmwkvlFAApiTghC5Nl79GrA=,iv:MGbdkojooGOVuaRAIfFNk80Rs2DYIJ/rdi0k/obDS4I=,tag:oXouQNGajbXHrwAQS0/xHw==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

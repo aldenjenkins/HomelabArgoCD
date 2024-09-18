@@ -1,0 +1,16 @@
+resources:
+  - argocd
+  - applicationset.yaml
+generators:
+  - sopsgenerator.yaml
+patchesStrategicMerge:
+  - patches/custom-cmd-params-cm.yaml
+  - patches/custom-rbac-cm.yaml
+  - patches/custom-cm.yaml
+  - patches/custom-notifications-cm.yaml
+  - patches/custom-repo-server-deployment.yaml
+# patches:
+#   - path: patches/slack.yaml
+#     target:
+#       kind: Secret
+#       name: argocd-notifications-secret

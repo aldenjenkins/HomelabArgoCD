@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: tempo
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/name: tempo
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - tempo.home.alden.ai

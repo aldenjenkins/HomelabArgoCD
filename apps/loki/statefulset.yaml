@@ -1,0 +1,351 @@
+# Source: loki/templates/chunks-cache/statefulset-chunks-cache.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-chunks-cache
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: "memcached-chunks-cache"
+    name: "memcached-chunks-cache"
+    app: loki
+    component: cache
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: "memcached-chunks-cache"
+      name: "memcached-chunks-cache"
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: loki-chunks-cache
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: loki
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/component: "memcached-chunks-cache"
+        name: "memcached-chunks-cache"
+    spec:
+      serviceAccountName: loki
+      securityContext:
+        fsGroup: 11211
+        runAsGroup: 11211
+        runAsNonRoot: true
+        runAsUser: 11211
+      initContainers: []
+      nodeSelector:
+        kubernetes.io/hostname: node11
+      affinity: {}
+      topologySpreadConstraints: []
+      tolerations: []
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: memcached
+          image: memcached:alpine
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 9830Mi
+            requests:
+              cpu: 500m
+              memory: 9830Mi
+          ports:
+            - containerPort: 11211
+              name: client
+          args:
+            - -m 8192
+            - --extended=modern,track_sizes,ext_path=/data/file:9G,ext_wbuf_size=16
+            - -I 5m
+            - -c 16384
+            - -v
+            - -u 11211
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - name: exporter
+          image: prom/memcached-exporter:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9150
+              name: http-metrics
+          args:
+            - "--memcached.address=localhost:11211"
+            - "--web.listen-address=0.0.0.0:9150"
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: nfs-retain
+        resources:
+          requests:
+            storage: "10G"
+---
+# Source: loki/templates/results-cache/statefulset-results-cache.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-results-cache
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: "memcached-results-cache"
+    name: "memcached-results-cache"
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: "memcached-results-cache"
+      name: "memcached-results-cache"
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: loki-results-cache
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: loki
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/component: "memcached-results-cache"
+        name: "memcached-results-cache"
+    spec:
+      serviceAccountName: loki
+      securityContext:
+        fsGroup: 11211
+        runAsGroup: 11211
+        runAsNonRoot: true
+        runAsUser: 11211
+      initContainers: []
+      nodeSelector: {}
+      affinity: {}
+      topologySpreadConstraints: []
+      tolerations: []
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: memcached
+          image: memcached:alpine
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 1229Mi
+            requests:
+              cpu: 500m
+              memory: 1229Mi
+          ports:
+            - containerPort: 11211
+              name: client
+          args:
+            - -m 1024
+            - --extended=modern,track_sizes,ext_path=/data/file:9G,ext_wbuf_size=16
+            - -I 5m
+            - -c 16384
+            - -v
+            - -u 11211
+          env:
+          envFrom:
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - name: exporter
+          image: prom/memcached-exporter:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9150
+              name: http-metrics
+          args:
+            - "--memcached.address=localhost:11211"
+            - "--web.listen-address=0.0.0.0:9150"
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: nfs-retain
+        resources:
+          requests:
+            storage: "10G"
+---
+# Source: loki/templates/single-binary/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/part-of: memberlist
+    app: loki
+    component: loki
+spec:
+  replicas: 1
+  podManagementPolicy: Parallel
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+  serviceName: loki-headless
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/component: single-binary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: loki
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/component: single-binary
+        app.kubernetes.io/part-of: memberlist
+        app: loki
+        component: loki
+    spec:
+      serviceAccountName: loki
+      automountServiceAccountToken: true
+      enableServiceLinks: true
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: loki-sc-rules
+          image: "kiwigrid/k8s-sidecar:1.27.5"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: METHOD
+              value: WATCH
+            - name: LABEL
+              value: "loki_rule"
+            - name: FOLDER
+              value: "/rules"
+            - name: RESOURCE
+              value: "both"
+            - name: WATCH_SERVER_TIMEOUT
+              value: "60"
+            - name: WATCH_CLIENT_TIMEOUT
+              value: "60"
+            - name: LOG_LEVEL
+              value: "INFO"
+          volumeMounts:
+            - name: sc-rules-volume
+              mountPath: "/rules"
+        - name: loki
+          image: docker.io/grafana/loki:latest
+          imagePullPolicy: Always
+          args:
+            - -config.file=/etc/loki/config/config.yaml
+            - -target=all
+          ports:
+            - name: http-metrics
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: http-memberlist
+              containerPort: 7946
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: config
+              mountPath: /etc/loki/config
+            - name: runtime-config
+              mountPath: /etc/loki/runtime-config
+            - name: storage
+              mountPath: /var/loki
+            - name: sc-rules-volume
+              mountPath: "/rules"
+          resources: {}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: single-binary
+              topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: loki
+            items:
+              - key: "config.yaml"
+                path: "config.yaml"
+        - name: runtime-config
+          configMap:
+            name: loki-runtime
+        - name: sc-rules-volume
+          emptyDir: {}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: nfs-retain
+        resources:
+          requests:
+            storage: "1Pi"

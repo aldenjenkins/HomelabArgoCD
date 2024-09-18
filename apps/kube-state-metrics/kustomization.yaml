@@ -1,0 +1,11 @@
+namespace: kube-state-metrics
+resources:
+  - namespace.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - deployment.yaml
+  - networkpolicy.yaml
+  - prometheusrule.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml

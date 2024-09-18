@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cockpit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cockpit
+  template:
+    metadata:
+      labels:
+        app: cockpit
+        sidecar.istio.io/inject: "true"
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command:
+            - sh
+            - "-c"
+            - |
+              cp /.ssh/sshkey /writable/sshkey && chmod 600 /writable/sshkey
+          volumeMounts:
+            # Readonly by default
+            - name: ssh-keys
+              mountPath: "/.ssh"
+            - name: ssh-storage
+              mountPath: "/writable"
+      containers:
+        - name: cockpit
+          image: quay.io/cockpit/ws
+          imagePullPolicy: Always
+          env:
+            - name: COCKPIT_SSH_KEY_PATH
+              value: /.ssh/sshkey
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - mountPath: /.ssh
+              name: ssh-storage
+              readOnly: true
+            - mountPath: /etc/cockpit/cockpit.conf
+              name: config
+              readOnly: true
+              subPath: cockpit.conf
+      volumes:
+        - name: ssh-keys
+          secret:
+            secretName: cockpit-ssh-key
+        - name: ssh-storage
+          emptyDir: {}  # Writable location for storing the SSH key needed for running chmod 600
+        - name: config
+          configMap:
+            name: cockpit-conf
+            items:
+              - key: cockpit.conf
+                path: cockpit.conf

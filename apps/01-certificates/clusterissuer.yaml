@@ -1,0 +1,35 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+    name: letsencrypt-dns
+spec:
+    acme:
+        server: ENC[AES256_GCM,data:xCklVOR08ORZ3PnU5vJfswI31/knlrbXCMOrSPHBB1o739EbtmmXs/LED0EGkg==,iv:zcg2BAzYbLw+uBBu8fnOCGI25SVppU0fDsDevx20cP8=,tag:deryJNWXGs7eWgbXTn++Eg==,type:str]
+        email: ENC[AES256_GCM,data:m1rPVUArMxNm3szrFPh5C/vC4ZnoiePBFLTa,iv:cWf0s1kJkd4l+2j3trIvQ91adGH5srX0iS1rmaxYUZs=,tag:uG9vxTXuv/R3U6caEAifAA==,type:str]
+        #ENC[AES256_GCM,data:0/zCV/QzRAxSkYbggjGqFCIaiUEnil501ldhSWuSjqCqfdKD061irVwQlHIVd3x5oa00d4ORtosBYtG6,iv:jTuJ+X2ed1lAmjUpJwVgdzDxJGVkgsXvLecWwplIHWg=,tag:2fPKaRM4JjfZSRiicMlMTQ==,type:comment]
+        privateKeySecretRef:
+            name: ENC[AES256_GCM,data:Ot1Kcxr9s+xSiXjLq0ve+3wnapQSqX+fIx/b,iv:PueaHXnGZrOEXjeL6KyVUXVx0gnOg/IObt3XEkaH1Q4=,tag:IXwZ4+1v3zkHplbnEXyC7A==,type:str]
+        #ENC[AES256_GCM,data:xlF9LOiIc26IDZ7RMO4QuPZv0I8zUXh5MhJDU8yF9jnbYBKL,iv:/naEoAD7KPc7vz6bd0gjWrPvRXPgy+o0W+Pj1ZyZMnA=,tag:S2NXUPj/otNEL3/ij3Fidw==,type:comment]
+        solvers:
+            - dns01:
+                cnameStrategy: ENC[AES256_GCM,data:lTsD7MMh,iv:ZQR2dACD8zOzYMLYA3N+lFOJWeAcF5v+XQkRDi9qo6k=,tag:1yWsnHGKiR5jUlh7/Hdf0A==,type:str]
+                cloudflare:
+                    email: ENC[AES256_GCM,data:BQBB4S6s/kXjc6whdxePIh6Lb4Jh8g+WrAIs,iv:lKFrjSlr/Vq/KPFpx2qPC22I2OFWEaDZeG0KhHvujDo=,tag:g7aSH3FfBJpOYD1YCiWvIQ==,type:str]
+                    apiTokenSecretRef:
+                        name: ENC[AES256_GCM,data:UW9noLVdHxN8YgfMRwkAWn2H,iv:DF0bUSZfA3G4/8jXpYbGMnhK3tILICe3xkdGN5bcdD0=,tag:0WG/+HTIm1nNU4fIjapSjQ==,type:str]
+                        key: ENC[AES256_GCM,data:fXBkkVNJ4v87cGdjcZE=,iv:PPzBx+XuWiwP8E7hztORusf4neHM/HwZCatwgWyY3N4=,tag:OwKB9ZNBEDKvu2++DpfuPw==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBkSllZblFvTjR5dzFKQzd5
+            WDA5UlhhdWY1eDY5ZGM2dlRiYnE3QzZEZ0U0CnN3RmNkQU9mZllpR2pNa2R2SlFq
+            cDFJVVJGUzBJdGhEY0p6TjRDUERLRnMKLS0tIEtkT2EwTDl5OHg0WlZhaWo2S0xk
+            NlB4WFlYTFdiYlpUMEY0R2xlamNlQlkKZsrcvPFCFHkMsZEZQyPpppY8anRy3jPB
+            KAt12enzzA38evBH93emXowimjrY2kA6QR47gtP7oPJaXQ3/wyP0nw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-06-19T01:18:11Z"
+    mac: ENC[AES256_GCM,data:DzTdsfdd5RggMdpEH3ZnEwFTORXJndUZZwYDL+6RrMaPCHN34au03BfJ8vtJcs2RTkU8MBBMmzDmPnbWCBBeX6nmEA8D+TGMQ5pqdK6S+hPqK/82r7VxfhhXdrAAiI2YREofO/aawWoOB9c92HR0XqUtGAJIMU3FSHWDGqSr0i8=,iv:NO9Mk8GGtYKHzt190ubncC65nSD2Ttxqq83CUeVXgVc=,tag:afmS++1AMBhX6Z9ZSTgiqA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

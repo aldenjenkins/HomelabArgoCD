@@ -1,0 +1,16 @@
+namespace: blackbox-exporter
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml
+  - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - prometheusrule.yaml
+generators:
+  - sopsgenerator.yaml

@@ -1,0 +1,4 @@
+resources:
+  - https://github.com/grafana/grafana-operator/releases/latest/download/kustomize-cluster_scoped.yaml
+  - servicemonitor.yaml
+  - grafanadashboard.yaml

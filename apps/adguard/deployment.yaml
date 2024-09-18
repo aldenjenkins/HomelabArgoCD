@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adguard-exporter
+  labels:
+    app.kubernetes.io/name: adguard-exporter
+    app.kubernetes.io/instance: adguard-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: adguard-exporter
+      app.kubernetes.io/instance: adguard-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: adguard-exporter
+        app.kubernetes.io/instance: adguard-exporter
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: adguard-exporter
+          image: ghcr.io/henrywhitaker3/adguard-exporter:latest
+          imagePullPolicy: Always
+          env:
+            - name: ADGUARD_SERVERS
+              value: http://adguard.adguard.svc.cluster.local
+            - name: ADGUARD_USERNAMES
+              valueFrom:
+                secretKeyRef:
+                  name: adguard-exporter-credentials
+                  key: ADGUARD_USERNAME
+            - name: ADGUARD_PASSWORDS
+              valueFrom:
+                secretKeyRef:
+                  name: adguard-exporter-credentials
+                  key: ADGUARD_PASSWORD
+            - name: INTERVAL
+              value: 10s
+          ports:
+            - name: metrics
+              containerPort: 9618
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 9618
+          readinessProbe:
+            tcpSocket:
+              port: 9618
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi

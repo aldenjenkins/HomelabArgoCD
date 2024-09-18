@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: excalidraw
+spec:
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - excalidraw.home.alden.ai
+  selector:
+    matchLabels:
+      app: excalidraw

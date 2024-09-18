@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    labels:
+        app: nats-jetstream
+    name: nats-jetstream
+data:
+    gnatsd.conf: ENC[AES256_GCM,data:7g1HWz2V1WB4VQ5gmptKgcG0zUK0kXTpsqJAaXUxun2oZ4X2YWovAITee+uCjRZo1I0noe/3WA7Mv5vwSER6m0IF0w==,iv:6vk5lMgLNNwAh7dqTO4B3bqqjsKWv2BDZq5Oc0yWJB8=,tag:2nNv03MpGY2SZNcMNyxuyw==,type:str]
+    jetstream.conf: ENC[AES256_GCM,data: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,iv:w9/7Sw9hCS2ne7Rbp2UeqR2fiF7VfdFHDHbZTagqOSg=,tag:tZy4i2ugal/dy52ruGfpqQ==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjOUZRMTVzSUNJVXBTR1Vy
+            V1JRd0V3SFFQRVgvTndlYWJSR1RBYzIwM0g0CnV1RVlCUnRuSVpKTG12MktySmNV
+            c3ByNGtFWTZrdVM3OHliOTUxcGxUemMKLS0tIEZQZnJERUdsWHBTdEhKbzcxTnRl
+            Vmc4UVV0Vyt6czdWbFQxQTZYaEsxYkUKfULmsoDavcAHiaPQwXSFZFST9t8XKe2N
+            0qxRUllrNh0NWC151NKlepTBEBlglrj8Y/8+AYcpjpjthIvy8N9sDQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T05:00:04Z"
+    mac: ENC[AES256_GCM,data:n8QdlHpBzd5xnG0wRvAWrSAc9K+hLvWmZ89mQ0Ei0+XeVR8kpGHszZkyFMC5jx4j19GzMyzUgrCSwwy1CII6QPmlOf0y/R/zQUAMaMnhzaDE8sZ06LJHaHgdN84e0CR5IZ7PUoxDXEDG9vY6ROE4xvHnS3cyTxdWGr5eMRH8lsU=,iv:aci2UnSnJ+j17ODyVHgtBs7of9xRxWeSSv5xDgwymWY=,tag:Ea8+ThyhMytdWZIKSFb1PQ==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

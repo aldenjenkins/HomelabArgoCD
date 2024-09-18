@@ -1,0 +1,5 @@
+namespace: intel-gpu-plugin
+resources:
+  - namespace.yaml
+  # Create GPU plugin daemonset
+  - 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/gpu_plugin/overlays/nfd_labeled_nodes?ref=main'

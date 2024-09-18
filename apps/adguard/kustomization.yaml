@@ -1,0 +1,11 @@
+namespace: adguard
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - servicemonitor.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - grafanadashboard.yaml
+generators:
+  - sopsgenerator.yaml

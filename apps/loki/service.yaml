@@ -1,0 +1,181 @@
+# Source: loki/templates/chunks-cache/service-chunks-cache-headless.yaml
+#   selector:
+#   matchLabels:
+#     app.kubernetes.io/instance: loki
+#     app.kubernetes.io/name: loki
+#     app.kubernetes.io/component: single-binary
+# endpoints:
+#   - port: http-metrics
+#     path: /metrics
+#     interval: 30s
+#     scheme: http
+#     relabelings:
+#       - action: replace
+#         replacement: my-cluster
+#         targetLabel: cluster
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-chunks-cache
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: "memcached-chunks-cache"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: memcached-client
+      port: 11211
+      targetPort: 11211
+    - name: http-metrics
+      port: 9150
+      targetPort: 9150
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: "memcached-chunks-cache"
+---
+# Source: loki/templates/gateway/service-gateway.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-gateway
+  labels:
+    app: loki
+    component: gateway
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: gateway
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 80
+      targetPort: http-metrics
+      protocol: TCP
+  selector:
+    app: loki
+    component: gateway
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: gateway
+---
+# Source: loki/templates/results-cache/service-results-cache-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-results-cache
+  labels:
+    app: loki
+    component: cache
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: "memcached-results-cache"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: memcached-client
+      port: 11211
+      targetPort: 11211
+    - name: http-metrics
+      port: 9150
+      targetPort: 9150
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: "memcached-results-cache"
+---
+# Source: loki/templates/service-memberlist.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-memberlist
+  labels:
+    app: loki
+    component: memberlist
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp
+      port: 7946
+      targetPort: http-memberlist
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/part-of: memberlist
+    app: loki
+    component: memberlist
+---
+# Source: loki/templates/single-binary/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-headless
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    variant: headless
+    prometheus.io/service-monitor: "false"
+spec:
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: 3100
+      targetPort: http-metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+---
+# Source: loki/templates/single-binary/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  labels:
+    helm.sh/chart: loki-6.16.0
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.1.1"
+    app.kubernetes.io/managed-by: Helm
+    app: loki
+    component: loki
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 3100
+      targetPort: http-metrics
+      protocol: TCP
+    - name: grpc
+      port: 9095
+      targetPort: grpc
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: single-binary
+    app: loki
+    component: loki

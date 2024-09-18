@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: twentycrm-server
+  name: twentycrm-server
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: twentycrm-server
+  template:
+    metadata:
+      labels:
+        app: twentycrm-server
+        sidecar.istio.io/inject: "true"
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+    spec:
+      containers:
+        - name: twentycrm
+          image: twentycrm/twenty:v1.5.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_PORT
+              value: "3000"
+            - name: SERVER_URL
+              value: "https://twenty.home.alden.ai:443"
+            - name: "PG_DATABASE_URL"
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: postgres_url
+            - name: "REDIS_URL"
+              value: "redis://twenty-cache-redis.twenty.svc.cluster.local:6379"
+            - name: SIGN_IN_PREFILLED
+              value: "false"
+            - name: STORAGE_TYPE
+              value: "s3"
+            - name: STORAGE_S3_NAME
+              value: "twentycrm-uploads"
+            - name: STORAGE_S3_REGION
+              value: "us-east-1"
+            - name: STORAGE_S3_ENDPOINT
+              value: "https://minio-api.home.alden.ai"
+            - name: AWS_S3_CUSTOM_DOMAIN
+              value: "minio-api.home.alden.ai"
+            - name: AWS_S3_ADDRESSING_STYLE
+              value: "path"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: minio_access_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: minio_secret_key
+            - name: "ACCESS_TOKEN_EXPIRES_IN"
+              value: "7d"
+            - name: "LOGIN_TOKEN_EXPIRES_IN"
+              value: "1h"
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: app_secret
+          ports:
+            - containerPort: 3000
+              name: http-tcp
+              protocol: TCP
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: twentycrm-worker
+  name: twentycrm-worker
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: twentycrm-worker
+  template:
+    metadata:
+      labels:
+        app: twentycrm-worker
+    spec:
+      containers:
+        - name: twentycrm
+          image: twentycrm/twenty:v1.5.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_PORT
+              value: "3000"
+            - name: SERVER_URL
+              value: "https://twenty.home.alden.ai:443"
+            - name: "PG_DATABASE_URL"
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: postgres_url
+            - name: "REDIS_URL"
+              value: "redis://twenty-cache-redis.twenty.svc.cluster.local:6379"
+            - name: DISABLE_DB_MIGRATIONS
+              value: "false" # it already runs on the server
+            - name: STORAGE_TYPE
+              value: "s3"
+            - name: STORAGE_S3_NAME
+              value: "twentycrm-uploads"
+            - name: STORAGE_S3_REGION
+              value: "us-east-1"
+            - name: STORAGE_S3_ENDPOINT
+              value: "https://minio-api.home.alden.ai"
+            - name: AWS_S3_CUSTOM_DOMAIN
+              value: "minio-api.home.alden.ai"
+            - name: AWS_S3_ADDRESSING_STYLE
+              value: "path"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: minio_access_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: minio_secret_key
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: twenty-secrets
+                  key: app_secret
+          command:
+            - yarn
+            - worker:prod
+          resources:
+            requests:
+              memory: "1025Mi"
+              cpu: "250m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+      restartPolicy: Always

@@ -1,0 +1,84 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: trace-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trace-collector
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'trace-collector.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: logs-agent-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: logs-agent-collector
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'logs-agent-collector.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: logs-gateway-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: logs-gateway-collector
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'logs-gateway-collector.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: otlp-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: otlp-collector
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'otlp-collector.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: kubernetes-events-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubernetes-events-collector
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'events-collector.home.alden.ai'

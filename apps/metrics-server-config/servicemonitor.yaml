@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-server-servicemonitor
+  labels:
+    serviceMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      k8s-app: metrics-server
+  endpoints:
+    - port: https
+      path: /metrics
+      interval: 5s
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      scheme: https
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+      tlsConfig:
+        insecureSkipVerify: true

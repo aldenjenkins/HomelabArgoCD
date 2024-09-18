@@ -1,0 +1,35 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: prometheus-datasource
+spec:
+  allowCrossNamespaceImport: true
+  datasource:
+    name: prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus-k8s.prometheus.svc:9090  # The central Prometheus server
+    isDefault: true
+    jsonData:
+      timeInterval: 15s
+      tlsSkipVerify: true
+      manageAlerts: true
+      prometheusType: Prometheus
+      exemplarTraceIdDestinations:
+        # Field with internal link pointing to data source in Grafana.
+        # datasourceUid value can be anything, but it should be unique across all defined data source uids.
+        - datasourceUid: tempo
+          name: traceID
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  plugins:
+    - name: grafana-lokiexplore-app
+      version: 1.0.2
+    - name: grafana-pyroscope-app
+      version: 0.1.14
+    - name: grafana-exploretraces-app
+      version: 0.1.2
+    - name: grafana-piechart-panel
+      version: 1.3.9

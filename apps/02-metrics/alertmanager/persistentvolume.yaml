@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: alertmanager-data
+    labels:
+        name: alertmanager-data
+spec:
+    capacity:
+        storage: ENC[AES256_GCM,data:ZTyp,iv:CPKLoF72yh85xtz51nPZS/OiA+slgo34RbS+X4VPnE4=,tag:FTRuwoo5LzRXKgXc7QIL6A==,type:str]
+    accessModes:
+        - ENC[AES256_GCM,data:MXXAvbdSZGNlszeWLg==,iv:Fm9M+OYv7GDfQCn17tqK7n2qz4H394je5ARDEQ38WWo=,tag:LbFcsqiQ0S9HAoOiN00Kpw==,type:str]
+    #ENC[AES256_GCM,data:xIAu6iS5e1rC38go9A==,iv:QkFsryMykJCyv2GMZ6QC8zauQHimJWbgow+azujr23I=,tag:XWb2VJG2KMFeXt+C7g13WQ==,type:comment]
+    storageClassName: ENC[AES256_GCM,data:2S4z1rUNqEq+IQ==,iv:m0A3mFh7zQ3irYtqUn/ZJwA3I0NccOxn1jY2MT+PMyk=,tag:cAo883E6GF77feHGoeFtkA==,type:str]
+    nfs:
+        server: ENC[AES256_GCM,data:6VCKDMsctWPpBmVqqP3G,iv:X8XouQRLoqcvNE4I7k28MZqM1VnPspulen6MnQejiBI=,tag:DmRyWwordskKLx92CnJ7TQ==,type:str]
+        path: ENC[AES256_GCM,data:oIhNHsOSMGtL1kGpJ697ci9cyEPtDe38DA1DIvGz/goVf+if7PJgy1GShJ88w/o63Drx1rc=,iv:HlXtg9+DUINq6ulQCtAoBs2NmG289HBzLFLYSJw7qbg=,tag:zvjAaJDgwqdD9HgId8F9Kg==,type:str]
+    mountOptions:
+        - ENC[AES256_GCM,data:Ek6enGZZifF62o0=,iv:DUZrB8r0H9zwsNC6xDAxme8t5ZUF5GrLosCdB5yTaOM=,tag:NGFr4nG1U7Ih+xG6L4KVDg==,type:str]
+    persistentVolumeReclaimPolicy: ENC[AES256_GCM,data:0F/VpuPw,iv:rPFondCGT3OPOxoieQ988Y8NncTeZFWr7xkV5RuYGaU=,tag:0vvvZubThX6udZnrG2PPuA==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEL0FvMmVlcUV2czRSYjM2
+            N3pOOHBNN3pXVFdNNjFCQmxoV21jM3FjN2xvCndSTjkvRWxmeDJlWGJ6Q2tkMFVM
+            VTBrczh0MXZlYzU4UjB5clNBaEx3MHcKLS0tIGVNaGNiMHFTdUduSGtJYUNic3VB
+            UUJmNXg2R2dvUVAxRnpSeGQvNmh2TzQKGUfRn3+em8sk4WltpbPeRrkzcDb3M+WN
+            Dc6B/av6O96vhnQ6skLv6+vhhocC6Z0bt6O7qoew399mdNPJPTBO5w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T00:23:33Z"
+    mac: ENC[AES256_GCM,data:hXTW9fgkSE4OK0fQ+hWC/FiCwzd9N4kgwF4tbdYzD9WkrdEt01N1YbrOA2ythaWsjU6EmmByKifz/Y8BYH6tPkTARZDCCKZz2EpoS00A/YRJCET/mVDMOLq/KSD0flmAgI1ka8+fF+u1OHN1BTV/SxHioOw97aJPYQMOQdWl+4M=,iv:Sey33OVMjk28U8kNwoYwiUkt+5jIxBJ3bL3DZJNJ0mY=,tag:dvYYm9jyZ/gbJLRo7+dAYw==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

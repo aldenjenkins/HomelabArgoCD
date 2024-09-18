@@ -1,0 +1,32 @@
+# Source: librespeed/templates/deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: librespeed
+  namespace: librespeed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: librespeed
+  template:
+    metadata:
+      labels:
+        app: librespeed
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: librespeed
+          image: linuxserver/librespeed
+          env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: 'America/Chicago'
+          ports:
+            - containerPort: 80
+              name: libspeed-http
+            - containerPort: 443
+              name: libspeed-https

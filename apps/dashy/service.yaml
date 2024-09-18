@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashy
+  labels:
+    app: dashy
+    app.kubernetes.io/name: dashy
+    app.kubernetes.io/instance: dashy
+    app.kubernetes.io/version: "3.1.1"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: dashy
+    app.kubernetes.io/name: dashy
+    app.kubernetes.io/instance: dashy

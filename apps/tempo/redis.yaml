@@ -1,0 +1,22 @@
+# Source: redis/templates/redis-standalone.yaml
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: Redis
+metadata:
+  name: tempo-cache-redis
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: redis
+    app.kubernetes.io/version: 0.16.5
+    app.kubernetes.io/component: middleware
+  annotations:
+spec:
+  kubernetesConfig:
+    image: "quay.io/opstree/redis:v7.0.15"
+    imagePullPolicy: "IfNotPresent"
+  redisExporter:
+    enabled: true
+    image: "quay.io/opstree/redis-exporter:v1.44.0"
+    imagePullPolicy: "IfNotPresent"
+  podSecurityContext:
+    fsGroup: 1000
+    runAsUser: 1000

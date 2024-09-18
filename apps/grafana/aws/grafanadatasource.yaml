@@ -1,0 +1,31 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: cloudwatch-datasource
+spec:
+  allowCrossNamespaceImport: true
+  valuesFrom:
+    - targetPath: "secureJsonData.accessKey"
+      valueFrom:
+        secretKeyRef:
+          name: "aws-cloudwatch-credentials"
+          key: "access_key_id"
+    - targetPath: "secureJsonData.secretKey"
+      valueFrom:
+        secretKeyRef:
+          name: "aws-cloudwatch-credentials"
+          key: "secret_access_key"
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  datasource:
+    name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    isDefault: false
+    jsonData:
+      "authType": "keys"
+      "defaultRegion": "us-east-1"
+    secureJsonData:
+      "accessKey": "${access_key_id}"
+      "secretKey": "${secret_access_key}"

@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: adguard-exporter
+  labels:
+    serviceMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: adguard-exporter
+      app.kubernetes.io/instance: adguard-exporter
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      # scrapeTimeout: 50s
+      scheme: http
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+  attachMetadata:
+    node: true

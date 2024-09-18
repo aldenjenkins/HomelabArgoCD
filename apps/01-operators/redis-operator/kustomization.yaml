@@ -1,0 +1,7 @@
+resources:
+  - github.com/OT-CONTAINER-KIT/redis-operator/config/default?ref=HEAD
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+
+patches:
+  - path: patch-deployment-image-pull-policy.yaml

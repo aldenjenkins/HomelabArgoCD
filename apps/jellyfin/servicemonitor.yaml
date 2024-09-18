@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: jellyfin
+  name: jellyfin
+spec:
+  endpoints:
+    - path: /metrics
+      port: jellyfin-http
+      interval: 30s
+  selector:
+    matchLabels:
+      app: jellyfin
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: jellyfin-exporter
+  labels:
+    app.kubernetes.io/name: jellyfin-exporter
+spec:
+  selector:
+    matchLabels:
+      app: jellyfin-exporter
+  endpoints:
+    - port: metrics
+      interval: 15s

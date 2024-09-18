@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: alloy-profiles
+spec:
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - alloy-profiles.home.alden.ai
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-profiles

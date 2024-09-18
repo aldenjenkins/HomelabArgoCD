@@ -1,0 +1,13 @@
+namespace: jellyfin
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - statefulset.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+generators:
+  - sopsgenerator.yaml

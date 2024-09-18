@@ -1,0 +1,9 @@
+resources:
+  - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+  # - https://github.com/google/cadvisor/deploy/kubernetes/base
+  - prometheus
+  - prometheus-adapter
+  - alertmanager
+  - blackbox-exporter
+  - namespaces/kube-system
+  - namespaces/mailinabox

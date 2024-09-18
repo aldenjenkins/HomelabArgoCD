@@ -1,0 +1,18 @@
+namespace: observability
+resources:
+  - namespace.yaml
+  - persistentvolume.yaml
+  - opentelemetrycollector-otlp.yaml
+  - opentelemetrycollector-logs-gateway.yaml
+  - opentelemetrycollector-logs-agent.yaml
+  - opentelemetrycollector-kubernetes-events.yaml
+  - opentelemetrycollector-trace.yaml
+  - instrumentation.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml

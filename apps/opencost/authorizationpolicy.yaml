@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: opencost
+spec:
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - opencost.home.alden.ai
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opencost
+      app.kubernetes.io/instance: opencost

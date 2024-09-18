@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cockpit-conf
+  labels:
+    app.kubernetes.io/name: cockpit
+    app.kubernetes.io/instance: cockpit
+data:
+  cockpit.conf: |-
+    [WebService]
+    ProtocolHeader = X-Forwarded-Proto
+    LoginTitle = Cockpit Bastion
+    RequireHost = true
+    AllowUnencrypted = true
+
+    [Negotiate]
+    action = none
+
+    [Basic]
+    Command = /container/cockpit-auth-ssh-key
+
+    [Ssh-Login]
+    Command = /container/cockpit-auth-ssh-key

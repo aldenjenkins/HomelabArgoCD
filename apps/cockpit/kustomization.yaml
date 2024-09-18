@@ -1,0 +1,10 @@
+namespace: cockpit
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - configmap.yaml
+generators:
+  - sopsgenerator.yaml

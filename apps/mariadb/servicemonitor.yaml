@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+    name: mysql-exporter
+    labels:
+        app: mysql-exporter
+spec:
+    selector:
+        matchLabels:
+            app: ENC[AES256_GCM,data:wES/qHkZ5tMLGtPL7Bo=,iv:b8rM4MjAYKtRvp3wnDyMW0d6rGAin77zgeCD3V+8pds=,tag:QHXy4kDwJ0UBh1wiuFVveA==,type:str]
+    endpoints:
+        - port: ENC[AES256_GCM,data:eZR2NRj/Fw==,iv:g1zIeePMr5CMw5eBVJAWgU3o0ewIc2t/dTsWuZ1MjRs=,tag:573f88sgFlohLom9YVl+CQ==,type:str]
+          interval: ENC[AES256_GCM,data:Aezt,iv:bQXmiD2rjD2pk7HPbgDvMWA31gTcLj3D508/y4WMVpw=,tag:3uxmQVcjamjOqgCGovVNvA==,type:str]
+          path: ENC[AES256_GCM,data:cD0d5+z7zak=,iv:BwbmikuDTBeSyRRlBkswn19Nn8iC3P8gA4UC0aga7SM=,tag:lAHpPqkQ5PgKVsZZRTebwg==,type:str]
+          relabelings:
+            - action: ENC[AES256_GCM,data:tmufgwphaQ==,iv:t5WVjnOK3Z++dJ2mTqpID0Om3xd9pM9tjENdOAgmMl4=,tag:DxagqHZndpZkQ2q4pQIXdg==,type:str]
+              replacement: ENC[AES256_GCM,data:aFmdJi6///siOZ4LZctwaANL72c=,iv:8kTdrbhPGRU7nkV+rOCQ3vfIrKV9i5/VR0QITg4SaCc=,tag:R1WQhWeNGdG02cM5ZhJbEw==,type:str]
+              targetLabel: ENC[AES256_GCM,data:xN/1yD40EuM=,iv:KTLElq4juNQ29g/UzKA7js29uBjlPbqlI+WHD04xrI0=,tag:hPKSamv/W0J1ZCCYeD22uQ==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEazhScmJ6bjFOS0NxUXNn
+            RXhLK0F1QVArd1UzeDh2QktEQU9SM2U5cm5NCnQ3THF0V1pUTGxXUlNiUER2eGpG
+            ZEVCR1FCbjJRQWVXbGFDamhMRUZHNDAKLS0tIHdmSFNHd1lPYUFCeVNIRDg1NUVY
+            bUtQNnZCWTM0MUloQjlCVzRSMDU2SXcK1DkK5QgYelBqpy0yaz8H/PXa/TsxfErC
+            GzReSTlAQ5ni6DnBQGtDW/YsQlFChZhmqNkljKqOBfXxonZ//xEvNw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T04:25:07Z"
+    mac: ENC[AES256_GCM,data:unKJPFZolTbRuU8B3fLpx3oeiV0ymYr9VvXrSKOtjM4Q2jAn4CCh51jq6AXKa9rJ83JURerXKvpHXREaLT7HDDpQa4ICWLy6fWffex19s3jvvylfq3vTeYI86/jvCRimC68adcrNUGYubKlK2+RZ/5QGQeEuHSpu7N8yMXV/Qp8=,iv:KzoVmm9YFhA9y8s+OFiqMdkL+0omPagkfaxSuMXfHbE=,tag:ifjVq6iyXgT0hVu1VJNU7w==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

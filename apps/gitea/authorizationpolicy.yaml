@@ -1,0 +1,35 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+    name: gitea
+spec:
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: ENC[AES256_GCM,data:xRRSiqA=,iv:e45VIl/3Z5P0j+BX8xEBPuj9JmpSPPzydu9w769ApVE=,tag:zI+6wRfjkiHurk6FHVsp6Q==,type:str]
+    action: ENC[AES256_GCM,data:1LCNMq6X,iv:cMhl9c0SM2+pZHrdA/0cEswIOUz32ECyNdu8khqgSjU=,tag:XsP7JYCi6JhG5HfK0QP3CA==,type:str]
+    provider:
+        name: ENC[AES256_GCM,data:JwWd6fJaLSE=,iv:Sxpecg31J1GY7T3fH62orQBIMMnpPrKWOrkH/DEmDA8=,tag:4Rl2D9RU/ZUndlyDh3A2EQ==,type:str]
+    rules:
+        - to:
+            - operation:
+                paths:
+                    - ENC[AES256_GCM,data:Pjs=,iv:2L3+sJGJ69f0y9K3vuscYwxPttENuknzOoPD9wKjaHg=,tag:agRoaU845c1FQnH8ju3itw==,type:str]
+                hosts:
+                    - ENC[AES256_GCM,data:KxFqe8HwcFuiN8NnhV0xCsDteg==,iv:6vfLZsh35UniNyEpLKY+zm6F06LLYxRKHU1guMwcWek=,tag:tWpqKQVb6ORAjHrMJNh5vA==,type:str]
+                notPaths:
+                    - ENC[AES256_GCM,data:EFIGozhPhz4NC85c0B+f4w==,iv:XvRfgu9Xs8JKGo9o2tYKppMzCs1KN8I0C1i09Nf8r84=,tag:DTtnWApfo+XPa52VA0+ffA==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBMVXo5eVlYemVhV0lqazBp
+            NnpheURLdUpPZ1g2UFNDbXBFbTE3bElEeFJNClFUekh5WDRFRTROT3VXV2wxbHpF
+            dGovM3BLYzI2UEswc0FyM2h4eDVtZVkKLS0tIHRiMHQwVUJkOGIyMnB2OXV4ZU92
+            cEVPQ0krQnh2Nk10TjdTVkE4bE8wSDAKnELOMveOahZ2wqeShqlHgIfK6OB+J9xY
+            +XpfMCSGNyVr65/sz6DgqT2ebvv1q30nd835CixjGTxZyv1N4IBUBA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T00:06:26Z"
+    mac: ENC[AES256_GCM,data:y9/BpVftf7NunE6j8SNVn+dOsR9MFEJsyHCP5MwKpGAsGJdcRnAdnN6mZ9ug4kkUhCS6SeBFnDeVjBgTZ8HqT9Tc3pip2kUIOEO0ImkFslv2yvBCA5VpGmbM1C9QUXD6/9N10/Ir9cg3xv3MCJuyZNvQhHLODikVZy12GDqNY48=,iv:7r7ZnvECMUYVZ9xDsEJqSmN9WeHK1Po/Y98MzKvybLc=,tag:GOFTBZiprt9nHMyx+T6VYw==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

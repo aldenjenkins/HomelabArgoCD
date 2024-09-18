@@ -1,0 +1,13 @@
+namespace: ntfy
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - deployment.yaml  # deployment definition
+  - service.yaml  # service connecting pods to cluster network
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+configMapGenerator:  # will parse config from raw config to configmap,it allows for dynamic reload of application if additional app is deployed ie https://github.com/stakater/Reloader
+  - name: ntfy-server-config
+    namespace: default
+    files:
+      - server.yml

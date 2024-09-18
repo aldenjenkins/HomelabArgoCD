@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  accounts.alden: login
+  kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
+  dex.config: |
+    connectors:
+      - type: 'authproxy'
+        id: authelia
+        name: Authelia
+        config:
+          userHeader: "Remote-User"
+          redirectURI: "https://argocd.home.alden.ai/auth/callback"
+  url: https://argocd.home.alden.ai

@@ -1,0 +1,12 @@
+namespace: istio-system
+resources:
+  - base
+  - envoyfilter.yaml
+  - gateway.yaml
+  - istio-ingress.yaml
+  - telemetry.yaml
+  - podmonitor.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+generators:
+  - sopsgenerator.yaml

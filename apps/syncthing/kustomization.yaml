@@ -1,0 +1,5 @@
+namespace: syncthing
+resources:
+  - namespace.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

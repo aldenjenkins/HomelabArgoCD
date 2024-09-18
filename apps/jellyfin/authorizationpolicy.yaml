@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: jellyfin
+spec:
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - jellyfin.home.alden.ai
+  selector:
+    matchLabels:
+      app: jellyfin

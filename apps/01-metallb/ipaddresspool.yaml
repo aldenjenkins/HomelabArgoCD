@@ -1,0 +1,23 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+    name: first-pool
+spec:
+    addresses:
+        - ENC[AES256_GCM,data:Gt4GolvGy7lHqVDs9Klj/QIA,iv:cn4YFiXH1fOfklnw/jZ1PbtQr9h6ar/4d84ODIBdqJk=,tag:RxkMWrRXgRp/rconDaELuA==,type:comment]
+        - ENC[AES256_GCM,data:68Ke5r56MXV+V0weQ6eqn8PaUinwhaOdOLeny3PO3w==,iv:984dP6EonouqnargN3fQ95f+G8cfhZ6ZJLRuIQlsHRc=,tag:taX1r/qR/FTfw2trHHIfuQ==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBmaWRIaHY0U3h5cmJDcXY0
+            bUEydHlIeHExV1RFSEgxVEt6dFVzaGtLTkJJCmdBQnRpdmxENEJXSXJ0MkZ3RHZQ
+            S05wNkNkTm5LeTdqVk0vZ1gyZTlZSWcKLS0tIGxZMGk4TkJabkdhcytkcE40a3Zu
+            T2ZyNTNQdDVIeHpPQmNGUjVlL2l2WWcKNI8+KUSYvo7ckF6kD7NcQyErTcJ0QTAK
+            BHsfaLben8xI0LwvvGOCaZ+fiG6fQGjmp8S6H8ljlGkF01CTnGmnqA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T02:47:43Z"
+    mac: ENC[AES256_GCM,data:jDcHKvLqlkoz1OlQ/YcIaA2FGuTiCf+h4FfE6DvIrpYlcdGIBAD56LD/+1aeKAt3elcggFILNkEY+7fpGMyUuxgIuHn3VH3Gm9gHScpUDg7Sb0QfmGst61zeDbNy4Q9ZyziE0nL4/1oIGo6ygSYaoVHedqPx+wgZKyUInQyAexc=,iv:AUCq+fma3E8mjsFDDrKZ+WvERDFtDm6RLlfwkLkIVaY=,tag:QnJXonP3JbnvnGqYhdfPsA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2
