@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: grafana-operator
+  name: grafana-controller-manager-metrics-monitor
+  namespace: grafana
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+      interval: 14s
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana-operator

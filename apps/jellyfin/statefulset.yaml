@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jellyfin
+spec:
+  serviceName: jellyfin
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+        sidecar.istio.io/inject: "true"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node12
+      containers:
+        - name: jellyfin
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          image: docker.io/jellyfin/jellyfin:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              gpu.intel.com/i915: 1
+          ports:
+            - containerPort: 8096
+              protocol: TCP
+              name: jellyfin-http
+          volumeMounts:
+            - mountPath: /data/media
+              name: jellyfin-media
+            - mountPath: /config
+              name: jellyfin-config
+            - name: jellyfin-cache
+              mountPath: /cache
+      restartPolicy: Always
+      # volumeClaimTemplates handles this
+      #  volumes:
+      #    - name: media-library
+      #      persistentVolumeClaim:
+      #        claimName: jellyfin-media
+      #    - name: jellyfin-config
+      #      persistentVolumeClaim:
+      #        claimName: jellyfin-config
+      volumes:
+        - name: jellyfin-cache
+          emptyDir:
+            sizeLimit: "10Gi"
+  volumeClaimTemplates:
+    - metadata:
+        name: jellyfin-media
+        annotations:
+          nfs.io/storage-path: "jellyfin/"
+      spec:
+        accessModes: ["ReadWriteMany"]
+        resources:
+          requests:
+            storage: 1Pi
+        storageClassName: nfs-media-retain
+    - metadata:
+        name: jellyfin-config
+        annotations:
+          nfs.io/storage-path: "jellyfin/"
+      spec:
+        accessModes: ["ReadWriteMany"]
+        storageClassName: nfs-appdata-retain
+        resources:
+          requests:
+            storage: 1Ti

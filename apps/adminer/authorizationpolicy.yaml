@@ -1,0 +1,18 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: adminer
+  namespace: adminer
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app: adminer
+  provider:
+    name:  authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - adminer.home.alden.ai

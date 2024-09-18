@@ -1,0 +1,84 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: plane-web
+spec:
+  selector:
+    matchLabels:
+      app.name: plane-web
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'plane.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: plane-admin
+spec:
+  selector:
+    matchLabels:
+      app.name: plane-admin
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'plane.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: plane-live
+spec:
+  selector:
+    matchLabels:
+      app.name: plane-live
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'plane.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: plane-api
+spec:
+  selector:
+    matchLabels:
+      app.name: plane-api
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'plane.home.alden.ai'
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: plane-space
+spec:
+  selector:
+    matchLabels:
+      app.name: plane-space
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'plane.home.alden.ai'

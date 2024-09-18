@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: adguard
+spec:
+  hosts:
+    - "adguard.home.alden.ai"
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - route:
+        - destination:
+            host: adguard.adguard.svc.cluster.local
+            port:
+              number: 80
+      # i think this was needed for dashy when using pihole but rarely use it and don't care
+      # rewrite:
+      #   authority: "dashy.home.alden.ai"

@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: metallb
+spec:
+  allowCrossNamespaceImport: true
+  parentFolderUID: networking-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

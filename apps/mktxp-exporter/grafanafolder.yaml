@@ -1,0 +1,11 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: mikrotik
+spec:
+  allowCrossNamespaceImport: true
+  uid: mikrotik-uid
+  parentFolderUID: networking-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

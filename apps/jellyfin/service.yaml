@@ -1,0 +1,31 @@
+# Source: jellyfin/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jellyfin
+  name: jellyfin
+spec:
+  ports:
+    - name: jellyfin-http
+      port: 8096
+      protocol: TCP
+      targetPort: 8096
+  selector:
+    app: jellyfin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-exporter
+  labels:
+    app: jellyfin-exporter
+spec:
+  selector:
+    app: jellyfin-exporter
+  ports:
+    - protocol: TCP
+      port: 9594
+      targetPort: 9594
+      name: metrics
+  type: ClusterIP

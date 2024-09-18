@@ -1,0 +1,23 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: otel
+spec:
+  metrics:
+    - providers:
+        - name: prometheus
+  accessLogging:
+    - providers:
+        - name: otel-logs
+  tracing:
+    - providers:
+        - name: otel-tracing
+      randomSamplingPercentage: 100
+      customTags:
+        k8s.pod.ip:
+          environment:
+            name: INSTANCE_IP
+            #customTags:
+            #  "my-attribute":
+            #    literal:
+            #      value: "default-value"

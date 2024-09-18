@@ -1,0 +1,56 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert-manager-controller
+  namespace: cert-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: cert-manager
+      app.kubernetes.io/name: cert-manager
+  endpoints:
+    - path: /metrics
+      port: tcp-prometheus-servicemonitor
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert-manager-webhook
+  namespace: cert-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: cert-manager
+      app.kubernetes.io/name: webhook
+  endpoints:
+    - path: /metrics
+      port: metrics
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert-manager-cainjector
+  namespace: cert-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: cainjector
+      app.kubernetes.io/instance: cert-manager
+      app.kubernetes.io/name: cainjector
+  endpoints:
+    - path: /metrics
+      port: http-metrics
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster

@@ -1,0 +1,10 @@
+namespace: freshrss
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+generators:
+  - sopsgenerator.yaml

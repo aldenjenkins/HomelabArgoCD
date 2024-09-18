@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mktxp-service-monitor
+  labels:
+    serviceMonitoring: enabled
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mktxp-exporter
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scheme: http
+      relabelings:
+        - action: replace
+          replacement: homelab-live
+          targetLabel: cluster
+  attachMetadata:
+    node: true

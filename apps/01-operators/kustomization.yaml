@@ -1,0 +1,9 @@
+resources:
+  - cert-manager-operator
+  - prometheus-operator
+  - grafana-operator
+  - external-secrets-operator
+  - redis-operator
+  - opentelemetry-operator
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"

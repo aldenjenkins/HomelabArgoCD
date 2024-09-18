@@ -1,0 +1,24 @@
+resources:
+  - https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+  - servicemonitor.yaml
+# patches:
+# - patch: |-
+#     $patch: delete
+#     apiVersion: v1
+#     kind: Namespace
+#     metadata:
+#       name: cert-manager
+# - target:
+#     kind: MutatingWebhookConfiguration
+#     name: cert-manager-webhook
+#   patch: |-
+#     - op: replace
+#       path: /metadata/annotations/cert-manager.io~1inject-ca-from-secret
+#       value: operators/cert-manager-webhook-ca
+# - target:
+#     kind: ValidatingWebhookConfiguration
+#     name: cert-manager-webhook
+#   patch: |-
+#     - op: replace
+#       path: /metadata/annotations/cert-manager.io~1inject-ca-from-secret
+#       value: operators/cert-manager-webhook-ca

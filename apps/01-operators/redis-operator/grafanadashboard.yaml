@@ -1,0 +1,16 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: redis-operator
+  namespace: redis-operator-system
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 10m
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  url: "https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/refs/heads/main/dashboards/redis-operator-cluster.json"
+  folderUID: redis-uid

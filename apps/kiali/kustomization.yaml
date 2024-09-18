@@ -1,0 +1,15 @@
+namespace: kiali
+resources:
+  - namespace.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - deployment.yaml
+  - role.yaml
+  - rolebinding.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - authorizationpolicy.yaml
+  - virtualservice.yaml
+generators:
+  - sopsgenerator.yaml

@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: nats-virtualservice
+spec:
+  hosts:
+    - nats.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: nats.nats-io.svc.cluster.local
+            port:
+              number: 8080

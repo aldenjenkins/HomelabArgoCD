@@ -1,0 +1,6 @@
+resources:
+  # Start NFD - if your cluster doesn't have NFD installed yet
+  - 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/nfd?ref=main'
+  # Create NodeFeatureRules for detecting GPUs on nodes
+  - 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/nfd/overlays/node-feature-rules?ref=main'
+  - ./intel-gpu-plugin

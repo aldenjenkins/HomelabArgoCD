@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: librespeed
+  namespace: librespeed
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app: librespeed
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - librespeed.home.alden.ai

@@ -1,0 +1,15 @@
+namespace: plane
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - redis.yaml
+  - deployment.yaml
+  - job.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - servicemonitor.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

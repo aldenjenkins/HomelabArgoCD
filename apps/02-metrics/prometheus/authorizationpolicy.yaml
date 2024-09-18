@@ -1,0 +1,21 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: prometheus
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - prometheus.home.alden.ai
+            notPaths:
+              - /api/v1/write
+              # This was for deleting old series after i reduced max metrics life in my Prometheus resource's spec. I had many old ones. I also wanted to test this out to see what its like. worked very nice.
+              # - /api/v1/admin/tsdb/delete_series

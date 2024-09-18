@@ -1,0 +1,33 @@
+namespace: nfs-provisioner
+resources:
+  - namespace.yaml
+  - ./base
+  - storageclass.yaml
+generators:
+  - sopsgenerator.yaml
+replacements:
+  - source:
+      kind: Secret
+      name: nfs-source-values
+      fieldPath: stringData.NFS_SERVER
+    targets:
+      - select:
+          kind: Deployment
+          name: nfs-client-provisioner
+        fieldPaths:
+          - spec.template.spec.volumes.0.nfs.server
+          - spec.template.spec.containers.0.env.1.value
+  - source:
+      kind: Secret
+      name: nfs-source-values
+      fieldPath: stringData.NFS_PATH
+    targets:
+      - select:
+          kind: Deployment
+          name: nfs-client-provisioner
+        fieldPaths:
+          - spec.template.spec.containers.0.env.2.value
+          - spec.template.spec.volumes.0.nfs.path
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"

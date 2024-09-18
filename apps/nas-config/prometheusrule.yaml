@@ -1,0 +1,282 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: zfs
+    app.kubernetes.io/name: zfs
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: zfs-rules
+spec:
+  groups:
+    - name: ZFS Rules
+      rules:
+        - alert: ZfsOfflinePool
+          expr: node_zfs_zpool_state{state=~"faulted|offline|unavail"} > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: ZFS offline pool (instance {{ $labels.instance }})
+            description: "A ZFS zpool is in a unexpected state: {{ $labels.state }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: ZfsDegradedPool
+          expr: node_zfs_zpool_state{state=~"degraded"} > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: ZFS offline pool (instance {{ $labels.instance }})
+            description: "A ZFS zpool is in a unexpected state: {{ $labels.state }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: ZfsPoolOutOfSpace
+          expr: zfs_pool_free_bytes * 100 / zfs_pool_size_bytes < 10 and ON (instance, device, mountpoint) zfs_pool_readonly == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: ZFS pool out of space (instance {{ $labels.instance }})
+            description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        # 0: ONLINE
+        # 1: DEGRADED
+        # 2: FAULTED
+        # 3: OFFLINE
+        # 4: UNAVAIL
+        # 5: REMOVED
+        # 6: SUSPENDED
+        - alert: ZfsPoolUnhealthy
+          expr: zfs_pool_health > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: ZFS pool unhealthy (instance {{ $labels.instance }})
+            description: "ZFS pool state is {{ $value }}. See comments for more information.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: ZfsPoolUnhealthy
+          expr: zfs_pool_health > 0 and zfs_pool_readonly > 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: ZFS pool readonly and offline ({{ $labels.pool }})
+            description: "ZFS pool {{ $labels.pool }} is in readonly mode."
+        - alert: ZfsCollectorFailed
+          expr: zfs_scrape_collector_success != 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: ZFS collector failed (instance {{ $labels.instance }})
+            description: "ZFS collector for {{ $labels.instance }} has failed to collect information\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+        - alert: ZpoolVolumeFillingUp
+          expr: |
+            (zfs_dataset_written_bytes{type="volume"} / zfs_dataset_volume_size_bytes * 100 > 60 and predict_linear(zfs_dataset_written_bytes{type="volume"}[6h], 24 * 60 * 60) < 0 and zfs_pool_readonly == 0)
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: Filesystem is predicted to run out of space within the next 24 hours.
+            description: Filesystem on volume {{ $labels.name }} is at {{ printf "%.2f" $value }}% capacity and is filling up.
+        - alert: ZpoolVolumeFillingUp
+          expr: |
+            (zfs_dataset_written_bytes{type="volume"} / zfs_dataset_volume_size_bytes * 100 > 80 and predict_linear(zfs_dataset_written_bytes{type="volume"}[6h], 4 * 60 * 60) < 0 and zfs_pool_readonly == 0)
+          for: 30m
+          labels:
+            severity: critical
+          annotations:
+            summary: Filesystem is predicted to run out of space within the next 4 hours.
+            description: Filesystem on volume {{ $labels.name }} is at {{ printf "%.2f" $value }}% capacity and is filling up.
+        - alert: ZpoolGlobalDataSetFillingUp
+          expr: |
+            (zfs_dataset_logical_used_bytes{name=~"(apollo|wd-pool|boot-pool)"} / zfs_dataset_available_bytes{name=~"(apollo|wd-pool|boot-pool)"} * 100 > 50 and predict_linear(zfs_dataset_logical_used_bytes{name=~"(apollo|wd-pool|boot-pool)"}[6h], 24 * 60 * 60) < 0 and zfs_pool_readonly == 0)
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: Filesystem is predicted to run out of space within the next 24 hours.
+            description: Filesystem on volume {{ $labels.name }} is at {{ printf "%.2f" $value }}% capacity and is filling up.
+        - alert: ZpoolGlobalDataSetFillingUp
+          expr: |
+            (zfs_dataset_logical_used_bytes{name=~"(apollo|wd-pool|boot-pool)"} / zfs_dataset_available_bytes{name=~"(apollo|wd-pool|boot-pool)"} * 100 > 80 and predict_linear(zfs_dataset_logical_used_bytes{name=~"(apollo|wd-pool|boot-pool)"}[6h], 4 * 60 * 60) < 0 and zfs_pool_readonly == 0)
+          for: 30m
+          labels:
+            severity: critical
+          annotations:
+            summary: Filesystem is predicted to run out of space within the next 4 hours.
+            description: Filesystem on volume {{ $labels.name }} is at {{ printf "%.2f" $value }}% capacity and is filling up.
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: mariadb-backup-prometheus-rules
+spec:
+  groups:
+    - name: mariadb-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: MariadbBackupFailed
+          expr: backup_success{backup_name="mariadb", backup_type="database"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup failed"
+            description: "MariaDB backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: MariadbBackupTooOld
+          expr: backup_age_hours{backup_name="mariadb", backup_type="database"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup is too old"
+            description: "MariaDB backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: MariadbBackupSizeSmall
+          expr: backup_size_bytes{backup_name="mariadb", backup_type="database"} < 1000000  # Less than 1MB
+          for: 5m
+          labels:
+            severity: warning
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup size is suspiciously small"
+            description: "MariaDB backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: postgresql-backup-prometheus-rules
+spec:
+  groups:
+    - name: postgresql-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: PostgresqlBackupFailed
+          expr: backup_success{backup_name="postgresql", backup_type="database"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup failed"
+            description: "PostgreSQL backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: PostgresqlBackupTooOld
+          expr: backup_age_hours{backup_name="postgresql", backup_type="database"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup is too old"
+            description: "PostgreSQL backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: PostgresqlBackupSizeSmall
+          expr: backup_size_bytes{backup_name="postgresql", backup_type="database"} < 1000000  # Less than 1MB
+          for: 5m
+          labels:
+            severity: warning
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup size is suspiciously small"
+            description: "PostgreSQL backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: mailinabox-prometheus-rules
+spec:
+  groups:
+    - name: mailinabox-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: MailInABoxBackupFailed
+          expr: backup_success{backup_name="mailinabox", backup_type="rsync"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup failed"
+            description: "Mail-in-a-Box backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: MailInABoxBackupTooOld
+          expr: backup_age_hours{backup_name="mailinabox", backup_type="rsync"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup is too old"
+            description: "Mail-in-a-Box backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: MailInABoxBackupSizeSmall
+          expr: backup_size_bytes{backup_name="mailinabox", backup_type="rsync"} < 1000000
+          for: 5m
+          labels:
+            severity: warning
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup size is suspiciously small"
+            description: "Mail-in-a-Box backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: backup-system-collector-rules
+spec:
+  groups:
+    - name: backup-system-collectors
+      rules:
+        # Collector hasn't updated its runner timestamp recently (stale)
+        - alert: BackupCollectorStale
+          expr: time() - max_over_time(collector_runner_last_run_timestamp[15m]) > 600
+          for: 5m
+          labels:
+            severity: warning
+            service: backups
+          annotations:
+            summary: "Backup collector runner is stale"
+            description: "collector_runner_last_run_timestamp hasn't updated in >10m on {{ $labels.instance }}."
+
+        # Collector is running but reports failure (uses your runner success gauge)
+        - alert: BackupCollectorFailed
+          expr: max_over_time(collector_runner_success[10m]) == 0
+          for: 10m
+          labels:
+            severity: critical
+            service: backups
+          annotations:
+            summary: "Backup collector is failing"
+            description: "collector_runner_success has been 0 for 10m on {{ $labels.instance }}."

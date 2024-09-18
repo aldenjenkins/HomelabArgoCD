@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ntfy
+spec:
+  selector:
+    matchLabels:
+      app: ntfy
+  template:
+    metadata:
+      labels:
+        app: ntfy
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: ntfy
+          image: binwiederhier/ntfy:v2.14
+          imagePullPolicy: IfNotPresent
+          args: ["serve"]
+          env:
+            - name: TZ
+              value: America/Chicago
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - mountPath: /etc/ntfy/server.yml
+              subPath: server.yml
+              name: config-volume  # generated vie configMapGenerator from kustomization file
+            - mountPath: /var/cache/ntfy
+              name: cache-volume  #cache volume mounted to persistent volume
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ntfy-server-config
+        - name: cache-volume
+          persistentVolumeClaim:  # stores /cache/ntfy
+            claimName: ntfy-data

@@ -1,0 +1,104 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: slackwebhook
+  labels:
+    alertmanagerConfig: slackwebhook
+spec:
+  route:
+    receiver: null_receiver
+    groupBy: ['alertname', 'job']
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 10m
+    routes:
+      - receiver: slack-notifications
+        matchers:
+          - name: severity
+            matchType: "=~"
+            value: "critical|warning"
+          - name: alertname
+            matchType: "!~"
+            value: "Watchdog|InfoInhibitor"
+        continue: false
+  receivers:
+    - name: null_receiver
+    - name: slack-notifications
+      slackConfigs:
+        - sendResolved: true
+          apiURL:
+            name: alertmanager-slack-webhook-url
+            key: webhook_url
+          username: "alertmanager"
+          iconURL: "https://avatars3.githubusercontent.com/u/3380462"
+          channel: '#alertmanager'
+          titleLink: '{{ define "slack.default.titlelink" }}{{ "" }}{{ end }}'
+          color: |-
+            {{ if eq .Status "firing" -}}
+              {{ if eq .CommonLabels.severity "warning" -}}
+                warning
+              {{- else if eq .CommonLabels.severity "fatal" -}}
+                #611f69
+              {{- else if eq .CommonLabels.severity "critical" -}}
+                #611f69
+              {{- else if eq .CommonLabels.severity "danger" -}}
+                danger
+              {{- else if eq .CommonLabels.severity "error" -}}
+                danger
+              {{- else if eq .CommonLabels.severity "notice" -}}
+                good
+              {{- else if eq .CommonLabels.severity "info" -}}
+                #36c5f0
+              {{- else -}}
+                .CommonLabels.severity
+              {{- end -}}
+            {{ else -}}
+            good
+            {{- end }}
+          actions:
+            - type: button
+              text: 'Query :mag:'
+              url: '{{ (index .Alerts 0).GeneratorURL }}'
+            - type: button
+              text: 'Dashboard :grafana:'
+              url: '{{ (index .Alerts 0).Annotations.dashboard_url }}'
+            - type: button
+              text: 'Runbook :green_book:'
+              url: '{{ (index .Alerts 0).Annotations.runbook_url }}'
+            - type: button
+              text: 'Silence :no_bell:'
+              url: |-
+                {{ .ExternalURL }}/#/silences/new?filter=%7B
+                {{- range .CommonLabels.SortedPairs -}}
+                    {{- if ne .Name "alertname" -}}
+                        {{- .Name }}%3D"{{- .Value -}}"%2C%20
+                    {{- end -}}
+                {{- end -}}
+                alertname%3D"{{- .CommonLabels.alertname -}}"%7D
+            - type: button
+              text: 'Link :globe_with_meridians:'
+              url: '{{ template "slack.default.titlelink" . }}'
+          title: |
+            [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ if ne .Status "firing" -}} :white_check_mark: {{- else if eq .CommonLabels.severity "critical" -}} :fire: {{- else if eq .CommonLabels.severity "warning" -}} :warning: {{- else if eq .CommonLabels.severity "info" -}} :information_source: {{- else -}} :white_check_mark: {{- end }} {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+            {{/*
+            {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
+              {{" "}}(
+              {{- with .CommonLabels.Remove .GroupLabels.Names }}
+                {{- range $index, $label := .SortedPairs -}}
+                  {{ if $index }}, {{ end }}
+                  {{- $label.Name }}="{{ $label.Value -}}"
+                {{- end }}
+              {{- end -}}
+              )
+            {{- end }}
+            */}}
+          text: >-
+            {{ range .Alerts -}}
+            {{/* *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }} */}}
+
+            {{ .Annotations.description }}
+
+            *Details:*
+              {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+              {{ end }}
+            {{ end }}

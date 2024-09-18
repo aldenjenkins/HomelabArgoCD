@@ -1,0 +1,10 @@
+namespace: external-secrets
+resources:
+  - namespace.yaml
+  - clustersecretstore.yaml
+  - externalsecret.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - prometheusrule.yaml
+generators:
+  - sopsgenerator.yaml

@@ -1,0 +1,10 @@
+namespace: mariadb
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - prometheusrule.yaml
+generators:
+  - sopsgenerator.yaml

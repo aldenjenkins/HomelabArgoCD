@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: external-secrets
+  labels:
+    app.kubernetes.io/component: external-secrets
+    app.kubernetes.io/name: external-secrets
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 11.2.1
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+    - name: external-secrets
+      rules:
+        - alert: SecretSyncError
+          annotations:
+            summary: SecretSyncError {{ $labels.name }}
+            description: |
+              Synchronization of the Secret `{{ $labels.name }}` in namespace `{{ $labels.exported_namespace }}` is failing.
+              Check for errors in the Status field of the associated ExternalSecret object.
+          expr: increase(externalsecret_sync_calls_error[5m]) > 0
+          for: 2m

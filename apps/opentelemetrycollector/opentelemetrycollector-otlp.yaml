@@ -1,0 +1,305 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otlp
+spec:
+  autoscaler:
+    maxReplicas: 3
+    minReplicas: 1
+    targetCPUUtilization: 75
+    targetMemoryUtilization: 90
+  mode: deployment
+  resources:
+    limits:
+      cpu: "2"
+      memory: 1536Mi
+    requests:
+      cpu: "1"
+      memory: 512Mi
+  serviceAccount: otel-collector
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+  image: otel/opentelemetry-collector-contrib:latest
+  config:
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      # Exporter for sending Prometheus data to Mimir.
+      prometheusremotewrite:
+        # Don't add suffixes to the metrics. We've already renamed the `traces.spanmetrics.calls` metric to
+        # `traces.spanmetrics.calls.total`, and we don't want to add the `_milliseconds` suffix to the
+        # `traces.spanmetrics.latency` metric.
+        add_metric_suffixes: false
+        # Send to the locally running Mimir service.
+        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        # TLS is not enabled for the instance.
+        tls:
+          insecure: true
+
+      # # TODO: add keda in cluster and uncomment this exporter after creating a keda collector
+      # otlp/keda-collector:
+      #   endpoint: http://keda-collector.observability.svc.cluster.local:4317
+      #   retry_on_failure:
+      #     enabled: true
+      #   tls:
+      #     insecure: true
+
+    extensions:
+      pprof: {}
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 5s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+      # cardinality:
+      #   aggregation_keys:
+      #     - service.name
+      #   circuit-breaker_adjustment_interval: 5m
+      #   circuit-breaker_adjustment_weight: 0.5
+      #   circuit-breaker_mode: disabled
+      #   ignore_keys_in_calculation:
+      #     - instance
+      #     - k8s.job.name
+      #     - k8s.pod.ip
+      #     - k8s.pod.name
+      #     - k8s.pod.uid
+      #     - k8s_pod_name
+      #     - k8s.node.name
+      #     - net.host.name
+      #     - node
+      #     - nodeName
+      #     - pod
+      #     - podName
+      #     - server.address
+      #     - service.instance.id
+      #   max_cardinality_per_metric_aggregation: 5000
+
+      groupbyattrs:
+        keys:
+          - k8s.pod.name
+          - k8s.namespace.name
+
+      resourcedetection/homelab:
+        detectors: [env, system]
+        timeout: 5s
+        override: false
+        attributes:
+          - k8s.cluster.name
+          - k8s.node.name
+
+      # Most of these below processors were taken from this: https://github.com/softwaremill/meerkat/blob/3d5d8590fac865d4d672210475019e8b7c330ae0/otel/jvm-collector.yaml#L87-L102
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 30s
+        # filter:
+          # node_from_env_var: KUBE_NODE_NAME
+        pod_association:
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.ip' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.ip
+          # - sources:
+          #     # This rule associates all resources containing the 'k8s.pod.uid' attribute with the matching pods.
+          #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+          #     - from: resource_attribute
+          #       name: k8s.pod.uid
+          - sources:
+              # - from: resource_attribute
+                # name: k8s.node.name
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+          # - sources:
+          #     # This rule will use the IP from the incoming connection from which the resource is received,
+          #     # and find the matching pod, based on the 'pod.status.podIP' of the observed pods
+          #     - from: connection
+        extract:
+          # The attributes provided in 'metadata' will be added to associated resources
+          metadata:  # extracted from the pod
+            - k8s.cronjob.name
+            - k8s.daemonset.name
+            - k8s.deployment.name
+            - k8s.job.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.start_time
+            - k8s.statefulset.name
+          #labels:
+          # # This label extraction rule takes the value 'app.kubernetes.io/component' label and maps it to the 'app.label.component' attribute which will be added to the associated resources
+          # - tag_name: app.label.component
+          #   key: app.kubernetes.io/component
+          #   from: pod
+          labels:
+            - tag_name: app.label.component
+              key: app.kubernetes.io/component
+              from: pod
+            - tag_name: app.label.name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: app  # extracts value of label from pods with key `app` and inserts it as a tag with key `app`
+              key: app
+              from: pod
+
+      metricstransform/add_standard_labels:
+        transforms:
+          - action: update
+            include: .+
+            match_type: regexp
+            operations:
+              - action: add_label
+                new_label: otel_source
+                new_value: otlp-collector
+
+      resource/service-instance:
+        attributes:
+          - action: insert
+            from_attribute: k8s.pod.name
+            key: service.instance.id
+          - action: insert
+            from_attribute: k8s.node.name
+            key: service.instance.id
+          - action: insert
+            from_attribute: host.name
+            key: service.instance.id
+          - action: insert
+            value: unknown
+            key: service.instance.id
+
+      transform/label_metrics:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(attributes["instance"], resource.attributes["k8s.pod.name"]) where
+                resource.attributes["k8s.pod.name"] != nil
+              - set(attributes["instance"], resource.attributes["k8s.node.name"]) where
+                resource.attributes["k8s.pod.name"] != nil
+              - set(attributes["service.name"], resource.attributes["service.name"]) where
+                resource.attributes["service.name"] != nil
+              - set(attributes["container.image.name"], resource.attributes["container.image.name"])
+              - set(attributes["container.image.tag"], resource.attributes["container.image.tag"])
+              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
+              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
+              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"])
+              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"])
+              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"])
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"])
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"])
+              - set(attributes["namespaceName"], resource.attributes["k8s.namespace.name"])
+              - set(attributes["nodeName"], resource.attributes["k8s.node.name"])
+              - set(attributes["podName"], resource.attributes["k8s.pod.name"])
+              - set(attributes["clusterName"], resource.attributes["k8s.cluster.name"])
+
+      transform/set_match_resource_attributes:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      # Configure receiving OTLP data via gRPC on port 4317 and HTTP on port 4318.
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+            keepalive:
+              server_parameters:
+                max_connection_age: 5s
+                max_connection_age_grace: 5s
+          http:
+            endpoint: 0.0.0.0:4318
+
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+
+      # A pipeline can exist for each of the signals received.
+      pipelines:
+        # Define the metrics pipeline.
+        # metrics/spanmetrics:
+        metrics:
+          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, servicegraph, exceptions]
+          receivers: 
+          - otlp
+          # Use the `batch` processor to process received metrics, use the transform metric to ensure that spanmetric
+          # metrics are in the correct format for Grafana Cloud (doesn't take effect unless receivers above are used.)
+          processors: 
+          # - filter/healthchecks
+          - metricstransform/add_standard_labels
+          - resource/service-instance
+          - batch 
+          - transform/set_match_resource_attributes
+          - groupbyattrs
+          - k8sattributes
+          - resourcedetection/homelab
+          - transform/label_metrics
+          # - cardinality
+          # Export to the `prometheusremotewrite` exporter.
+          exporters: 
+          - prometheusremotewrite
+
+      extensions:
+        - zpages
+        - health_check
+
+      telemetry:
+        logs:
+          encoding: json
+        # Push collector internal metrics to Prometheus
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true
+        # metrics:
+        #   level: detailed
+        #   readers:
+        #     - periodic:
+        #         interval: 10000
+        #         exporter:
+        #           otlp:
+        #             protocol: grpc
+        #             endpoint: localhost:14317
+        #             insecure: true
+
+

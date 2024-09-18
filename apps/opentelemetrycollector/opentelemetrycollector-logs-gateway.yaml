@@ -1,0 +1,573 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: logs-gateway
+spec:
+  replicas: 1
+  mode: statefulset
+  image: otel/opentelemetry-collector-contrib:latest
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+  podSecurityContext:
+    fsGroup: 999
+  nodeSelector:
+    kubernetes.io/hostname: node12
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata: 
+        name: file-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: local-storage
+        volumeMode: Filesystem
+  volumeMounts:
+    - mountPath: /var/lib/storage/otc
+      name: file-storage
+  resources:
+    limits:
+      cpu: "1200m"
+      memory: 3Gi
+    requests:
+      cpu: "500m"
+      memory: 1Gi
+  serviceAccount: otel-collector
+  config:
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      # Exporter for sending logs via otlphttp to the logs gateway 
+      otlphttp/loki:
+        compression: gzip
+        endpoint: http://loki-gateway.loki/otlp
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 30s
+        sending_queue:
+          enabled: true
+          num_consumers: 10
+          queue_size: 1000
+          storage: file_storage
+
+    extensions:
+      file_storage:
+        compaction:
+          directory: /var/lib/storage/otc/compaction
+          on_rebound: true
+        create_directory: true
+        directory: /var/lib/storage/otc
+        timeout: 10s
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
+      pprof: {}
+
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+
+
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 1s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+      attributes/extract_systemd_source_fields:
+        actions:
+          - action: extract
+            key: fluent.tag
+            pattern: ^host\.(?P<_sourceName>[a-zA-z0-9]+)\..+$
+          - action: insert
+            from_attribute: _HOSTNAME
+            key: _sourceHost
+      attributes/remove_fluent_tag:
+        actions:
+          - action: delete
+            key: fluent.tag
+      filter/exclude_kubelet:
+        logs:
+          exclude:
+            match_type: strict
+            record_attributes:
+              - key: _SYSTEMD_UNIT
+                value: kubelet.service
+      filter/exclude_kubelet_hostname:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: _HOSTNAME
+                value: $^
+      filter/exclude_kubelet_priority:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: SYSLOG_FACILITY
+                value: $^
+      filter/exclude_kubelet_syslog:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: SYSLOG_FACILITY
+                value: $^
+      filter/exclude_kubelet_unit:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: _SYSTEMD_UNIT
+                value: $^
+      filter/exclude_systemd_hostname:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: _HOSTNAME
+                value: $^
+      filter/exclude_systemd_priority:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: PRIORITY
+                value: $^
+      filter/exclude_systemd_syslog:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: SYSLOG_FACILITY
+                value: $^
+      filter/exclude_systemd_unit:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: _SYSTEMD_UNIT
+                value: $^
+      filter/include_containers:
+        logs:
+          include:
+            match_type: regexp
+            record_attributes:
+              - key: k8s.container.name
+                value: .+
+      filter/include_fluent_tag_host:
+        logs:
+          include:
+            match_type: regexp
+            record_attributes:
+              - key: fluent.tag
+                value: host\..+
+      filter/include_kubelet:
+        logs:
+          include:
+            match_type: strict
+            record_attributes:
+              - key: _SYSTEMD_UNIT
+                value: kubelet.service
+      filter/include_systemd:
+        logs:
+          include:
+            match_type: regexp
+            record_attributes:
+              - key: _SYSTEMD_UNIT
+                value: .+
+      groupbyattrs/containers:
+        keys:
+          - k8s.container.id
+          - k8s.container.name
+          - k8s.namespace.name
+          - k8s.pod.name
+          - _collector
+      groupbyattrs/label_fields:
+        keys:
+          - level
+          - category
+      groupbyattrs/systemd:
+        keys:
+          - _sourceName
+          - _sourceHost
+          - _collector
+          - service_name
+
+      #
+      # k8sattributes/from_access_logs:
+      #   auth_type: "serviceAccount"
+      #   passthrough: false
+      #   wait_for_metadata: true
+      #   wait_for_metadata_timeout: 15s
+      #   pod_association:
+      #     # - sources:
+      #     #     # This rule associates all resources containing the 'k8s.pod.ip' attribute with the matching pods.
+      #     #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+      #     #     - from: resource_attribute
+      #     #       name: k8s.pod.ip
+      #     # - sources:
+      #     #     # This rule associates all resources containing the 'k8s.pod.uid' attribute with the matching pods.
+      #     #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
+      #     #     - from: resource_attribute
+      #     #       name: k8s.pod.uid
+      #     # - sources:
+      #     #     - from: resource_attribute
+      #     #       name: k8s.node.name
+      #     #     - from: resource_attribute
+      #     #       name: k8s.pod.name
+      #     #     - from: resource_attribute
+      #     #       name: k8s.cluster.name
+      #     - sources:
+      #         # This rule will use the IP from the incoming connection from which the resource is received,
+      #         # and find the matching pod, based on the 'pod.status.podIP' of the observed pods
+      #         - from: connection
+      #   extract:
+      #     # The attributes provided in 'metadata' will be added to associated resources
+      #     metadata:  # extracted from the pod
+      #       - k8s.cronjob.name
+      #       - k8s.daemonset.name
+      #       - k8s.deployment.name
+      #       - k8s.job.name
+      #       - k8s.namespace.name
+      #       - k8s.node.name
+      #       - k8s.pod.name
+      #       - k8s.pod.uid
+      #       - k8s.pod.start_time
+      #       - k8s.statefulset.name
+      #     #labels:
+      #     # # This label extraction rule takes the value 'app.kubernetes.io/component' label and maps it to the 'app.label.component' attribute which will be added to the associated resources
+      #     # - tag_name: app.label.component
+      #     #   key: app.kubernetes.io/component
+      #     #   from: pod
+      #     labels:
+      #       - tag_name: app.label.component
+      #         key: app.kubernetes.io/component
+      #         from: pod
+      #       - tag_name: app.label.name
+      #         key: app.kubernetes.io/name
+      #         from: pod
+      #       - tag_name: app  # extracts value of label from pods with key `app` and inserts it as a tag with key `app`
+      #         key: app
+      #         from: pod
+
+
+      k8sattributes:
+        extract:
+          labels:
+            - from: pod
+              key: app
+              tag_name: app
+            - from: pod
+              tag_name: app.label.component
+              key: app.kubernetes.io/component
+            - from: pod
+              tag_name: app.label.name
+              key: app.kubernetes.io/name
+          metadata:
+            - k8s.cronjob.name
+            - k8s.daemonset.name
+            - k8s.deployment.name
+            - k8s.node.name
+            - k8s.statefulset.name
+            - service.name
+            - service.namespace
+        passthrough: false
+        pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.name
+            - from: resource_attribute
+              name: k8s.namespace.name
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 30s
+
+      memory_limiter:
+        check_interval: 5s
+        limit_percentage: 90
+        spike_limit_percentage: 20
+
+      resource/add_cluster:
+        attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: homelab-live
+      resource/containers_copy_node_to_host:
+        attributes:
+          - action: upsert
+            from_attribute: k8s.node.name
+            key: k8s.pod.hostname
+      resource/remove_pod_name:
+        attributes:
+          - action: delete
+            key: pod_name
+      resource/remove_redundant_extracted:
+        attributes:
+          - action: delete
+            key: deployment_extracted
+          - action: delete
+            key: service_name_extracted
+      resource/rename-k8s.container.image-to-container_image:
+        attributes:
+          - action: insert
+            from_attribute: k8s.container.image
+            key: container_image
+          - action: delete
+            key: k8s.container.image
+
+      transform/add_bloom_fields:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - set(attributes["trace_id"], body["traceID"]) where IsMap(body)
+              - set(attributes["trace_id"], body["trace_id"]) where IsMap(body)
+              - set(attributes["trace_id"], body["trace.id"]) where IsMap(body)
+              - set(attributes["trace_id"], body["traceId"]) where IsMap(body)
+      transform/add_homelab_attributes:
+        log_statements:
+          - context: log
+            statements:
+              - set(resource.attributes["homelab_type"], "container_log")
+              - set(resource.attributes["k8s_cronjob_name"], resource.attributes["k8s.cronjob.name"])
+              - delete_key(resource.attributes, "k8s.cronjob.name")
+      transform/add_journald_attributes:
+        log_statements:
+          - context: log
+            statements:
+              - set(attributes["homelab_type"], "kubernetes_journald")
+              - set(attributes["service_name"], attributes["_SYSTEMD_UNIT"])
+      transform/add_label_fields:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - set(attributes["level"], "unknown")
+              - set(attributes["level"], body["level"]) where IsMap(body)
+              - set(attributes["level"], body["log.level"]) where IsMap(body)
+              - set(attributes["level"], body["log"]["level"]) where IsMap(body) and
+                IsMap(body["log"])
+              - set(attributes["level"], "info") where attributes["level"] == "INFO"
+              - set(attributes["level"], "warn") where attributes["level"] == "WARN"
+              - set(attributes["level"], "warn") where attributes["level"] == "WARNING"
+              - set(attributes["level"], "error") where attributes["level"] == "ERROR"
+              - set(attributes["level"], "error") where attributes["level"] == "CRITICAL"
+              - set(attributes["level"], "debug") where attributes["level"] == "DEBUG"
+              - set(attributes["level"], "trace") where attributes["level"] == "TRACE"
+              - delete_key(attributes, "level") where attributes["level"] != nil and 
+                not IsMatch(attributes["level"], "(info|warn|error|debug|trace|unknown)")
+              - set(attributes["level"], "info") where IsString(body) and IsMatch(body,
+                "[\\[\\s]?(INFO|info)[\\]\\s:]")
+              - set(attributes["level"], "warn") where IsString(body) and IsMatch(body,
+                "[\\[\\s]?(WARN|warn|WARNING|warning)[\\]\\s:]")
+              - set(attributes["level"], "error") where IsString(body) and IsMatch(body,
+                "[\\[\\s]?(ERROR|error|CRITICAL|critical)[\\]\\s:]")
+              - set(attributes["level"], "debug") where IsString(body) and IsMatch(body,
+                "[\\[\\s]?(DEBUG|debug)[\\]\\s:]")
+              - set(attributes["level"], "trace") where IsString(body) and IsMatch(body,
+                "[\\[\\s]?(TRACE|trace)[\\]\\s:]")
+              - set(attributes["category"], "application")
+              - set(attributes["category"], "access") where IsString(body) and IsMatch(body,
+                "^ACCESS")
+              # - set(attributes["category"], "application") where IsString(body) and IsMatch(body,
+              #   "^APPLICATION")
+              - set(attributes["category"], body["category"]) where IsMap(body)
+              # - delete_key(attributes, "category") where attributes["category"] != nil
+              #   and not IsMatch(attributes["category"], "(access|application)")
+      transform/containers_parse_json:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - set(body, ParseJSON(body)) where IsMatch(body, "^{")
+      transform/flatten:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - merge_maps(attributes, body, "insert") where IsMap(body)
+              - set(body, "") where IsMap(body)
+      transform/post_flatten:
+        log_statements:
+          - context: log
+            statements:
+              - set(body, attributes["MESSAGE"])
+              - delete_key(attributes, "MESSAGE")
+              - delete_key(attributes, "PRIORITY")
+              - delete_key(attributes, "SYSLOG_FACILITY")
+              - delete_key(attributes, "SYSLOG_IDENTIFIER")
+              - delete_key(attributes, "BOOT_ID")
+              - delete_key(attributes, "CAP_EFFECTIVE")
+              - delete_key(attributes, "CMDLINE")
+              - delete_key(attributes, "MACHINE_ID")
+              - delete_key(attributes, "PID")
+              - delete_key(attributes, "STREAM_ID")
+              - delete_key(attributes, "SYSTEMD_SLICE")
+
+      transform/remove_attributes:
+        log_statements:
+          - context: log
+            statements:
+              - limit(attributes, 0, [])
+
+      # Filter to select only Istio access logs for the istio pipeline.
+      filter/istio_only:
+        logs:
+          include:
+            match_type: regexp
+            record_attributes:
+              - key: http.direction
+                value: .+
+      
+      # Filter to exclude Istio logs from the general container pipeline.
+      filter/not_istio:
+        logs:
+          exclude:
+            match_type: regexp
+            record_attributes:
+              - key: http.direction
+                value: .+
+
+      # This transform sets level and category based on attributes
+      transform/set_istio_level_and_category:
+        log_statements:
+          - context: log
+            statements:
+              - set(attributes["level"], "error") where attributes["http.response.status_code"] != nil and Int(attributes["http.response.status_code"]) >= 500
+              - set(attributes["level"], "warn") where attributes["http.response.status_code"] != nil and Int(attributes["http.response.status_code"]) >= 400 and Int(attributes["http.response.status_code"]) < 500
+              - set(attributes["level"], "info") where attributes["http.response.status_code"] != nil and Int(attributes["http.response.status_code"]) < 400
+              - set(attributes["category"], "access")
+
+      # The grouping keys now reflect the new, richer attributes from Istio.
+      groupbyattrs/istio_access_logs:
+        keys:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.ip
+          # - client.address
+          # - http.request.method
+          # - http.response.status_code
+          # - url.path
+          # - category
+          # - level
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+      extensions:
+        - health_check
+        - file_storage
+        - pprof
+        - zpages
+
+      pipelines:
+        logs/otlp/containers:
+          receivers: 
+          - otlp
+          processors: 
+          - memory_limiter
+          - filter/include_containers
+          - filter/not_istio
+          - groupbyattrs/containers
+          - k8sattributes
+          - resource/add_cluster
+          - transform/containers_parse_json
+          - resource/remove_pod_name
+          - resource/remove_redundant_extracted
+          - transform/add_homelab_attributes
+          - transform/add_label_fields
+          - transform/add_bloom_fields
+          - groupbyattrs/label_fields
+          - batch
+          exporters: 
+          - otlphttp/loki
+        logs/otlp/kubelet:
+          receivers: 
+          - otlp
+          processors: 
+          - memory_limiter
+          - filter/include_fluent_tag_host
+          - filter/include_kubelet
+          - filter/not_istio
+          - filter/exclude_kubelet_syslog
+          - filter/exclude_kubelet_hostname
+          - filter/exclude_kubelet_priority
+          - filter/exclude_kubelet_unit
+          - attributes/extract_systemd_source_fields
+          - attributes/remove_fluent_tag
+          - transform/add_journald_attributes
+          - groupbyattrs/systemd
+          - resource/add_cluster
+          - transform/remove_attributes
+          - transform/flatten
+          - transform/post_flatten
+          - batch
+          exporters: 
+          - otlphttp/loki
+        logs/otlp/istio:
+          receivers: 
+          - otlp
+          processors: 
+          - memory_limiter
+          # 1. Filter to only process Istio logs sent via otel-als
+          - filter/istio_only
+          # add pod attributes from meshconfig's log labels to the resource.attributes for k8sattrs to use
+          - groupbyattrs/istio_access_logs
+          # 2. Add k8s metadata
+          - k8sattributes
+          - resource/add_cluster
+          # 3. Set level and category based on status code
+          - transform/set_istio_level_and_category
+          # 4. Group similar logs together
+          - groupbyattrs/label_fields
+          # 5. Batch before sending
+          - batch
+          exporters: 
+          - otlphttp/loki
+
+      telemetry:
+        logs:
+          encoding: json
+          level: info
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true

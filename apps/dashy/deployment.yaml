@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashy
+  labels:
+    app: dashy
+    app.kubernetes.io/name: dashy
+    app.kubernetes.io/instance: dashy
+    app.kubernetes.io/version: "3.1.1"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: dashy
+      app.kubernetes.io/name: dashy
+      app.kubernetes.io/instance: dashy
+  template:
+    metadata:
+      labels:
+        app: dashy
+        app.kubernetes.io/name: dashy
+        app.kubernetes.io/instance: dashy
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: dashy
+          image: "lissy93/dashy:release-3.1.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/user-data/conf.yml
+              subPath: conf.yml
+              name: dashy-conf
+      volumes:
+        - name: dashy-conf
+          configMap:
+            name: dashy-conf
+            items:
+              - key: conf
+                path: conf.yml

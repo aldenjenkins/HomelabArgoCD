@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excalidraw
+  labels:
+    app: excalidraw
+spec:
+  selector:
+    matchLabels:
+      app: excalidraw
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: excalidraw
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: excalidraw
+          image: 'excalidraw/excalidraw:latest'
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

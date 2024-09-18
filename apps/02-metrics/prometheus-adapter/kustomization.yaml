@@ -1,0 +1,12 @@
+namespace: prometheus
+resources:
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - rolebinding.yaml
+  - clusterrolebinding.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - networkpolicy.yaml
+  - poddisruptionbudget.yaml
+  - service.yaml
+  - servicemonitor.yaml

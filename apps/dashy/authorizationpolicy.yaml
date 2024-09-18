@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: dashy
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dashy
+      app.kubernetes.io/name: dashy
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - dashy.home.alden.ai

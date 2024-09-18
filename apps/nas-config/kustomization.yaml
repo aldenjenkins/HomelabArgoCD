@@ -1,0 +1,6 @@
+namespace: nas
+resources:
+  - namespace.yaml
+  - prometheusrule.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

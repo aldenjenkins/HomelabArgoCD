@@ -1,0 +1,6 @@
+namespace: cloudflare
+resources:
+  - namespace.yaml
+  - prometheusrule.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

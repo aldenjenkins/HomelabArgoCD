@@ -1,0 +1,12 @@
+namespace: alloy
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - clusterrole.yaml
+  - serviceaccount.yaml
+  - clusterrolebinding.yaml
+  - service.yaml
+  - daemonset.yaml
+  - authorizationpolicy.yaml
+  - virtualservice.yaml
+  - servicemonitor.yaml

@@ -1,0 +1,13 @@
+namespace: promtail
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - servicemonitor.yaml
+generators:
+  - sopsgenerator.yaml
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/component: syslog-receiver
+      app.kubernetes.io/name: promtail

@@ -1,0 +1,33 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+    name: postgresql
+    labels:
+        kubernetes.io/service-name: postgresql
+addressType: ENC[AES256_GCM,data:dNzFFg==,iv:VQiV5+/yuT0oVBJtU8erWPuuaxzcVgKVUge64e0BNuE=,tag:bfbA5/y+kU0fqDtUqgV1MQ==,type:str]
+ports:
+    - name: ENC[AES256_GCM,data:l7zDfA==,iv:NIIIS+yhsZSJJmfHas5No4PYiC49nP2EiX28ghgEzIk=,tag:5dsvVdds36ZpAQdk1Kr1Lw==,type:str]
+      protocol: ENC[AES256_GCM,data:NZpY,iv:KIKaynzKk2s2c+mUIOZaGLa1xOXDFbvPnDzj62dMqb8=,tag:ICOzogs2G0BL6yAknrBS+w==,type:str]
+      port: ENC[AES256_GCM,data:/qfKdg==,iv:t9JsMtQ7kW9ysAuAMe5M2Q0oYTLB+qCPFsPBuuHMZkk=,tag:4/I11PKroCF9rhDT+wAaeg==,type:int]
+endpoints:
+    - addresses:
+        - ENC[AES256_GCM,data:pcOEcDF71B0BWJNVs7jh,iv:QynN2xGZKxNOo3L+Jo5lMx5mpzbGlMQWnkmaGN7FL/g=,tag:OoALap7JYk67PcDle9CGng==,type:str]
+      conditions:
+        ready: ENC[AES256_GCM,data:ZXYQMg==,iv:jbjtX81iRfO2OrSpWh0wZl29QXeGplvoH/71Alv9OIo=,tag:4Z66whAww6WkOV6pM7WfPA==,type:bool]
+        serving: ENC[AES256_GCM,data:D/NL1g==,iv:mydJiuS7ItOr8Pw0b1kV37T1dUmuV4AawXmA2kw3w5Y=,tag:aGdZBstEa/6vx8Mzn1TzEA==,type:bool]
+        terminating: ENC[AES256_GCM,data:rEL1pPA=,iv:HqHvjfEkJVykP/eDW0LmPpDpFA2nyE1fvObDKt/E0So=,tag:bIbnEQhCFgXGtU/Ji1EyHA==,type:bool]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB0aWFtRkNiSXl5Q0oreWh6
+            Q2FnaTd6V2dzUldWQ0pCZ2NYM3JoSTI2ZTBvCjh1TENEenRGT09qTXpXN2l4UzB2
+            aFRmQTFOU1YxczV1c1JpWDNYbWVZREkKLS0tIFVaMkJ0ZkNNbGdvTUEvUDAyeHlZ
+            M0NwOTROTW1XQmpOM1JvendjRzBaMkUK0pGB9WS5jz2tfBaQkf4YopuieL0Mz3wp
+            ZiUj6uAP19jNzQdZDhssWdAG5PaWVYDThzg/vya3S5Zq7U+zSaDQRg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-02T23:54:41Z"
+    mac: ENC[AES256_GCM,data:F/inQ9e29y5olIZU0c8zTrugZArYGlTWTkgB1WX0uYi42KIwrUrEXRY/LgS+k5RhDKYpOB7whJwNw3TVkkTJ91Uy3OhqMRxxfJcP6tjCc9NrxUMVT9WMy8Rp0lLjA97boSHlvHl/c2x31Xd376hGZapJjCEkCaW3E7QZYQavJJo=,iv:si/VlFt4rtBdiuSLBvplNafeNxEAWeM9I3jd4JzGoBs=,tag:ndU0lo0fABnaFVBIrJLkuQ==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

@@ -1,0 +1,11 @@
+namespace: minio
+resources:
+  - namespace.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+generators:
+  - sopsgenerator.yaml

@@ -1,0 +1,6 @@
+namespace: argocd
+resources:
+  - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
+patches:
+  - path: patch_notification_secret.yaml

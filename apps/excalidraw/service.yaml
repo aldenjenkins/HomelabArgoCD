@@ -1,0 +1,11 @@
+# Source: freshrss/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: excalidraw
+spec:
+  selector:
+    app: excalidraw
+  ports:
+    - name: excalidraw-http
+      port: 80

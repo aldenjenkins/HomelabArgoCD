@@ -1,0 +1,5 @@
+resources:
+  - namespace.yaml
+  - templatedistiofiles.yaml
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-2"

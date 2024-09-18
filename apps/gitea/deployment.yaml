@@ -1,0 +1,91 @@
+# Source: gitea/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  labels:
+    app.kubernetes.io/name: gitea
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gitea
+  template:
+    metadata:
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-go: "true"
+      #   instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/app/gitea/gitea"
+      labels:
+        sidecar.istio.io/inject: "true"
+        app.kubernetes.io/name: gitea
+    spec:
+      containers:
+        - name: gitea
+          image: "gitea/gitea:latest"
+          # Required for otel injection
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          imagePullPolicy: Always
+          ports:
+            - name: ssh
+              containerPort: 22
+            - name: http
+              containerPort: 3000
+          # env:
+          #   - name: GITEA_APP_INI
+          #     value: /etc/gitea/conf/app.ini
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 23
+            timeoutSeconds: 5
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: gitea-data
+              mountPath: /data
+              subPath: data
+            - name: gitea-config
+              mountPath: /data/gitea/conf
+              readOnly: true
+              #        - name: memcached
+              #          image: "memcached:alpine"
+              #          imagePullPolicy: Always
+              #          command:
+              #            - memcached
+              #            - -m 64
+              #            - -o
+              #            - modern
+              #            - -v
+              #          ports:
+              #            - name: memcache
+              #              containerPort: 11211
+              #          livenessProbe:
+              #            tcpSocket:
+              #              port: memcache
+              #            initialDelaySeconds: 30
+              #            timeoutSeconds: 5
+              #          readinessProbe:
+              #            tcpSocket:
+              #              port: memcache
+              #            initialDelaySeconds: 5
+              #            timeoutSeconds: 1
+              #          securityContext:
+              #            runAsUser: 1000
+      volumes:
+        - name: gitea-data
+          persistentVolumeClaim:
+            claimName: gitea-data
+        - name: gitea-config
+          secret:
+            secretName: gitea-config-secret

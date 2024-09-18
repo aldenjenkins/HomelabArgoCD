@@ -1,0 +1,19 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: alertmanager-source
+spec:
+  allowCrossNamespaceImport: true
+  datasource:
+    name: Alertmanager
+    uid: alertmanager-datasource
+    type: alertmanager
+    access: proxy
+    url: http://alertmanager-main.alertmanager.svc.cluster.local:9093
+    isDefault: false
+    jsonData:
+      handleGrafanaManagedAlerts: true
+      implementation: prometheus
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana

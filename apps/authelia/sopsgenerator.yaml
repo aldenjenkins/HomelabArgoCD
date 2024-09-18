@@ -1,0 +1,18 @@
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: sops-generator
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+secretFrom:
+  - metadata:
+      name: authelia-config
+      namespace: authelia
+      annotations:
+        kustomize.config.k8s.io/needs-hash: "false"
+    type: Opaque
+    files:
+      - configuration.yaml=./config/configuration.yaml
+      - users_database.yml=./config/users_database.yml

@@ -1,0 +1,9 @@
+namespace: dashy
+resources:
+  - namespace.yaml
+  - authorizationpolicy.yaml
+  - deployment.yaml
+  - service.yaml
+  - virtualservice.yaml
+generators:
+  - sopsgenerator.yaml

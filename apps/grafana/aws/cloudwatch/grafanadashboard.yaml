@@ -1,0 +1,15 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cloudwatch-logs
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  datasources:
+    - inputName: "DS_CLOUDWATCH"
+      datasourceName: "CloudWatch"
+  folderRef: cloudwatch
+  url: https://grafana.com/api/dashboards/20303/revisions/2/download

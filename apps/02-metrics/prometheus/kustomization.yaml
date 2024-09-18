@@ -1,0 +1,22 @@
+namespace: prometheus
+resources:
+  - namespace.yaml
+  - kubePrometheus-prometheusRule.yaml
+  - prometheus-clusterRole.yaml
+  - prometheus-clusterRoleBinding.yaml
+  - prometheus-networkPolicy.yaml
+  - prometheus-podDisruptionBudget.yaml
+  - prometheus.yaml
+  - prometheusrule.yaml
+  - prometheus-roleBindingConfig.yaml
+  - prometheus-roleBindingSpecificNamespaces.yaml
+  - prometheus-roleConfig.yaml
+  - prometheus-roleSpecificNamespaces.yaml
+  - prometheus-service.yaml
+  - prometheus-serviceAccount.yaml
+  - prometheus-serviceMonitor.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

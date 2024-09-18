@@ -1,0 +1,84 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: tempo-datasource
+spec:
+  allowCrossNamespaceImport: true
+  datasource:
+    name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo.tempo.svc:3100
+    isDefault: false
+    jsonData:
+      tracesToLogsV2:
+        # Field with an internal link pointing to a logs data source in Grafana.
+        # datasourceUid value must match the uid value of the logs data source.
+        datasourceUid: 'loki'
+        spanStartTimeShift: '-1m'
+        spanEndTimeShift: '1m'
+        #tags: ['job', 'instance', 'pod', 'namespace']
+        # tags: [{key: 'k8s.namespace', value: 'service_namespace'}]
+        filterByTraceID: false
+        filterBySpanID: false
+        customQuery: true
+        query: '{k8s_cluster_name="homelab-live"} | trace_id="${__trace.traceId}"'
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      spanBar:
+        type: 'Tag'
+        tag: 'http.path'
+      streamingEnabled:
+        search: true
+        metrics: true
+      traceQuery:
+        timeShiftEnabled: true
+        spanStartTimeShift: '-10m'
+        spanEndTimeShift: '10m'
+      tracesToMetrics:
+        datasourceUid: 'prometheus'
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: [{key: 'service.name', value: 'service_name'}, {key: 'job'}]
+        queries:
+          - name: 'Sample query'
+            query: 'sum(rate(traces_spanmetrics_latency_bucket{$__tags}[5m]))'
+      tracesToProfiles:
+        datasourceUid: 'pyroscope'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
+        customQuery: true
+        query: 'method="${__span.tags.method}"'
+      serviceMap:
+        datasourceUid: 'prometheus'
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: tempo-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: tempo-redis
+    type: redis-datasource
+    url: redis://tempo-cache-redis.tempo.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: 2.2.0
+---

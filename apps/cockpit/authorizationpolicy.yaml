@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: cockpit
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app: cockpit
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - cockpit.home.alden.ai

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    nfs.io/storage-path: "kanboard/"
+  labels:
+    app: kanboard
+  name: kanboard-data
+spec:
+  storageClassName: nfs-appdata-retain
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi

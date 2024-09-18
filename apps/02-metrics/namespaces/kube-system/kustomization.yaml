@@ -1,0 +1,9 @@
+namespace: kube-system
+resources:
+  - kubescheduler-servicemonitor.yaml
+  - apiserver-servicemonitor.yaml
+  - coredns-servicemonitor.yaml
+  - controllermanager-servicemonitor.yaml
+  - kubelet-servicemonitor.yaml
+  - rolebinding.yaml
+  - role.yaml

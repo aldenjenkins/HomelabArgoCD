@@ -1,0 +1,20 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: argocd
+spec:
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - argocd.home.alden.ai
+            notPaths:
+              - "/auth/token"
+              - "/api/v1/session"
+              - "/session.SessionService/Create"  # Exclude gRPC session creation from authentication
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server

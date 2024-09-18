@@ -1,0 +1,9 @@
+# resources:
+  # - https://github.com/knative/net-istio/releases/download/knative-v1.16.0/net-istio.yaml
+  # - peerauthentication.yaml
+  # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/servicemonitor.yaml
+  # - knativeserving.yaml
+  # - broker.yaml
+  # - knativeeventing.yaml
+  # - virtualservice.yaml
+  # - trigger.yaml

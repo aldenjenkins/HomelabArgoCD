@@ -1,0 +1,163 @@
+# Source: tempo/templates/configmap-tempo-query.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-query
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "2.8.0"
+data:
+  tempo-query.yaml: |
+    backend: tempo:3100
+---
+# Source: tempo/templates/configmap-tempo.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/version: "2.8.0"
+data:
+  overrides.yaml: |
+    overrides:
+      {}
+  tempo.yaml: |
+    # For more information on this configuration, see the complete reference guide at:
+    # https://grafana.com/docs/tempo/latest/configuration/
+    # Also the example setup from the otlp guide repo here:
+    # https://github.com/grafana/intro-to-mltp/blob/14f8df4745b93a932cd2c4bf37e9ff1e8d3ad909/tempo/tempo.yaml
+
+    # Enables result streaming from Tempo (to Grafana) via HTTP.
+    stream_over_http_enabled: true
+
+    # Configure the server block.
+    server:
+      # Listen for all incoming requests on port 3200.
+      http_listen_port: 3100
+
+    multitenancy_enabled: false
+    usage_report:
+      reporting_enabled: false
+
+    # The compactor block configures the compactor responsible for compacting TSDB blocks.
+    compactor:
+      compaction:
+        compaction_window: 1h              # Blocks in this time window will be compacted together.
+        max_block_bytes: 100_000_000       # Maximum size of a compacted block.
+        block_retention: 1h                # How long to keep blocks. Default is 14 days, this demo system is short-lived.
+        compacted_block_retention: 10m     # How long to keep compacted blocks stored elsewhere.
+      ring:
+        kvstore:
+          store: memberlist
+
+    # The distributor receives incoming trace span data for the system.
+    distributor:
+      receivers:
+        # jaeger:
+        #   protocols:
+        #     grpc:
+        #       endpoint: 0.0.0.0:14250
+        #     thrift_binary:
+        #       endpoint: 0.0.0.0:6832
+        #     thrift_compact:
+        #       endpoint: 0.0.0.0:6831
+        #     thrift_http:
+        #       endpoint: 0.0.0.0:14268
+        # opencensus: null
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
+
+    # The ingester receives data from the distributor and processes it into indices and blocks.
+    ingester:
+      trace_idle_period: 10s       # The length of time after a trace has not received spans to consider it complete and flush it.
+      max_block_bytes: 1_000_000   # Cut the head block when it hits this size or
+      max_block_duration: 5m       # this much time passes
+
+    # Configuration block to determine where to store TSDB blocks.
+    storage:
+      trace:
+        backend: s3
+        s3:
+          bucket: tempo-traces
+          endpoint: minio-api.minio.svc.cluster.local:9000
+          # access_key: ${TEMPO_S3_ACCESS_KEY}
+          # secret_key: ${TEMPO_S3_SECRET_KEY}
+          insecure: true
+          # Use path-style for MinIO compatibility
+          forcepathstyle: true
+          region: us-east-1
+        wal:
+          path: /tmp/tempo/wal
+
+    # https://github.com/grafana/tempo/blob/main/docs/sources/tempo/configuration/_index.md#cache
+    cache:
+      caches:
+      - roles:
+        - bloom
+        - frontend-search
+        - parquet-footer
+        - parquet-page
+        - trace-id-index
+        redis:
+          endpoint: tempo-cache-redis.tempo.svc.cluster.local:6379
+    querier:
+      {}
+    query_frontend:
+      {}
+    metrics_generator:
+      # Specifies which processors to use.
+      processor:
+        # # Span metrics create metrics based on span type, duration, name and service.
+        # span_metrics:
+        #     # Configure extra dimensions to add as metric labels.
+        #     dimensions:
+        #       - http.method
+        #       - http.target
+        #       - http.status_code
+        #       - service.version
+        # # Service graph metrics create node and edge metrics for determinng service interactions.
+        # service_graphs:
+        #     # Configure extra dimensions to add as metric labels.
+        #     dimensions:
+        #       - http.method
+        #       - http.target
+        #       - http.status_code
+        #       - service.version
+        # Configure the local blocks processor.
+        local_blocks:
+          # Ensure that metrics blocks are flushed to storage so TraceQL metrics queries against historical data.
+          flush_to_storage: true
+      # The registry configuration determines how to process metrics.
+      registry:
+        collection_interval: 5s                 # Create new metrics every 5s.
+        # Configure extra labels to be added to metrics.
+        external_labels:
+          source: tempo                         # Add a `{source="tempo"}` label.
+          group: 'homelab'                      # Add any additional labels (in this case, a `{group="homelab"}` label).
+      # Configures where the store for metrics is located.
+      storage:
+        # WAL for metrics generation.
+        path: "/tmp/tempo/generator/wal"
+        # Where to remote write metrics to.
+        remote_write:
+          - url: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+            send_exemplars: true
+      traces_storage:
+        path: "/tmp/tempo/generator/traces"
+
+    overrides:
+      per_tenant_override_config: /conf/overrides.yaml
+      defaults:
+        metrics_generator:
+          processors:
+            # - 'service-graphs'
+            # - 'span-metrics'
+            - 'local-blocks'
+          generate_native_histograms: both

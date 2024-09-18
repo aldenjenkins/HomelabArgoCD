@@ -1,0 +1,10 @@
+namespace: prometheus-operator-system
+resources:
+  - namespace.yaml
+  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.82.2/bundle.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+labels:
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/part-of: kube-prometheus

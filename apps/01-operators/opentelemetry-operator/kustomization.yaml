@@ -1,0 +1,76 @@
+resources:
+  - https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+  - servicemonitor.yaml
+patches:
+  - target:
+      kind: Deployment
+      name: opentelemetry-operator-controller-manager
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: "--enable-go-instrumentation"
+    # kind: Deployment
+    # metadata:
+    #   labels:
+    #     app.kubernetes.io/name: opentelemetry-operator
+    #     control-plane: controller-manager
+    #   name: opentelemetry-operator-controller-manager
+    #   namespace: opentelemetry-operator-system
+    # spec:
+    #   replicas: 1
+    #   selector:
+    #     matchLabels:
+    #       app.kubernetes.io/name: opentelemetry-operator
+    #       control-plane: controller-manager
+    #   template:
+    #     metadata:
+    #       labels:
+    #         app.kubernetes.io/name: opentelemetry-operator
+    #         control-plane: controller-manager
+    #     spec:
+    #       containers:
+    #         - args:
+    #             - --metrics-addr=127.0.0.1:8080
+    #             - --enable-leader-election
+    #             - --zap-log-level=info
+    #             - --zap-time-encoding=rfc3339nano
+    #             - --enable-nginx-instrumentation=true
+    #           env:
+    #             - name: SERVICE_ACCOUNT_NAME
+    #   - target:
+    #       kind: CustomResourceDefinition
+    #       name: opentelemetrycollectors.opentelemetry.io
+    #     patch: |-
+    #       - op: replace
+    #         path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    #         value: operators/opentelemetry-operator-serving-cert
+    #   - target:
+    #       kind: CustomResourceDefinition
+    #       name: targetallocators.opentelemetry.io
+    #     patch: |-
+    #       - op: replace
+    #         path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    #         value: operators/opentelemetry-operator-serving-cert
+    #   - target:
+    #       kind: MutatingWebhookConfiguration
+    #       name: opentelemetry-operator-mutating-webhook-configuration
+    #     patch: |-
+    #       - op: replace
+    #         path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    #         value: operators/opentelemetry-operator-serving-cert
+    #   - target:
+    #       kind: ValidatingWebhookConfiguration
+    #       name: opentelemetry-operator-validating-webhook-configuration
+    #     patch: |-
+    #       - op: replace
+    #         path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    #         value: operators/opentelemetry-operator-serving-cert
+    #   - target:
+    #       kind: Certificate
+    #       name: opentelemetry-operator-serving-cert
+    #     patch: |-
+    #       - op: replace
+    #         path: /spec/dnsNames
+    #         value:
+    #           - opentelemetry-operator-webhook-service.operators.svc
+    #           - opentelemetry-operator-webhook-service.operators.svc.cluster.local

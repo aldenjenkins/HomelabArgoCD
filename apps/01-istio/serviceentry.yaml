@@ -1,0 +1,114 @@
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+    name: homeserver-postgres
+spec:
+    hosts:
+        - ENC[AES256_GCM,data:eStABgMDW3bX,iv:uml9ZhXOJjXpLqp7W4D0bD1tewiAEe0ZQDXkcXqeUUY=,tag:oHad3l1ufMLzM/GdjHlvmQ==,type:comment]
+        - ENC[AES256_GCM,data:hemdD4xNrWSIve3FDjI4bFQjYA==,iv:s2s0xSkjOXeKReJ4NnBQhy6p0BAK9ooZ0hJ5lk2Wczs=,tag:6LnVTGxQjLu/tLXRKm21rA==,type:str]
+    addresses:
+        - ENC[AES256_GCM,data:XZYX+BvF7OL8Hxsow1JcR3nmBH8MH1tjE43BsoDxOMBzoqIju30XILkPtAotkNVfKA==,iv:v9+btYGMnPZX9RkzKF0XypWSOdqZoRYvt6ElYoRRFlg=,tag:BYqTnJ8M8gPv24jZ83Z1zg==,type:comment]
+        - ENC[AES256_GCM,data:GyzqeJuVs48/ECY/0igy,iv:cBONRh69fOZGvmarXtGlSwSI9XhOe2KZSyigmKyHwgA=,tag:vQ9oiEB7Wig/MZzc2a500g==,type:str]
+    location: ENC[AES256_GCM,data:AC9l0Q1snEK5zCYk3A==,iv:pFA0gRG0vKrKyYOQcq+eAQLFOfMus+9qgLyySH6jA8c=,tag:LbEWLhLTT7UOq9xu6nzC8Q==,type:str]
+    ports:
+        - number: ENC[AES256_GCM,data:WOIm7A==,iv:7DHIUHquWwCWim5kdfQOvoFix3MDKQE1UqCLpW5NKos=,tag:jHy0dBWzxBRNkRXaeYgTtg==,type:int]
+          name: ENC[AES256_GCM,data:AdoIhSd49bG7kh1l,iv:l+Jbv/hNM0RfQQvUJqGSOl8U9WdzDqiyceuSLHgBugg=,tag:xHQ0tJJoPZkzW0Rt0mtIOA==,type:str]
+          protocol: ENC[AES256_GCM,data:0izv,iv:cxENKSpvzKL0azHSWD3VaEKJL6LDccqdXDgiXVqmD9o=,tag:SdTypOQFbMRhIUQ6ltpKmg==,type:str]
+    #ENC[AES256_GCM,data:wL0xTsciPEKwJ+H4cf3W2KIgvbEPbSql8jdwnDICdDZ2uI5hs8FqvpxxpzjeminuVRJSTiIU9BhdzHejmstzBzbTeGeBIUpMoQ==,iv:bVmKA288+YHHN9Bq2DNgxHcrLZTESaHNT2sxeu/xgSY=,tag:mpaL+zseZVTGrFyssDnnoA==,type:comment]
+    resolution: ENC[AES256_GCM,data:K+CIHdxK,iv:ZnLls2G9dRTbj8MzJ1WciZOXJGcErm/LUD8VchCpS3A=,tag:UzWAeeCu68+LjYxR7WS9uQ==,type:str]
+    endpoints:
+        - ENC[AES256_GCM,data:iWob8Vb3cw+Ip3Id/KBKbYqn5gsue+tz/fyEzGrUzm5wkjTzxiE=,iv:O5vwqVOJzbVNSBIOnUi9sZNQuhgVM5cplN6Yqtf+y/k=,tag:1FX8KqzblBL8Mvi3Fj0sqw==,type:comment]
+        - address: ENC[AES256_GCM,data:oH/RjJLWmg/nzWT0/RkZ,iv:0bbr+ZxJ6jmwKyzhGuqhCb19RxpPqvUy0CxwnrDWgbk=,tag:ol/NQhbp2B2D1ipQQw0GhA==,type:str]
+          ports:
+            tcp-postgres: ENC[AES256_GCM,data:qlV9RA==,iv:bi3TV6rHWI+ah/cSUjHKJxTK/Jb3/K520NwrlUdy5cY=,tag:bRUXSz/GXn5m5hmyDcoDRQ==,type:int]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBROEFQaC9tTlhLYUE1VUxQ
+            WVBaK0JuNFFCQ1hVc1dWRnVvbXg0ZDVMNXlBCmpHNi8rUEY4UXpqb2w5RXZjOTEz
+            SURPb2pZNlBVY0tiWjB6R2NtS2xOV1UKLS0tIFNhYSsyWnJRVEVVTmRmT1FnT1hl
+            MUNLM2NiLy9wYnJ5NHROSDVBOVNnSUUK1IFJCr5Z4LF1i1/GCmU+Vs3F/D2EZKMf
+            nY8MSUSjCDarxUvj9QL1ni0saB+07zBFss+0qiV3mZYKgMQAsFg36w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T04:39:41Z"
+    mac: ENC[AES256_GCM,data:Y+8obLI/Ge+9Tyijl04/EV3SoIbSNYE3PSj7+n+wQlfgL7O1CgTMOKtz5Wpmy3+w1lm95csehR+7xQMsCVnhwsDXwaP3mABoDeyqs2gPl++QtYYJ5nnuFpQEaF7P4BDcmSwsAipd1ZdDMTVnpLTx8JUtpy08hTYjrqiTBXl2EJg=,iv:Q13jqtcdAE913em+jOHOe+rNRtbqH69iXKnWUiWvU3w=,tag:utTv8z6GGeQcQPciJBGa5Q==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+    name: homeserver-mariadb
+spec:
+    hosts:
+        - ENC[AES256_GCM,data:eStABgMDW3bX,iv:uml9ZhXOJjXpLqp7W4D0bD1tewiAEe0ZQDXkcXqeUUY=,tag:oHad3l1ufMLzM/GdjHlvmQ==,type:comment]
+        - ENC[AES256_GCM,data:ziHlVrqje3kjaxd0+Rgfyr7Q,iv:6Cj6WVltGVy4G4CEF4dGt8l9Oij3jx0af+0K2RIMG0o=,tag:Bwv3tzcjxRpvz8GLeIFYvg==,type:str]
+    addresses:
+        - ENC[AES256_GCM,data:XZYX+BvF7OL8Hxsow1JcR3nmBH8MH1tjE43BsoDxOMBzoqIju30XILkPtAotkNVfKA==,iv:v9+btYGMnPZX9RkzKF0XypWSOdqZoRYvt6ElYoRRFlg=,tag:BYqTnJ8M8gPv24jZ83Z1zg==,type:comment]
+        - ENC[AES256_GCM,data:GyzqeJuVs48/ECY/0igy,iv:cBONRh69fOZGvmarXtGlSwSI9XhOe2KZSyigmKyHwgA=,tag:vQ9oiEB7Wig/MZzc2a500g==,type:str]
+    location: ENC[AES256_GCM,data:AC9l0Q1snEK5zCYk3A==,iv:pFA0gRG0vKrKyYOQcq+eAQLFOfMus+9qgLyySH6jA8c=,tag:LbEWLhLTT7UOq9xu6nzC8Q==,type:str]
+    ports:
+        - number: ENC[AES256_GCM,data:MhuIFw==,iv:ENXF3P7CPxqulJ31JJVk6JSp/S2x3uH7lMfS8nDuHjo=,tag:WKeARhbUJcsYIHnkieNliQ==,type:int]
+          name: ENC[AES256_GCM,data:kShEYmN3XhYc/hs=,iv:CGT23j5XgPbjhNrqdCTCLP4Dq2/DSZqDBBPSlE9Ay5c=,tag:nC7OEdBmcX8bKcIXlpzkdw==,type:str]
+          protocol: ENC[AES256_GCM,data:0izv,iv:cxENKSpvzKL0azHSWD3VaEKJL6LDccqdXDgiXVqmD9o=,tag:SdTypOQFbMRhIUQ6ltpKmg==,type:str]
+    #ENC[AES256_GCM,data:wL0xTsciPEKwJ+H4cf3W2KIgvbEPbSql8jdwnDICdDZ2uI5hs8FqvpxxpzjeminuVRJSTiIU9BhdzHejmstzBzbTeGeBIUpMoQ==,iv:bVmKA288+YHHN9Bq2DNgxHcrLZTESaHNT2sxeu/xgSY=,tag:mpaL+zseZVTGrFyssDnnoA==,type:comment]
+    resolution: ENC[AES256_GCM,data:K+CIHdxK,iv:ZnLls2G9dRTbj8MzJ1WciZOXJGcErm/LUD8VchCpS3A=,tag:UzWAeeCu68+LjYxR7WS9uQ==,type:str]
+    endpoints:
+        - ENC[AES256_GCM,data:iWob8Vb3cw+Ip3Id/KBKbYqn5gsue+tz/fyEzGrUzm5wkjTzxiE=,iv:O5vwqVOJzbVNSBIOnUi9sZNQuhgVM5cplN6Yqtf+y/k=,tag:1FX8KqzblBL8Mvi3Fj0sqw==,type:comment]
+        - address: ENC[AES256_GCM,data:oH/RjJLWmg/nzWT0/RkZ,iv:0bbr+ZxJ6jmwKyzhGuqhCb19RxpPqvUy0CxwnrDWgbk=,tag:ol/NQhbp2B2D1ipQQw0GhA==,type:str]
+          ports:
+            tcp-mariadb: ENC[AES256_GCM,data:cnH05A==,iv:Ecgibz6SS+wrb7ScfrYsY+lSySWo63jtLC2vfFM8VpI=,tag:dgd93QgT6HtAY+dki3MvRA==,type:int]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBROEFQaC9tTlhLYUE1VUxQ
+            WVBaK0JuNFFCQ1hVc1dWRnVvbXg0ZDVMNXlBCmpHNi8rUEY4UXpqb2w5RXZjOTEz
+            SURPb2pZNlBVY0tiWjB6R2NtS2xOV1UKLS0tIFNhYSsyWnJRVEVVTmRmT1FnT1hl
+            MUNLM2NiLy9wYnJ5NHROSDVBOVNnSUUK1IFJCr5Z4LF1i1/GCmU+Vs3F/D2EZKMf
+            nY8MSUSjCDarxUvj9QL1ni0saB+07zBFss+0qiV3mZYKgMQAsFg36w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T04:39:41Z"
+    mac: ENC[AES256_GCM,data:Y+8obLI/Ge+9Tyijl04/EV3SoIbSNYE3PSj7+n+wQlfgL7O1CgTMOKtz5Wpmy3+w1lm95csehR+7xQMsCVnhwsDXwaP3mABoDeyqs2gPl++QtYYJ5nnuFpQEaF7P4BDcmSwsAipd1ZdDMTVnpLTx8JUtpy08hTYjrqiTBXl2EJg=,iv:Q13jqtcdAE913em+jOHOe+rNRtbqH69iXKnWUiWvU3w=,tag:utTv8z6GGeQcQPciJBGa5Q==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+    name: homeserver-minio
+spec:
+    hosts:
+        - ENC[AES256_GCM,data:eStABgMDW3bX,iv:uml9ZhXOJjXpLqp7W4D0bD1tewiAEe0ZQDXkcXqeUUY=,tag:oHad3l1ufMLzM/GdjHlvmQ==,type:comment]
+        - ENC[AES256_GCM,data:45oJxKLLQmU6TPhtR/ZGDg==,iv:JtHJkpOP5F02hcWhCaYhjjUA6oC+qVlmtLS27/nG19w=,tag:tks8HlunuupyKLXFDUBnUQ==,type:str]
+    addresses:
+        - ENC[AES256_GCM,data:GyzqeJuVs48/ECY/0igy,iv:cBONRh69fOZGvmarXtGlSwSI9XhOe2KZSyigmKyHwgA=,tag:vQ9oiEB7Wig/MZzc2a500g==,type:str]
+    location: ENC[AES256_GCM,data:AC9l0Q1snEK5zCYk3A==,iv:pFA0gRG0vKrKyYOQcq+eAQLFOfMus+9qgLyySH6jA8c=,tag:LbEWLhLTT7UOq9xu6nzC8Q==,type:str]
+    ports:
+        - number: ENC[AES256_GCM,data:EgJUZA==,iv:FwZXapMb8MHsrvIa7HDIBOtdnWxsrJ1bXk1IQ9ZYRfo=,tag:zljzuJDELlhox/9D8o9v3A==,type:int]
+          name: ENC[AES256_GCM,data:4bi10NcqdU+R,iv:iljt0w1dO02HoU8qoqXQRgfyNUfnf+7YvifZ68Gvr4o=,tag:Hw1WAewv3Nc6HYLMB2kSzA==,type:str]
+          protocol: ENC[AES256_GCM,data:0izv,iv:cxENKSpvzKL0azHSWD3VaEKJL6LDccqdXDgiXVqmD9o=,tag:SdTypOQFbMRhIUQ6ltpKmg==,type:str]
+    #ENC[AES256_GCM,data:wL0xTsciPEKwJ+H4cf3W2KIgvbEPbSql8jdwnDICdDZ2uI5hs8FqvpxxpzjeminuVRJSTiIU9BhdzHejmstzBzbTeGeBIUpMoQ==,iv:bVmKA288+YHHN9Bq2DNgxHcrLZTESaHNT2sxeu/xgSY=,tag:mpaL+zseZVTGrFyssDnnoA==,type:comment]
+    resolution: ENC[AES256_GCM,data:K+CIHdxK,iv:ZnLls2G9dRTbj8MzJ1WciZOXJGcErm/LUD8VchCpS3A=,tag:UzWAeeCu68+LjYxR7WS9uQ==,type:str]
+    endpoints:
+        - address: ENC[AES256_GCM,data:oH/RjJLWmg/nzWT0/RkZ,iv:0bbr+ZxJ6jmwKyzhGuqhCb19RxpPqvUy0CxwnrDWgbk=,tag:ol/NQhbp2B2D1ipQQw0GhA==,type:str]
+          ports:
+            tcp-minio: ENC[AES256_GCM,data:QPbVFA==,iv:L4/LdDk6zfME83B4/SAnmyeIkTX1zLfYT/dhSLT0WsE=,tag:KlI+xKiy5A1VRzvlh+UmKQ==,type:int]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBROEFQaC9tTlhLYUE1VUxQ
+            WVBaK0JuNFFCQ1hVc1dWRnVvbXg0ZDVMNXlBCmpHNi8rUEY4UXpqb2w5RXZjOTEz
+            SURPb2pZNlBVY0tiWjB6R2NtS2xOV1UKLS0tIFNhYSsyWnJRVEVVTmRmT1FnT1hl
+            MUNLM2NiLy9wYnJ5NHROSDVBOVNnSUUK1IFJCr5Z4LF1i1/GCmU+Vs3F/D2EZKMf
+            nY8MSUSjCDarxUvj9QL1ni0saB+07zBFss+0qiV3mZYKgMQAsFg36w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T04:39:41Z"
+    mac: ENC[AES256_GCM,data:Y+8obLI/Ge+9Tyijl04/EV3SoIbSNYE3PSj7+n+wQlfgL7O1CgTMOKtz5Wpmy3+w1lm95csehR+7xQMsCVnhwsDXwaP3mABoDeyqs2gPl++QtYYJ5nnuFpQEaF7P4BDcmSwsAipd1ZdDMTVnpLTx8JUtpy08hTYjrqiTBXl2EJg=,iv:Q13jqtcdAE913em+jOHOe+rNRtbqH69iXKnWUiWvU3w=,tag:utTv8z6GGeQcQPciJBGa5Q==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

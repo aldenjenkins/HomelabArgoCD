@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard-exporter
+  labels:
+    app.kubernetes.io/name: adguard-exporter
+    app.kubernetes.io/instance: adguard-exporter
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9618
+      targetPort: 9618
+      protocol: TCP
+      name: metrics
+  selector:
+    app.kubernetes.io/name: adguard-exporter
+    app.kubernetes.io/instance: adguard-exporter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard
+  labels:
+    app.kubernetes.io/name: adguard
+    app.kubernetes.io/instance: adguard
+spec:
+  clusterIP: None  # Headless service
+  ports:
+    - port: 80
+      targetPort: 80
+      name: web

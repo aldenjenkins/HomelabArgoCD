@@ -1,0 +1,10 @@
+namespace: kanboard
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - authorizationpolicy.yaml
+  - virtualservice.yaml
+generators:
+  - sopsgenerator.yaml

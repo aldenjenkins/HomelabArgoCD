@@ -1,0 +1,252 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: logs-agent
+spec:
+  mode: daemonset
+  # this updateStrategy block rolls out all pods simultaneously rather than the one-by-one sequential default
+  daemonSetUpdateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: "100%"
+  image: otel/opentelemetry-collector-contrib:latest
+  # Unfortunately the operator doesnt automatically expose zpages in the correlated service automatically. 
+  # Maybe that will change in the future, but for now, we have to define all exposed ports to add it.
+  ports:
+    - name: metrics
+      port: 8888
+      protocol: TCP
+      targetPort: 0
+    - name: zpages
+      port: 55679
+      protocol: TCP
+      targetPort: 0
+    - name: pprof
+      port: 1777
+      protocol: TCP
+      targetPort: 0
+  securityContext:
+    runAsGroup: 0
+    runAsUser: 0
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: "100m"
+      memory: 32Mi
+  volumeMounts:
+    - mountPath: /var/log/pods
+      name: varlogpods
+      readOnly: true
+    - mountPath: /var/lib/docker/containers
+      name: varlibdockercontainers
+      readOnly: true
+    - mountPath: /var/lib/storage/otc
+      name: file-storage
+  volumes:
+    - hostPath:
+        path: /var/log/pods
+        type: ""
+      name: varlogpods
+    - hostPath:
+        path: /var/lib/docker/containers
+        type: ""
+      name: varlibdockercontainers
+    - hostPath:
+        path: /var/lib/otc
+        type: DirectoryOrCreate
+      name: file-storage
+  # presets:
+  #   logsCollection:
+  #     enabled: true
+  #
+  serviceAccount: otel-collector
+  config:
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      debug:
+        verbosity: detailed
+
+      # Exporter for sending logs via otlphttp to the logs gateway 
+      otlphttp:
+        disable_keep_alives: true
+        endpoint: http://logs-gateway-collector.observability.svc.cluster.local.:4318
+        tls:
+          insecure: true
+        sending_queue:
+          queue_size: 10
+
+    extensions:
+      file_storage:
+        compaction:
+          directory: /var/lib/storage/otc
+          on_rebound: true
+        create_directory: true
+        directory: /var/lib/storage/otc
+        timeout: 10s
+      pprof: {}
+      zpages:
+        endpoint: 0.0.0.0:55679
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
+
+
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      # Use the in-built `batch` processor to batch up data before writing it for export.
+      batch:
+        timeout: 1s  # Reduce if too high
+        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_max_size: 2048
+
+    # Define the protocols to receive data for.
+    # See https://opentelemetry.io/docs/collector/configuration/#receivers
+    receivers:
+      filelog/containers:
+        exclude:
+          # don't collect logs from otel logs pods otherwise that would create infinite loop when debug logs are enabled.
+          - /var/log/pods/observability_logs-agent-collector*/*/*.log
+          - /var/log/pods/observability_logs-gateway-collector*/*/*.log
+        include:
+          - /var/log/pods/*/*/*.log
+        include_file_name: false
+        include_file_path: true
+        operators:
+          - id: get-format
+            routes:
+              - expr: body matches "^\\{"
+                output: parser-docker
+              - expr: body matches "^[^ Z]+ "
+                output: parser-crio
+              - expr: body matches "^[^ Z]+Z"
+                output: parser-containerd
+            type: router
+          - id: parser-crio
+            output: merge-cri-lines
+            parse_to: body
+            regex: ^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*)(
+              |)(?P<log>.*)$
+            timestamp:
+              layout: "2006-01-02T15:04:05.999999999-07:00"
+              layout_type: gotime
+              parse_from: body.time
+            type: regex_parser
+          - id: parser-containerd
+            output: merge-cri-lines
+            parse_to: body
+            regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*)(
+              |)(?P<log>.*)$
+            timestamp:
+              layout: '%Y-$m-%dT%H:%M:%S.%LZ'
+              parse_from: body.time
+            type: regex_parser
+          - id: parser-docker
+            output: merge-docker-lines
+            parse_to: body
+            timestamp:
+              layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+              parse_from: body.time
+            type: json_parser
+          - combine_field: body.log
+            combine_with: ""
+            id: merge-docker-lines
+            is_last_entry: body.log matches "\n$"
+            max_unmatched_batch_size: 1
+            output: strip-trailing-newline
+            source_identifier: attributes["log.file.path"]
+            type: recombine
+          - combine_field: body.log
+            combine_with: ""
+            id: merge-cri-lines
+            is_last_entry: body.logtag == "F"
+            max_unmatched_batch_size: 1
+            output: extract-metadata-from-filepath
+            overwrite_with: newest
+            source_identifier: attributes["log.file.path"]
+            type: recombine
+          - id: strip-trailing-newline
+            output: extract-metadata-from-filepath
+            parse_from: body.log
+            parse_to: body
+            regex: |-
+              ^(?P<log>.*)
+              $
+            type: regex_parser
+          - id: extract-metadata-from-filepath
+            parse_from: attributes["log.file.path"]
+            regex: ^.*\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\-]+)\/(?P<container_name>[^\._]+)\/(?P<run_id>\d+)\.log$
+            type: regex_parser
+          - from: body.stream
+            id: move-attributes
+            to: attributes["stream"]
+            type: move
+          - from: attributes.container_name
+            to: attributes["k8s.container.name"]
+            type: move
+          - from: attributes.namespace
+            to: attributes["k8s.namespace.name"]
+            type: move
+          - from: attributes.pod_name
+            to: attributes["k8s.pod.name"]
+            type: move
+          - from: body.log
+            to: body
+            type: move
+          - field: attributes.run_id
+            type: remove
+          - field: attributes.uid
+            type: remove
+          - default: merge-multiline-logs
+            id: multiline
+            type: router
+          - combine_field: body
+            combine_with: |2+
+
+
+            id: merge-multiline-logs
+            is_first_entry: body matches "^\\[?\\d{4}-\\d{1,2}-\\d{1,2}.\\d{2}:\\d{2}:\\d{2}|^{"
+            max_unmatched_batch_size: 1
+            output: clean-up-log-file-path
+            source_identifier: attributes["log.file.path"]
+            type: recombine
+          - field: attributes["log.file.path"]
+            id: clean-up-log-file-path
+            type: remove
+        storage: file_storage
+
+    # Define the full service graph for the OpenTelemetry collector.
+    service:
+      extensions:
+        - health_check
+        - file_storage
+        - pprof
+        - zpages
+
+      pipelines:
+        logs/containers:
+          receivers: 
+          - filelog/containers
+          processors: 
+          - batch 
+          exporters: 
+          - otlphttp
+
+      telemetry:
+        logs:
+          encoding: json
+          level: info
+        # Push collector internal metrics to Prometheus
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true

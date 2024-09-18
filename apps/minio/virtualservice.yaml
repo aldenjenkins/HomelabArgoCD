@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-web
+spec:
+  hosts:
+    - "minio.home.alden.ai"
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - route:
+        - destination:
+            host: minio-web.minio.svc.cluster.local
+            port:
+              number: 9001
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-api
+spec:
+  hosts:
+    - "minio-api.home.alden.ai"
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - route:
+        - destination:
+            host: minio-api.minio.svc.cluster.local
+            port:
+              number: 9000

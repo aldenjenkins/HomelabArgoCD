@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubelet-csr-approver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubelet-csr-approver
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: '8080'
+        prometheus.io/scrape: 'true'
+      labels:
+        app: kubelet-csr-approver
+    spec:
+      serviceAccountName: kubelet-csr-approver
+      containers:
+        - name: kubelet-csr-approver
+          image: postfinance/kubelet-csr-approver:v1.2.11
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          args:
+            - -metrics-bind-address
+            - ":8080"
+            - -health-probe-bind-address
+            - ":8081"
+            - -leader-election
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+          ports:
+            - containerPort: 8080
+              name: metrics
+          env:
+            - name: PROVIDER_IP_PREFIXES
+              value: "192.168.123.1/24,::/0"
+            - name: MAX_EXPIRATION_SECONDS
+              value: "31622400"  # 366 days
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal

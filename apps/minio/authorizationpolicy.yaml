@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: minio-web
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: minio-web
+  action: 'CUSTOM'
+  provider:
+    name: 'authelia'
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - 'minio.home.alden.ai'

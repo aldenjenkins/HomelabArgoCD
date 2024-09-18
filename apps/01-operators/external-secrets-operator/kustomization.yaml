@@ -1,0 +1,6 @@
+resources:
+  - namespace.yaml
+  - github.com/external-secrets/external-secrets/config/crds/bases?ref=HEAD
+  - manifests.yaml
+  # - podmonitor.yaml
+  - externalsecret.yaml

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+data:
+  server.insecure: "true"
+  server.content.security.policy: "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'self' https://dashy.home.alden.ai"

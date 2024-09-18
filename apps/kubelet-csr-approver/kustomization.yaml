@@ -1,0 +1,7 @@
+namespace: kube-system
+resources:
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - deployment.yaml
+  - serviceaccount.yaml
+  - podmonitor.yaml

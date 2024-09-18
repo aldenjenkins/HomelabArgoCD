@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyroscope
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pyroscope
+  template:
+    metadata:
+      labels:
+        app: pyroscope
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - name: pyroscope
+          image: grafana/pyroscope:1.14.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 4040

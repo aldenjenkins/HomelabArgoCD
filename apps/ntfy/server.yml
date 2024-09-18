@@ -1,0 +1,3 @@
+cache-file: "/var/cache/ntfy/cache.db"
+base-url: "https://ntfy.home.alden.ai"
+attachment-cache-dir: "/var/cache/ntfy/attachments"

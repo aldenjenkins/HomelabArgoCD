@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: cockpit-virtualservice
+spec:
+  hosts:
+    - cockpit.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: cockpit.cockpit.svc.cluster.local
+            port:
+              number: 9090

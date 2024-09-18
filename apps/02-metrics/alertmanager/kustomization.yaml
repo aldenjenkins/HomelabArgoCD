@@ -1,0 +1,16 @@
+namespace: alertmanager
+resources:
+  - namespace.yaml
+  - alertmanager.yaml
+  - alertmanagerconfig.yaml
+  - networkpolicy.yaml
+  - poddisruptionbudget.yaml
+  - prometheusrule.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - authorizationpolicy.yaml
+  - virtualservice.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

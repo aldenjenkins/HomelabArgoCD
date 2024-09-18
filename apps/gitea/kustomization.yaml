@@ -1,0 +1,16 @@
+namespace: gitea
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - gateway.yaml
+  - virtualservice.yaml
+  - pvc.yaml
+  - servicemonitor.yaml
+  - grafanadatasource.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - redis.yaml
+  - instrumentation.yaml
+generators:
+  - sopsgenerator.yaml

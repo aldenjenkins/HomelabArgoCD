@@ -1,0 +1,18 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: pyroscope-source
+spec:
+  allowCrossNamespaceImport: true
+  datasource:
+    name: Pyroscope
+    uid: pyroscope
+    type: grafana-pyroscope-datasource
+    access: proxy
+    url: http://pyroscope.pyroscope.svc:4040
+    isDefault: false
+    jsonData:
+      minStep: '15s'
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana

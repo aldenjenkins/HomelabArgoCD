@@ -1,0 +1,17 @@
+namespace: loki
+resources:
+  - namespace.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - virtualservice.yaml
+  - configmap.yaml
+  - statefulset.yaml
+  - service.yaml
+  - servicemonitor.yaml
+  - podmonitor.yaml
+  - prometheusrule.yaml
+  - grafanadatasource.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

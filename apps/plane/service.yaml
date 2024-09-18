@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/instance: rabbitmq
+    app.kubernetes.io/component: rabbitmq
+spec:
+  type: ClusterIP
+  selector:
+    # This must match the 'app: rabbitmq' label from the Deployment
+    app: rabbitmq
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: http-mgmt
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+    - name: http-metrics
+      protocol: TCP
+      port: 15692
+      targetPort: 15692
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-admin
+  labels:
+    app.name: plane-admin
+spec:
+  clusterIP: None
+  ports:
+  - name: admin-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app.name: plane-admin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-api
+  labels:
+    app.name: plane-api
+spec:
+  clusterIP: None
+  ports:
+  - name: api-8000
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app.name: plane-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-live
+  labels:
+    app.name: plane-live
+spec:
+  clusterIP: None
+  ports:
+  - name: live-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app.name: plane-live
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-space
+  labels:
+    app.name: plane-space
+spec:
+  clusterIP: None
+  ports:
+  - name: space-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app.name: plane-space
+---
+# Source: plane-ce/templates/workloads/web.deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-web
+  labels:
+    app.name: plane-web
+spec:
+  clusterIP: None
+  ports:
+  - name: web-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app.name: plane-web

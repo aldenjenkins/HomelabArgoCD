@@ -1,0 +1,24 @@
+resources:
+  - argocd
+  - applicationset.yaml
+generators:
+  - sopsgenerator.yaml
+patchesStrategicMerge:
+  - patches/custom-cmd-params-cm.yaml
+  - patches/custom-rbac-cm.yaml
+  - patches/custom-cm.yaml
+  - patches/custom-notifications-cm.yaml
+  - patches/custom-repo-server-deployment.yaml
+replacements:
+  - source:
+      kind: Secret
+      name: slack-token
+      namespace: argocd
+      fieldPath: stringData
+    targets:
+      - select:
+          kind: Secret
+          name: argocd-notifications-secret
+          namespace: argocd
+        fieldPaths:
+          - stringData
