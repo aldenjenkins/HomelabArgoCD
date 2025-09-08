@@ -9,8 +9,16 @@ patchesStrategicMerge:
   - patches/custom-cm.yaml
   - patches/custom-notifications-cm.yaml
   - patches/custom-repo-server-deployment.yaml
-# patches:
-#   - path: patches/slack.yaml
-#     target:
-#       kind: Secret
-#       name: argocd-notifications-secret
+replacements:
+  - source:
+      kind: Secret
+      name: slack-token
+      namespace: argocd
+      fieldPath: stringData
+    targets:
+      - select:
+          kind: Secret
+          name: argocd-notifications-secret
+          namespace: argocd
+        fieldPaths:
+          - stringData
