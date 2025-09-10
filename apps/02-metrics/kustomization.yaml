@@ -6,4 +6,3 @@ resources:
   - alertmanager
   - blackbox-exporter
   - namespaces/kube-system
-  - namespaces/mailinabox

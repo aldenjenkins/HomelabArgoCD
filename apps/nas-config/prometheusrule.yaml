@@ -103,3 +103,177 @@ spec:
           annotations:
             summary: Filesystem is predicted to run out of space within the next 4 hours.
             description: Filesystem on volume {{ $labels.name }} is at {{ printf "%.2f" $value }}% capacity and is filling up.
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: mariadb-backup-prometheus-rules
+spec:
+  groups:
+    - name: mariadb-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: MariadbBackupFailed
+          expr: backup_success{backup_name="mariadb", backup_type="database"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup failed"
+            description: "MariaDB backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: MariadbBackupTooOld
+          expr: backup_age_hours{backup_name="mariadb", backup_type="database"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup is too old"
+            description: "MariaDB backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: MariadbBackupSizeSmall
+          expr: backup_size_bytes{backup_name="mariadb", backup_type="database"} < 1000000  # Less than 1MB
+          for: 5m
+          labels:
+            severity: warning
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup size is suspiciously small"
+            description: "MariaDB backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+
+        # Alert if we have no metrics at all for this backup
+        - alert: MariadbBackupMetricsMissing
+          expr: absent(backup_success{backup_name="mariadb", backup_type="database"})
+          for: 30m
+          labels:
+            severity: warning
+            service: mariadb-backup
+          annotations:
+            summary: "MariaDB backup metrics missing"
+            description: "No backup metrics found for MariaDB. Node exporter or the backup metrics script may be failing."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: postgresql-backup-prometheus-rules
+spec:
+  groups:
+    - name: postgresql-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: PostgresqlBackupFailed
+          expr: backup_success{backup_name="postgresql", backup_type="database"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup failed"
+            description: "PostgreSQL backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: PostgresqlBackupTooOld
+          expr: backup_age_hours{backup_name="postgresql", backup_type="database"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup is too old"
+            description: "PostgreSQL backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: PostgresqlBackupSizeSmall
+          expr: backup_size_bytes{backup_name="postgresql", backup_type="database"} < 1000000  # Less than 1MB
+          for: 5m
+          labels:
+            severity: warning
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup size is suspiciously small"
+            description: "PostgreSQL backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+
+        # Alert if we have no metrics at all for this backup
+        - alert: PostgresqlBackupMetricsMissing
+          expr: absent(backup_success{backup_name="postgresql", backup_type="database"})
+          for: 30m
+          labels:
+            severity: warning
+            service: postgresql-backup
+          annotations:
+            summary: "PostgreSQL backup metrics missing"
+            description: "No backup metrics found for PostgreSQL. Node exporter or the backup metrics script may be failing."
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    prometheus: k8s
+    role: alert-rules
+  name: mailinabox-prometheus-rules
+spec:
+  groups:
+    - name: mailinabox-backup
+      rules:
+        # Alert if the last backup was reported unsuccessful (0)
+        - alert: MailInABoxBackupFailed
+          expr: backup_success{backup_name="mailinabox", backup_type="rsync"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup failed"
+            description: "Mail-in-a-Box backup last run reported failure (value={{ $value }}) on {{ $labels.instance }}."
+
+        # Alert if the latest backup is older than 26 hours
+        - alert: MailInABoxBackupTooOld
+          expr: backup_age_hours{backup_name="mailinabox", backup_type="rsync"} > 26
+          for: 15m
+          labels:
+            severity: warning
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup is too old"
+            description: "Mail-in-a-Box backup age is {{ $value }} hours on {{ $labels.instance }}, exceeding the 26-hour threshold."
+
+        # Alert if backup size is suspiciously small
+        - alert: MailInABoxBackupSizeSmall
+          expr: backup_size_bytes{backup_name="mailinabox", backup_type="rsync"} < 1000000
+          for: 5m
+          labels:
+            severity: warning
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup size is suspiciously small"
+            description: "Mail-in-a-Box backup size is {{ $value | humanize1024 }}B on {{ $labels.instance }}, which may indicate an incomplete backup."
+
+        # Alert if we have no metrics at all for this backup (node_exporter/script issues)
+        - alert: MailInABoxBackupMetricsMissing
+          expr: absent(backup_success{backup_name="mailinabox", backup_type="rsync"})
+          for: 30m
+          labels:
+            severity: warning
+            service: mailinabox-backup
+          annotations:
+            summary: "Mail-in-a-Box backup metrics missing"
+            description: "No backup metrics found for mailinabox (rsync). Node exporter or the backup metrics script may be failing."

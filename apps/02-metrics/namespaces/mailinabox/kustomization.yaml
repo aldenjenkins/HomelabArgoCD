@@ -1,4 +1,0 @@
-namespace: mailinabox
-resources:
-  - namespace.yaml
-  - prometheusrule.yaml
