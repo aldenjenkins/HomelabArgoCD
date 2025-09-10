@@ -18,6 +18,6 @@ spec:
       containers:
         - name: excalidraw
           image: 'excalidraw/excalidraw:latest'
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 80

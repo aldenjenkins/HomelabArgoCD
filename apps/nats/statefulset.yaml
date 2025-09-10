@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: nats-jetstream
-          image: nats:latest
-          imagePullPolicy: Always
+          image: nats:2.11.9-alpine
+          imagePullPolicy: IfNotPresent
           args:
             - -D
             - --jetstream
@@ -67,7 +67,8 @@ spec:
         #                               #
         #################################
         - name: nats-exporter
-          image: natsio/prometheus-nats-exporter:latest
+          image: natsio/prometheus-nats-exporter:0.17.3
+          imagePullPolicy: IfNotPresent
           args:
             - -varz
             - -jsz=all

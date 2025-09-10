@@ -42,8 +42,8 @@ spec:
       enableServiceLinks: false
       containers:
         - name: authelia
-          image: ghcr.io/authelia/authelia:latest
-          imagePullPolicy: Always
+          image: authelia/authelia:4.39.9
+          imagePullPolicy: IfNotPresent
           command: ["authelia"]
           resources:
             limits: {}

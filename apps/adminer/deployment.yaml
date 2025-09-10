@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: adminer
-          image: adminer:latest
+          image: adminer:5.4.0
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           resources:

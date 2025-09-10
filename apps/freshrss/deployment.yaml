@@ -19,8 +19,8 @@ spec:
           claimName: freshrss
       containers:
       - name: freshrss
-        image: linuxserver/freshrss:latest
-        imagePullPolicy: Always
+        image: freshrss/freshrss:1.27.0
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: data-and-extensions
           mountPath: /config/www/freshrss
