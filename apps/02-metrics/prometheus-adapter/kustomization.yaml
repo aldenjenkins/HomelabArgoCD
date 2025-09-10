@@ -1,6 +1,5 @@
 namespace: prometheus
 resources:
-  - namespace.yaml
   - serviceaccount.yaml
   - clusterrole.yaml
   - rolebinding.yaml
