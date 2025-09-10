@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: python-fast-slow
-          image: python:3.11
+          image: python:3.13
           imagePullPolicy: IfNotPresent
           command: [ "python3" ]
           args: [ "/app/main.py" ]
