@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/\\.yaml$/"
+    ]
+  },
+  "regexManagers": [
+     {
+       "description": "Update image from :latest and set imagePullPolicy to IfNotPresent",
+       "fileMatch": ["\\.yaml$"],
+       // This regex finds images using `:latest` and `imagePullPolicy: Always`
+       "matchStrings": [
+         "image: (?<depName>.*?):latest\\s*\\n\\s*imagePullPolicy: Always"
+       ],
+       // Tells Renovate to look up the dependency on Docker Hub (or other registries)
+       "datasource": "docker",
+       // Tells Renovate to find the highest stable version number
+       "versioning": "semver",
+       // This defines how to write the new lines
+       "replaceTemplate": "image: {{depName}}:{{newValue}}\n          imagePullPolicy: IfNotPresent"
+     }
+   ]
+}
+
