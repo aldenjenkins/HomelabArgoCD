@@ -277,8 +277,8 @@ spec:
             - name: sc-rules-volume
               mountPath: "/rules"
         - name: loki
-          image: docker.io/grafana/loki:latest
-          imagePullPolicy: Always
+          image: grafana/loki:3.5.4
+          imagePullPolicy: IfNotPresent
           args:
             - -config.file=/etc/loki/config/config.yaml
             - -target=all

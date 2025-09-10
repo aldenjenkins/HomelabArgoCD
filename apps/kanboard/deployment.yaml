@@ -20,8 +20,8 @@ spec:
             claimName: kanboard-data
       containers:
         - name: kanboard
-          image: kanboard/kanboard:nightly
-          imagePullPolicy: Always
+          image: kanboard/kanboard:v1.2.47
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: appdata
               mountPath: /var/www/app/data
