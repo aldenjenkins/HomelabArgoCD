@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: twentycrm
-          image: twentycrm/twenty:v1.5.0
+          image: twentycrm/twenty:v1.5.3
           imagePullPolicy: IfNotPresent
           env:
             - name: NODE_PORT
@@ -109,7 +109,7 @@ spec:
     spec:
       containers:
         - name: twentycrm
-          image: twentycrm/twenty:v1.5.0
+          image: twentycrm/twenty:v1.5.3
           imagePullPolicy: IfNotPresent
           env:
             - name: NODE_PORT
