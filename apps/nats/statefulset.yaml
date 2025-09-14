@@ -82,14 +82,16 @@ spec:
           name: config-volume
       nodeSelector:
         kubernetes.io/os: linux
-        kubernetes.io/hostname: node12
+        kubernetes.io/hostname: control-plane-03
   volumeClaimTemplates:
     - metadata:
         name: nats-data
+        annotations:
+          nfs.io/storage-path: "nats/"
       spec:
         accessModes:
-          - "ReadWriteOnce"
-        storageClassName: local-storage
+          - "ReadWriteMany"
+        storageClassName: nfs-appdata-retain
         resources:
           requests:
-            storage: "10Gi"
+            storage: "25Gi"
