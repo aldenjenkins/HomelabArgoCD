@@ -1,14 +1,14 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-  name: nfs-retain
-provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
-reclaimPolicy: Retain
-parameters:
-  archiveOnDelete: "false"
-  pathPattern: "${.PVC.namespace}/${.PVC.name}/${.PVC.annotations.nfs.io/storage-path}"  # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   annotations:
+#     storageclass.kubernetes.io/is-default-class: "true"
+#   name: nfs-retain
+# provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
+# reclaimPolicy: Retain
+# parameters:
+#   archiveOnDelete: "false"
+#   pathPattern: "${.PVC.namespace}/${.PVC.name}/${.PVC.annotations.nfs.io/storage-path}"  # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
 ---
 # Create a storage class for local volumes on large NUCs (node11, node12)
 apiVersion: storage.k8s.io/v1
@@ -25,6 +25,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: nfs-appdata-retain
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
 parameters:
   pathPattern: "appdata/${.PVC.annotations.nfs.io/storage-path}"
