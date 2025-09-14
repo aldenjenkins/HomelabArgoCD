@@ -22,7 +22,7 @@ spec:
     cluster: "homelab-live"
   nodeSelector:
     kubernetes.io/os: linux
-    kubernetes.io/hostname: node11
+    kubernetes.io/hostname: control-plane-02
   podMetadata:
     labels:
       app.kubernetes.io/component: prometheus
