@@ -45,7 +45,6 @@ spec:
             storage: 50Gi
         accessModes:
           - ReadWriteMany
-        volumeName: alertmanager-data
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true

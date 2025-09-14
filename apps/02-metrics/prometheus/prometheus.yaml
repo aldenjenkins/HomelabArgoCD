@@ -71,7 +71,6 @@ spec:
             storage: 100Gi
         accessModes:
           - ReadWriteMany
-        volumeName: prometheus-data
   tracingConfig:
     endpoint: "trace-collector.observability.svc.cluster.local:4317"
     samplingFraction: "0.1"
