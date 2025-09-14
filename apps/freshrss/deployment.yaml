@@ -16,7 +16,7 @@ spec:
       volumes:
       - name: data-and-extensions
         persistentVolumeClaim:
-          claimName: freshrss
+          claimName: freshrss-data
       containers:
       - name: freshrss
         image: freshrss/freshrss:1.27.0

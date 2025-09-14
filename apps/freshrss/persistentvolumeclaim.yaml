@@ -3,14 +3,14 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     app: freshrss
-  name: freshrss
+  name: freshrss-data
+  annotations:
+    nfs.io/storage-path: "freshrss/"
 spec:
   accessModes:
   - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
-  selector:
-    matchLabels:
-      name: freshrss
-  volumeName: freshrss
+  storageClassName: nfs-appdata-retain
+  volumeName: freshrss-data
