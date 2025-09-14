@@ -15,7 +15,7 @@ spec:
         sidecar.istio.io/inject: "true"
     spec:
       nodeSelector:
-        kubernetes.io/hostname: node12
+        kubernetes.io/hostname: control-plane-03
       containers:
         - name: jellyfin
           env:
@@ -51,14 +51,6 @@ spec:
             - name: jellyfin-cache
               mountPath: /cache
       restartPolicy: Always
-      # volumeClaimTemplates handles this
-      #  volumes:
-      #    - name: media-library
-      #      persistentVolumeClaim:
-      #        claimName: jellyfin-media
-      #    - name: jellyfin-config
-      #      persistentVolumeClaim:
-      #        claimName: jellyfin-config
       volumes:
         - name: jellyfin-cache
           emptyDir:
@@ -72,7 +64,7 @@ spec:
         accessModes: ["ReadWriteMany"]
         resources:
           requests:
-            storage: 1Pi
+            storage: 15Ti
         storageClassName: nfs-media-retain
     - metadata:
         name: jellyfin-config
@@ -83,4 +75,4 @@ spec:
         storageClassName: nfs-appdata-retain
         resources:
           requests:
-            storage: 1Ti
+            storage: 500Gi
