@@ -4,6 +4,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - virtualservice.yaml
-  - pvc.yaml
+  - persistentvolumeclaim.yaml
   - grafanadashboard.yaml
   - servicemonitor.yaml
