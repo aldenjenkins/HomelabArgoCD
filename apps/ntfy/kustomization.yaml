@@ -1,7 +1,7 @@
 namespace: ntfy
 resources:
   - namespace.yaml
-  - pvc.yaml
+  - persistentvolumeclaim.yaml
   - deployment.yaml  # deployment definition
   - service.yaml  # service connecting pods to cluster network
   - virtualservice.yaml
