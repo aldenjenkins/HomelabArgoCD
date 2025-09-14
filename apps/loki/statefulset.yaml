@@ -41,7 +41,7 @@ spec:
         runAsUser: 11211
       initContainers: []
       nodeSelector:
-        kubernetes.io/hostname: node11
+        kubernetes.io/hostname: control-plane-02
       affinity: {}
       topologySpreadConstraints: []
       tolerations: []
@@ -73,7 +73,7 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           volumeMounts:
-            - name: data
+            - name: loki-chunks-cache
               mountPath: /data
         - name: exporter
           image: prom/memcached-exporter:latest
@@ -95,13 +95,15 @@ spec:
             readOnlyRootFilesystem: true
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: loki-chunks-cache
+        annotations:
+          nfs.io/storage-path: "loki/chunks-cache"
       spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: nfs-retain
+        accessModes: ["ReadWriteMany"]
+        storageClassName: nfs-monitoring-retain
         resources:
           requests:
-            storage: "10G"
+            storage: "20G"
 ---
 # Source: loki/templates/results-cache/statefulset-results-cache.yaml
 apiVersion: apps/v1
@@ -177,7 +179,7 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           volumeMounts:
-            - name: data
+            - name: loki-results-cache
               mountPath: /data
         - name: exporter
           image: prom/memcached-exporter:latest
@@ -199,10 +201,12 @@ spec:
             readOnlyRootFilesystem: true
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: loki-results-cache
+        annotations:
+          nfs.io/storage-path: "loki/results-cache/"
       spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: nfs-retain
+        accessModes: ["ReadWriteMany"]
+        storageClassName: nfs-monitoring-retain
         resources:
           requests:
             storage: "10G"
@@ -311,7 +315,7 @@ spec:
               mountPath: /etc/loki/config
             - name: runtime-config
               mountPath: /etc/loki/runtime-config
-            - name: storage
+            - name: loki-storage
               mountPath: /var/loki
             - name: sc-rules-volume
               mountPath: "/rules"
@@ -341,11 +345,13 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: storage
+        name: loki-storage
+        annotations:
+          nfs.io/storage-path: "loki/storage"
       spec:
         accessModes:
-          - ReadWriteOnce
-        storageClassName: nfs-retain
+          - ReadWriteMany
+        storageClassName: nfs-monitoring-retain
         resources:
           requests:
-            storage: "1Pi"
+            storage: "1Ti"
