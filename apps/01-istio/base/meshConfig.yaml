@@ -27,10 +27,10 @@ spec:
                 port: 22
                 name: ssh
     cni:
-      enabled: true
-  values:
-    cni:
-      cniBinDir: /usr/libexec/cni
+      enabled: false
+  # values:
+  #   cni:
+  #     cniBinDir: /usr/libexec/cni
   meshConfig:
     enableTracing: true
     defaultConfig:
