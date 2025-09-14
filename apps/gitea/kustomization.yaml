@@ -5,7 +5,7 @@ resources:
   - service.yaml
   - gateway.yaml
   - virtualservice.yaml
-  - pvc.yaml
+  - persistentvolumeclaim.yaml
   - servicemonitor.yaml
   - grafanadatasource.yaml
   - grafanafolder.yaml

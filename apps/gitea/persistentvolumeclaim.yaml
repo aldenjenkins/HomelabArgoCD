@@ -4,13 +4,13 @@ metadata:
   labels:
     app: gitea-data
   name: gitea-data
+  annotations:
+    nfs.io/storage-path: "gitea/"
 spec:
   accessModes:
     - ReadWriteMany
+  storageClassName: nfs-appdata-retain
   resources:
     requests:
       storage: 1Ti
-  selector:
-    matchLabels:
-      name: gitea-data
   volumeName: gitea-data
