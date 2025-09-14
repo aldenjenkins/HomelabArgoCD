@@ -32,6 +32,20 @@ spec:
       cpu: 4m
       memory: 100Mi
   secrets: []
+  storage:
+    volumeClaimTemplate:
+      metadata:
+        name: alertmanager-data
+        annotations:
+          nfs.io/storage-path: "alertmanager-data/"
+      spec:
+        storageClassName: nfs-monitoring-retain
+        resources:
+          requests:
+            storage: 50Gi
+        accessModes:
+          - ReadWriteMany
+        volumeName: alertmanager-data
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true

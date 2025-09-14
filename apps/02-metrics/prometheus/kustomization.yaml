@@ -18,5 +18,3 @@ resources:
   - virtualservice.yaml
   - authorizationpolicy.yaml
   - grafanadatasource.yaml
-generators:
-  - sopsgenerator.yaml
