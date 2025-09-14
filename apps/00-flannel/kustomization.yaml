@@ -1,5 +1,0 @@
-namespace: kube-flannel
-resources:
-  - https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
-commonAnnotations:
-  argocd.argoproj.io/sync-wave: "-2"
