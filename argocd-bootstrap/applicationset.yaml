@@ -8,7 +8,7 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
-        repoURL: 'git@github.com:aldenjenkins/HomelabArgoCD.git'
+        repoURL: https://github.com/aldenjenkins/HomelabArgoCD.git
         revision: HEAD
         directories:
           - path: 'apps/*'
@@ -20,7 +20,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: 'git@github.com:aldenjenkins/HomelabArgoCD.git'
+        repoURL: https://github.com/aldenjenkins/HomelabArgoCD.git
         targetRevision: HEAD
         # Path will be replaced for each subdirectory, e.g. 'apps/app1', 'apps/app2', etc.
         path: 'apps/{{.path.basename}}'
