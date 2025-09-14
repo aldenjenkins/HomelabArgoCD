@@ -1,7 +1,7 @@
 namespace: kanboard
 resources:
   - namespace.yaml
-  - pvc.yaml
+  - persistentvolumeclaim.yaml
   - deployment.yaml
   - service.yaml
   - authorizationpolicy.yaml
