@@ -27,7 +27,8 @@ spec:
                 port: 22
                 name: ssh
     cni:
-      enabled: false
+      enabled: true
+      namespace: istio-system
   # values:
   #   cni:
   #     cniBinDir: /usr/libexec/cni
