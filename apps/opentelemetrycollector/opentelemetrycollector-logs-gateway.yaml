@@ -22,7 +22,7 @@ spec:
   podSecurityContext:
     fsGroup: 999
   nodeSelector:
-    kubernetes.io/hostname: node12
+    kubernetes.io/hostname: control-plane-03
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
