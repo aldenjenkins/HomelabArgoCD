@@ -1,3 +1,4 @@
+# This was just used to generate the templates via `helm template <...>`
 test:
   enabled: false
 agent:
@@ -29,9 +30,9 @@ write:
 singleBinary:
   replicas: 1
   persistence:
-    size: 1Pi
+    size: 1Ti
     enabledStatefulSetAutoDeletePVC: false
-    storageClass: nfs-client
+    storageClass: nfs-monitoring-retain
 grafana:
   enabled: false
 promtail:
@@ -43,10 +44,10 @@ lokiCanary:
 resultsCache:
   persistence:
     enabled: true
-    size: 1Pi
-    storageClass: nfs-client
+    size: 20Gi
+    storageClass: nfs-monitoring-retain
 chunksCache:
   persistence:
     enabled: true
-    size: 1Pi
-    storageClass: nfs-client
+    size: 10Gi
+    storageClass: nfs-monitoring-retain
