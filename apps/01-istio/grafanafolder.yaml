@@ -1,0 +1,11 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: istio
+spec:
+  allowCrossNamespaceImport: true
+  parentFolderUID: networking-uid
+  uid: istio-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

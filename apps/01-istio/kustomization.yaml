@@ -8,5 +8,7 @@ resources:
   - podmonitor.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
 generators:
   - sopsgenerator.yaml

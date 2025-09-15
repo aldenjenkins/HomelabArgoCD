@@ -4,7 +4,7 @@ resources:
   - redis.yaml
   - grafana.yaml
   - grafanadatasource.yaml
-  - grafanafolders.yaml
+  - grafanafolder.yaml
   - grafanadashboard.yaml
   - dashboards
   - virtualservice.yaml

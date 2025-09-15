@@ -23,17 +23,6 @@ spec:
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaFolder
 metadata:
-  name: istio
-spec:
-  parentFolderUID: networking-uid
-  uid: istio-uid
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaFolder
-metadata:
   name: kubernetes
 spec:
   uid: kubernetes-uid
