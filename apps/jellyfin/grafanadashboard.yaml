@@ -11,7 +11,7 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
-  folderRef: jellyfin
+  folderUID: jellyfin-uid
   json: |-
     {
 

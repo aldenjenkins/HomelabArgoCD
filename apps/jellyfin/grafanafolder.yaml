@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: jellyfin
 spec:
+  uid: jellyfin-uid
   allowCrossNamespaceImport: true
   resyncPeriod: 1m
   instanceSelector:
