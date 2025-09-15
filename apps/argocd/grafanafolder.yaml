@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: argocd
 spec:
+  uid: argocd-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:

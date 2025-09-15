@@ -7,7 +7,7 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  folderRef: argocd
+  folderUID: argocd-uid
   instanceSelector:
     matchLabels:
       dashboards: grafana
