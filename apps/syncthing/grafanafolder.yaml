@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: syncthing
 spec:
+  uid: syncthing-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
