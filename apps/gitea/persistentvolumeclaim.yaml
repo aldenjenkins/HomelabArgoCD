@@ -13,4 +13,3 @@ spec:
   resources:
     requests:
       storage: 1Ti
-  volumeName: gitea-data
