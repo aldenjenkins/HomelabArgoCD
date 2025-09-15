@@ -23,9 +23,9 @@ spec:
         - name: gitea
           image: "gitea/gitea:latest"
           # Required for otel injection
-          securityContext:
-            privileged: true
-            runAsUser: 0
+          # securityContext:
+          #   privileged: true
+          #   runAsUser: 0
           imagePullPolicy: Always
           ports:
             - name: ssh

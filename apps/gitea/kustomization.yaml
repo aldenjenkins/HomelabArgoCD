@@ -11,6 +11,6 @@ resources:
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - redis.yaml
-  - instrumentation.yaml
+  # - instrumentation.yaml
 generators:
   - sopsgenerator.yaml
