@@ -2,6 +2,9 @@ apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
     name: etcd-metrics
+    annotations:
+        argocd.argoproj.io/sync-options: Validate=false
+        argocd.argoproj.io/managed: "true"
     labels:
         kubernetes.io/service-name: etcd-metrics
 addressType: ENC[AES256_GCM,data:RU6jYQ==,iv:ERBklxXO/QeYkr4bAnt0rB0HMUOdvpo8VjZcZ1wt49g=,tag:cjoK9/woncAtdSz9qeEvyg==,type:str]
@@ -29,7 +32,7 @@ sops:
             RHVua2YwdjdibkdYWHRjUnc5ZjBwK1EKfplZhTaWeWA66NQlQEWr8oMRu83Bgb3n
             ocwgN09bUpoBGqpqqlerrluQAE2mEnV7uRHmLb+orgpnECgNJhpLUA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-09-15T03:32:25Z"
-    mac: ENC[AES256_GCM,data:Nwe3NJU6hzRUpylPmZ2So8U7c9CHO8IGU0IKXBfyjdPmSHk6ina9VOiCj1190QFiLCozdDHpigS/H248YGxmfMt/Yv/fRkkDTp2lxG+zkoHrKVe/Axo4TYLRc+DmsYgFCGkNZF8XNpYjQRTkv7HJAuzZVEpCUvnA4L0Pqp7AQsE=,iv:7wYwHD63nlhbvDtpfA075G2ZdZgA83dW4x2jatuOLAw=,tag:/qVV+mIIDZOY2DTtve0qZQ==,type:str]
+    lastmodified: "2025-09-15T03:40:17Z"
+    mac: ENC[AES256_GCM,data:aqVaAu4/s2xy0dg2es0K9OSNaqo6a1xf0V+P00Sk7MrlGjU6lhgpuNvzeaPbITYEPJGwKtw8l597tHjQHoG9FMmFpvq6g6WOZw1lK+/HV/9Nhitl/9jwoTVbfxGwMUQCYPpi9YrgT/E5EM+MAHce3fSB/BR2uWoHeLL1h8yQt9k=,iv:E0AwR8fS7UT3yhPHdniX3/unJzHL++n7qgHBXdE0SSI=,tag:qNeFKcECbXZRMsDz6k2xZA==,type:str]
     unencrypted_regex: ^(apiVersion|metadata|kind|type)$
     version: 3.10.2
