@@ -12,4 +12,4 @@ spec:
     - inputName: "DS_OBSERVE-PROMETHEUS02"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/12485/revisions/1/download"
-  folderRef: postgresql
+  folderUID: postgresql-uid

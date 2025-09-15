@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: postgresql
 spec:
+  uid: postgresql-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
