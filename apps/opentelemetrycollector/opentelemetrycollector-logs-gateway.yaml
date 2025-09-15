@@ -23,22 +23,22 @@ spec:
     fsGroup: 999
   nodeSelector:
     kubernetes.io/hostname: control-plane-03
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata: 
-        name: file-storage
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 10Gi
-        storageClassName: local-storage
-        volumeMode: Filesystem
-  volumeMounts:
-    - mountPath: /var/lib/storage/otc
-      name: file-storage
+  # volumeClaimTemplates:
+  #   - apiVersion: v1
+  #     kind: PersistentVolumeClaim
+  #     metadata: 
+  #       name: file-storage
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       resources:
+  #         requests:
+  #           storage: 10Gi
+  #       storageClassName: local-storage
+  #       volumeMode: Filesystem
+  # volumeMounts:
+  #   - mountPath: /var/lib/storage/otc
+  #     name: file-storage
   resources:
     limits:
       cpu: "1200m"
