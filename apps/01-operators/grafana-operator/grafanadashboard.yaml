@@ -8,7 +8,7 @@ spec:
     matchLabels:
       dashboards: grafana
   resyncPeriod: 30s
-  folderRef: grafana
+  folderUID: grafana-uid
   datasources:
     - inputName: DS_PROMETHEUS
       datasourceName: prometheus
