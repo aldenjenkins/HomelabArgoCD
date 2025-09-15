@@ -1,0 +1,38 @@
+# Helm chart values for gettings templated manifests, setup for talos, ref: https://github.com/enix/x509-certificate-exporter/issues/297#issuecomment-2214334104
+
+hostPathsExporter:
+  securityContext:
+    privileged: true
+    capabilities:
+      add:
+      - SYS_ADMIN
+
+  hostPathVolumeType: null
+
+  daemonSets:
+    cp:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      watchFiles:
+      - /etc/kubernetes/pki/ca.crt
+      - /var/lib/kubelet/pki/kubelet-client-current.pem
+      - /system/secrets/etcd/server.crt
+      - /system/secrets/etcd/peer.crt
+      - /system/secrets/etcd/ca.crt
+      - /system/secrets/etcd/admin.crt
+      - /system/secrets/kubernetes/kube-apiserver/aggregator-ca.crt
+      - /system/secrets/kubernetes/kube-apiserver/apiserver-kubelet-client.crt
+      - /system/secrets/kubernetes/kube-apiserver/apiserver.crt
+      - /system/secrets/kubernetes/kube-apiserver/ca.crt
+      - /system/secrets/kubernetes/kube-apiserver/etcd-client-ca.crt
+      - /system/secrets/kubernetes/kube-apiserver/etcd-client.crt
+      - /system/secrets/kubernetes/kube-apiserver/front-proxy-client.crt
+
+    nodes:
+      watchFiles:
+      - /etc/kubernetes/pki/ca.crt
+      - /var/lib/kubelet/pki/kubelet-client-current.pem
