@@ -4,3 +4,5 @@ resources:
   # Create NodeFeatureRules for detecting GPUs on nodes
   - 'https://github.com/intel/intel-device-plugins-for-kubernetes/deployments/nfd/overlays/node-feature-rules?ref=main'
   - ./intel-gpu-plugin
+patches:
+  - path: patches/patch_node_feature_discovery_namespace.yaml
