@@ -11,7 +11,7 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
-  folderRef: opencost
+  folderUID: opencost-uid
   url: https://grafana.com/api/dashboards/22208/revisions/2/download
 ---
 apiVersion: grafana.integreatly.org/v1beta1
@@ -27,5 +27,5 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
-  folderRef: opencost
+  folderUID: opencost-uid
   url: https://grafana.com/api/dashboards/22252/revisions/3/download

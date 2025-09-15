@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: opencost
 spec:
+  uid: opencost-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
