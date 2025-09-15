@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: external-secrets
 spec:
+  uid: external-secrets-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:

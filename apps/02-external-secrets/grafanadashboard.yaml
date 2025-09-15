@@ -11,7 +11,7 @@ spec:
   datasources:
     - inputName: "DS_METRICS"
       datasourceName: "prometheus"
-  folderRef: external-secrets
+  folderUID: external-secrets-uid
   json: |-
     {
       "__inputs": [
@@ -1859,7 +1859,7 @@ spec:
   datasources:
     - inputName: "DS_METRICS"
       datasourceName: "prometheus"
-  folderRef: external-secrets
+  folderUID: external-secrets-uid
   json: |-
     {
       "annotations": {
