@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: gitea
 spec:
+  uid: gitea-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
