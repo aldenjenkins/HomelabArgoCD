@@ -12,4 +12,4 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/13502/revisions/26/download"
-  folderRef: minio
+  folderUID: minio-uid
