@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+    name: etcd
+    labels:
+        prometheus: homelab-live
+spec:
+    staticConfigs:
+        - targets:
+            - ENC[AES256_GCM,data:DAZrg3Nitn78Z17DpWyZpvMdJUU=,iv:jOSlTXBC4C0Zd4kIcfm7t0lEKNkvonypXrtZ2yhl6FY=,tag:TN13/3dxWuLHcH/o1C2A8A==,type:str]
+            - ENC[AES256_GCM,data:e6ajTDoJhLM9lrDsMqvQMQQP0Cs=,iv:XecMhpkhqkjhUAVrOuDowZ0hIYKP2DTrw8JQr3G7RTU=,tag:KkWHEnx0QrcnxZJ5tWBbeQ==,type:str]
+            - ENC[AES256_GCM,data:EZXuS90cJmsfB8VYy9bstG0GwdY=,iv:M8ylvbu+c3NbL9EXjQyM74RQrYAQa4vj0Cz7v6A6zsM=,tag:35PFTCpj8xdG1Qf8moWsIg==,type:str]
+    scrapeInterval: ENC[AES256_GCM,data:Y6wV,iv:hmtCyb+CNOYe0ad1KVFlYii0NH2Va1ihMhjPGFdWkNY=,tag:906DMCSmNRFYgroYyrXtIw==,type:str]
+    metricsPath: ENC[AES256_GCM,data:+LLNNlL2Qok=,iv:C6GQquTOYfLTjtaYW3/1j8/xp816dBQSynvTQdBSDdU=,tag:PTCsWvPnquvxKKGY7ZFeFQ==,type:str]
+    relabelings:
+        - action: ENC[AES256_GCM,data:hIvC2evHuQ==,iv:d2kWUumJlbM71pnDQj8e8+v+lqV+MuTepoXpLhbjikg=,tag:78TSkyf8tVBocStOVaZt9A==,type:str]
+          replacement: ENC[AES256_GCM,data:bHnMyoro9U8v0LUt,iv:nzJoNfFokbW7YULcTizYxtnT3cEpA4T56EoAMzX4lYc=,tag:ifR3rkNKuS0bNjv/bPlZiQ==,type:str]
+          targetLabel: ENC[AES256_GCM,data:rw/YUMYGPA==,iv:Ce0wf099BhJoNW8PcXiCQt59C8SZCheNVtvTSwZHXsU=,tag:3DPHjN/8CDbB1l2w7U3FUg==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUMmRrWE9iRU9IT2JJTWJD
+            S2pmckl1bGxidzJ2MjZnbWVuUU5pREdFcERZCk5iMXdzdG5zUksxOEU1YlFzZmpQ
+            bzJkb2JZTjEzeWFMOEg1S3pITm44bXcKLS0tIEl5c0xHMzdWVzJ0Nk8vSlltM3lE
+            VFFOTVdyMXdYQXRXdmgrTFpyWVJDSnMKmnPzRgiZrVVlrTUAFSb0GGlVy/X+D9I4
+            QEldguCTeyvQBPo1NqVWq2aS/oU77r2IqTqt/5lrrovYPfIPzd9f5Q==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-15T03:55:38Z"
+    mac: ENC[AES256_GCM,data:2d/iwsUyW1wCncOyJhpnpA5w1o2ezfB8eYVAApYVluvzLC4sNqPpaKL2qKQlsWgMXVHmzBUHVmb3JrR5pDpugcc98v/NY4tLBPNOymsJ95vmtAm5mj8/iVr8UFcIAJKUHfXPcXDYNIUg8ethqdG70A7KPa3aRdmQoTBIXp2c6g8=,iv:SI1bSGBOffojrI51H1GBdeYRqaQT1BpQ8bjqbzx8270=,tag:U0UehbMZRlM7a+FIRJvqlw==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2
