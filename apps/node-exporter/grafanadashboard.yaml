@@ -1,0 +1,15 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: node-exporter-dashboard
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 30s
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  url: "https://grafana.com/api/dashboards/1860/revisions/latest/download"
+  folderUID: kubernetes-uid

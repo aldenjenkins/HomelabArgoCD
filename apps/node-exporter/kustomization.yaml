@@ -9,3 +9,4 @@ resources:
   - service.yaml
   - serviceaccount.yaml
   - servicemonitor.yaml
+  - grafanadashboard.yaml
