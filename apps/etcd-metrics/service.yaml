@@ -3,12 +3,11 @@ kind: Service
 metadata:
   name: etcd-metrics
   labels:
-    app: etcd
+    app: etcd-metrics
 spec:
+  clusterIP: None
   ports:
     - name: metrics
       port: 2381
-      protocol: TCP
       targetPort: 2381
-  selector:
-    component: etcd
+      protocol: TCP

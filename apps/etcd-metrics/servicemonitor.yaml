@@ -10,7 +10,7 @@ spec:
       - kube-system
   selector:
     matchLabels:
-      app: etcd
+      app: etcd-metrics
   endpoints:
     - port: metrics
       path: /metrics

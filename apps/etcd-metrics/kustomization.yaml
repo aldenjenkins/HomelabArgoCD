@@ -4,3 +4,5 @@ resources:
   - servicemonitor.yaml
   - prometheusrule.yaml
   - grafanadashboard.yaml
+generators:
+  - sopsgenerator.yaml
