@@ -69,16 +69,16 @@ spec:
           enabled: true
           num_consumers: 10
           queue_size: 1000
-          storage: file_storage
+          # storage: file_storage
 
     extensions:
-      file_storage:
-        compaction:
-          directory: /var/lib/storage/otc/compaction
-          on_rebound: true
-        create_directory: true
-        directory: /var/lib/storage/otc
-        timeout: 10s
+      # file_storage:
+      #   compaction:
+      #     directory: /var/lib/storage/otc/compaction
+      #     on_rebound: true
+      #   create_directory: true
+      #   directory: /var/lib/storage/otc
+      #   timeout: 10s
       zpages:
         endpoint: 0.0.0.0:55679
       health_check:
@@ -490,7 +490,7 @@ spec:
     service:
       extensions:
         - health_check
-        - file_storage
+        # - file_storage
         - pprof
         - zpages
 
