@@ -17629,6 +17629,21 @@ metadata:
   namespace: istio-system
 
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: istio
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ztunnel
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: ztunnel-1.0.0
+  name: ztunnel
+  namespace: istio-system
+
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -17656,6 +17671,40 @@ rules:
   - get
   - list
   - watch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: istio-cni
+    app.kubernetes.io/instance: istio
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: istio-cni
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: cni-1.0.0
+    install.operator.istio.io/owning-resource: unknown
+    istio.io/rev: default
+    operator.istio.io/component: Cni
+    release: istio
+  name: istio-cni-ambient
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resourceNames:
+  - istio-cni-node
+  resources:
+  - daemonsets
+  verbs:
+  - get
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -18169,6 +18218,32 @@ metadata:
     k8s-app: istio-cni-repair
     operator.istio.io/component: Cni
     release: istio
+  name: istio-cni-ambient
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: istio-cni-ambient
+subjects:
+- kind: ServiceAccount
+  name: istio-cni
+  namespace: istio-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: istio
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: istio-cni
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: cni-1.0.0
+    install.operator.istio.io/owning-resource: unknown
+    istio.io/rev: default
+    k8s-app: istio-cni-repair
+    operator.istio.io/component: Cni
+    release: istio
   name: istio-cni-repair-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -18300,10 +18375,16 @@ apiVersion: v1
 data:
   mesh: |-
     accessLogFile: /dev/stdout
+    ambient:
+      enabled: true
     defaultConfig:
       discoveryAddress: istiod.istio-system.svc:15012
       gatewayTopology:
         numTrustedProxies: 0
+      image:
+        imageType: distroless
+      proxyMetadata:
+        ISTIO_META_ENABLE_HBONE: "true"
       tracing: {}
     defaultProviders:
       accessLogging:
@@ -18369,6 +18450,14 @@ data:
         service: authelia.authelia.svc.cluster.local
       name: authelia
     rootNamespace: istio-system
+    serviceScopeConfigs:
+    - scope: GLOBAL
+      servicesSelector:
+        matchExpressions:
+        - key: istio.io/global
+          operator: In
+          values:
+          - "true"
     trustDomain: cluster.local
   meshNetworks: 'networks: {}'
 kind: ConfigMap
@@ -18391,7 +18480,7 @@ metadata:
 apiVersion: v1
 data:
   AMBIENT_DNS_CAPTURE: "true"
-  AMBIENT_ENABLED: "false"
+  AMBIENT_ENABLED: "true"
   AMBIENT_ENABLEMENT_SELECTOR: |-
     - podSelector:
         matchLabels:
@@ -20542,7 +20631,7 @@ data:
           "servicePort": 0
         },
         "tag": "1.27.1",
-        "variant": "",
+        "variant": "distroless",
         "waypoint": {
           "affinity": {},
           "nodeSelector": {},
@@ -20562,10 +20651,15 @@ data:
       },
       "pilot": {
         "cni": {
+          "ambient": {
+            "enabled": true
+          },
           "enabled": true,
           "provider": "default"
         },
-        "env": {}
+        "env": {
+          "PILOT_ENABLE_AMBIENT": "true"
+        }
       },
       "revision": "",
       "sidecarInjectorWebhook": {
@@ -20609,6 +20703,9 @@ data:
         "enableIstioConfigCRDs": true
       },
       "cni": {
+        "ambient": {
+          "enabled": true
+        },
         "enabled": true,
         "provider": "default"
       },
@@ -20620,7 +20717,9 @@ data:
       "deploymentAnnotations": {},
       "deploymentLabels": {},
       "enabled": true,
-      "env": {},
+      "env": {
+        "PILOT_ENABLE_AMBIENT": "true"
+      },
       "envVarFrom": [],
       "experimental": {
         "stableValidationPolicy": false
@@ -20719,7 +20818,7 @@ data:
           "servicePort": 0
         },
         "tag": "1.27.1",
-        "variant": "",
+        "variant": "distroless",
         "waypoint": {
           "affinity": {},
           "nodeSelector": {},
@@ -20754,9 +20853,15 @@ data:
       "memory": {},
       "meshConfig": {
         "accessLogFile": "/dev/stdout",
+        "ambient": {
+          "enabled": true
+        },
         "defaultConfig": {
           "gatewayTopology": {
             "numTrustedProxies": 0
+          },
+          "proxyMetadata": {
+            "ISTIO_META_ENABLE_HBONE": "true"
           },
           "tracing": {}
         },
@@ -20841,6 +20946,22 @@ data:
             },
             "name": "authelia"
           }
+        ],
+        "serviceScopeConfigs": [
+          {
+            "scope": "GLOBAL",
+            "servicesSelector": {
+              "matchExpressions": [
+                {
+                  "key": "istio.io/global",
+                  "operator": "In",
+                  "values": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          }
         ]
       },
       "nodeSelector": {},
@@ -20853,10 +20974,14 @@ data:
         "cni": {
           "enabled": true
         },
-        "enabled": true
+        "enabled": true,
+        "env": {
+          "PILOT_ENABLE_AMBIENT": "true"
+        }
       },
       "podAnnotations": {},
       "podLabels": {},
+      "profile": "ambient",
       "replicaCount": 1,
       "resources": {
         "requests": {
@@ -20926,6 +21051,9 @@ data:
       },
       "meshConfig": {
         "accessLogFile": "/dev/stdout",
+        "ambient": {
+          "enabled": true
+        },
         "defaultConfig": {
           "gatewayTopology": {
             "numTrustedProxies": 0
@@ -21020,6 +21148,7 @@ data:
         },
         "enabled": true
       },
+      "profile": "ambient",
       "ztunnel": {
         "resourceName": "ztunnel"
       }
@@ -21286,7 +21415,7 @@ spec:
         envFrom:
         - configMapRef:
             name: istio-cni-config
-        image: docker.io/istio/install-cni:1.27.1
+        image: docker.io/istio/install-cni:1.27.1-distroless
         name: install-cni
         ports:
         - containerPort: 15014
@@ -21324,6 +21453,11 @@ spec:
           name: cni-net-dir
         - mountPath: /var/run/istio-cni
           name: cni-socket-dir
+        - mountPath: /host/var/run/netns
+          mountPropagation: HostToContainer
+          name: cni-netns-dir
+        - mountPath: /var/run/ztunnel
+          name: cni-ztunnel-sock-dir
       nodeSelector:
         kubernetes.io/os: linux
       priorityClassName: system-node-critical
@@ -21345,6 +21479,10 @@ spec:
           type: Directory
         name: cni-host-procfs
       - hostPath:
+          path: /var/run/ztunnel
+          type: DirectoryOrCreate
+        name: cni-ztunnel-sock-dir
+      - hostPath:
           path: /etc/cni/net.d
         name: cni-net-dir
       - hostPath:
@@ -21357,6 +21495,158 @@ spec:
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1
+    type: RollingUpdate
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: istio
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ztunnel
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: ztunnel-1.0.0
+  name: ztunnel
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: ztunnel
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: ztunnel
+        app.kubernetes.io/instance: istio
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: ztunnel
+        app.kubernetes.io/part-of: istio
+        app.kubernetes.io/version: 1.0.0
+        helm.sh/chart: ztunnel-1.0.0
+        istio.io/dataplane-mode: none
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - args:
+        - proxy
+        - ztunnel
+        env:
+        - name: CA_ADDRESS
+          value: istiod.istio-system.svc:15012
+        - name: XDS_ADDRESS
+          value: istiod.istio-system.svc:15012
+        - name: RUST_LOG
+          value: info
+        - name: RUST_BACKTRACE
+          value: "1"
+        - name: ISTIO_META_CLUSTER_ID
+          value: Kubernetes
+        - name: INPOD_ENABLED
+          value: "true"
+        - name: TERMINATION_GRACE_PERIOD_SECONDS
+          value: "30"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: INSTANCE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
+        - name: ISTIO_META_ENABLE_HBONE
+          value: "true"
+        - name: ZTUNNEL_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
+        image: docker.io/istio/ztunnel:1.27.1-distroless
+        name: istio-proxy
+        ports:
+        - containerPort: 15020
+          name: ztunnel-stats
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 15021
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - NET_RAW
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1337
+          runAsNonRoot: false
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/run/secrets/istio
+          name: istiod-ca-cert
+        - mountPath: /var/run/secrets/tokens
+          name: istio-token
+        - mountPath: /var/run/ztunnel
+          name: cni-ztunnel-sock-dir
+        - mountPath: /tmp
+          name: tmp
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      serviceAccountName: ztunnel
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+      volumes:
+      - name: istio-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              audience: istio-ca
+              expirationSeconds: 43200
+              path: istio-token
+      - configMap:
+          name: istio-ca-root-cert
+        name: istiod-ca-cert
+      - hostPath:
+          path: /var/run/ztunnel
+          type: DirectoryOrCreate
+        name: cni-ztunnel-sock-dir
+      - emptyDir: {}
+        name: tmp
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
     type: RollingUpdate
 
 ---
@@ -21477,13 +21767,15 @@ spec:
           value: cluster.local
         - name: ISTIO_META_UNPRIVILEGED_POD
           value: "true"
+        - name: ISTIO_META_ENABLE_HBONE
+          value: "true"
         - name: ISTIO_META_CLUSTER_ID
           value: Kubernetes
         - name: ISTIO_META_NODE_NAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: docker.io/istio/proxyv2:1.27.1
+        image: docker.io/istio/proxyv2:1.27.1-distroless
         name: istio-proxy
         ports:
         - containerPort: 15021
@@ -21680,6 +21972,8 @@ spec:
           value: /var/run/secrets/remote/config
         - name: CA_TRUSTED_NODE_ACCOUNTS
           value: istio-system/ztunnel
+        - name: PILOT_ENABLE_AMBIENT
+          value: "true"
         - name: PILOT_TRACE_SAMPLING
           value: "1"
         - name: PILOT_ENABLE_ANALYSIS
@@ -21698,7 +21992,7 @@ spec:
               resource: limits.cpu
         - name: PLATFORM
           value: ""
-        image: docker.io/istio/pilot:1.27.1
+        image: docker.io/istio/pilot:1.27.1-distroless
         name: discovery
         ports:
         - containerPort: 8080

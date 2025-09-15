@@ -1,6 +1,7 @@
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
+  profile: ambient
   components:
     ingressGateways:
       - name: istio-ingressgateway
@@ -33,6 +34,8 @@ spec:
   #   cni:
   #     cniBinDir: /usr/libexec/cni
   meshConfig:
+    ambient:
+      enabled: true
     enableTracing: true
     defaultConfig:
       tracing: {}
