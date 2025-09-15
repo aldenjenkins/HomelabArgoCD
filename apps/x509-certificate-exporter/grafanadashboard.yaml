@@ -1,0 +1,15 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: x509-certificate-exporter-dashboard
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 30s
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  url: "https://grafana.com/api/dashboards/13922/revisions/latest/download"
+  folderUID: networking-uid
