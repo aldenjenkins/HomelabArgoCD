@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: cloudflare
 spec:
+  uid: cloudflare-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
