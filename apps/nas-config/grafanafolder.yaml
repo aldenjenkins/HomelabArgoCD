@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: zfs
 spec:
+  uid: zfs-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
@@ -13,6 +14,7 @@ kind: GrafanaFolder
 metadata:
   name: nas
 spec:
+  uid: nas-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:

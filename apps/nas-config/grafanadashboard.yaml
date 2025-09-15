@@ -11,7 +11,7 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
-  folderRef: nas
+  folderUID: nas-uid
   url: https://grafana.com/api/dashboards/11600/revisions/1/download
 ---
 apiVersion: grafana.integreatly.org/v1beta1
@@ -27,7 +27,7 @@ spec:
   datasources:
     - inputName: "DS_LXD-HOSTS"
       datasourceName: "prometheus"
-  folderRef: zfs
+  folderUID: zfs-uid
   json: |-
     {
       "__inputs": [
