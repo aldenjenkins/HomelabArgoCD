@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: mariadb
 spec:
+  uid: mariadb-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:

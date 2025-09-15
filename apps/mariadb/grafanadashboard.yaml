@@ -12,7 +12,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   # url: "https://grafana.com/api/dashboards/14057/revisions/1/download"
-  folderRef: mariadb
+  folderUID: mariadb-uid
   json: |-
     {
       "__inputs": [],
