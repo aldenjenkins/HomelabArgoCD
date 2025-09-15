@@ -6,5 +6,7 @@ resources:
   - virtualservice.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
 generators:
   - sopsgenerator.yaml

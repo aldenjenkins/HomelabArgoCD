@@ -18,3 +18,5 @@ resources:
   - virtualservice.yaml
   - authorizationpolicy.yaml
   - grafanadatasource.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

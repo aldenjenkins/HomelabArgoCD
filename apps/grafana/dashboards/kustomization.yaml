@@ -22,9 +22,6 @@ resources:
   - grafana-dashboard-nodes.yaml
   - grafana-dashboard-persistentvolumesusage.yaml
   - grafana-dashboard-pod-total.yaml
-  - grafana-dashboard-prometheus-remote-write.yaml
-  - grafana-dashboard-prometheus.yaml
   - grafana-dashboard-proxy.yaml
   - grafana-dashboard-scheduler.yaml
   - grafana-dashboard-workload-total.yaml
-  - grafana-dashboard-nats-jetstream.yaml
