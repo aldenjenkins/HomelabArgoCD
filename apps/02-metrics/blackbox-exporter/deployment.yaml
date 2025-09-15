@@ -24,6 +24,8 @@ spec:
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 0.25.0
         sidecar.istio.io/inject: "true"
+        # Ignored from envoy-stats-monitor because the blackbox exporter metrics already get these same metrics
+        istio-prometheus-ignore: "true"
     spec:
       automountServiceAccountToken: true
       containers:

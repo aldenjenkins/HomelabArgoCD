@@ -12,7 +12,6 @@ spec:
     - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
       interval: 15s
       path: /metrics
-      honorLabels: true
       port: https
       scheme: https
       relabelings:
