@@ -12,4 +12,4 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://raw.githubusercontent.com/authelia/authelia/refs/heads/master/examples/grafana-dashboards/simple.json"
-  folderRef: authelia
+  folderUID: authelia-uid
