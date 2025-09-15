@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: loki
 spec:
+  uid: loki-uid
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:
