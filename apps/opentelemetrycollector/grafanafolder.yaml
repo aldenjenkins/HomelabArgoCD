@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: opentelemetry
 spec:
+  uid: opentelemetry-uid
   allowCrossNamespaceImport: true
   resyncPeriod: 30s
   instanceSelector:
