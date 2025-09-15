@@ -5,5 +5,6 @@ resources:
   - service.yaml
   - virtualservice.yaml
   - persistentvolumeclaim.yaml
+  - grafanafolder.yaml
   - grafanadashboard.yaml
   - servicemonitor.yaml

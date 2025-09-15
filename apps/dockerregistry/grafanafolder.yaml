@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: docker
+spec:
+  allowCrossNamespaceImport: true
+  uid: docker-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
