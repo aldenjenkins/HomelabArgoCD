@@ -11,7 +11,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/15762/revisions/latest/download"
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -26,7 +26,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/7639/revisions/latest/download"
-  folderRef: istio
+  folderUID: istio-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -41,7 +41,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/7636/revisions/latest/download"
-  folderRef: istio
+  folderUID: istio-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -56,7 +56,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/7630/revisions/latest/download"
-  folderRef: istio
+  folderUID: istio-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -71,7 +71,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/11829/revisions/latest/download"
-  folderRef: istio
+  folderUID: istio-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -86,7 +86,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/7645/revisions/latest/download"
-  folderRef: istio
+  folderUID: istio-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -101,7 +101,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/13277/revisions/190/download"
-  folderRef: istio
+  folderUID: istio-uid
 # ---
 # apiVersion: grafana.integreatly.org/v1beta1
 # kind: GrafanaDashboard
@@ -134,7 +134,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/13922/revisions/latest/download"
-  folderRef: networking
+  folderUID: networking-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -149,7 +149,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/1860/revisions/latest/download"
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -164,7 +164,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/13968/revisions/3/download"
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -179,7 +179,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/8588/revisions/latest/download"
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -194,7 +194,7 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://raw.githubusercontent.com/brngates98/GrafanaAgents/refs/heads/main/grafana-k8s-monitoring/dashboards/efficiency.json"
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -205,7 +205,7 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  folderRef: kubernetes
+  folderUID: kubernetes-uid
   instanceSelector:
     matchLabels:
       dashboards: grafana
