@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: aws
 spec:
+  uid: aws-uid
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

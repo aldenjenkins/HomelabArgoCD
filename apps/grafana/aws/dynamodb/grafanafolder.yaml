@@ -3,7 +3,8 @@ kind: GrafanaFolder
 metadata:
   name: dynamodb
 spec:
-  parentFolderRef: aws
+  uid: dynamodb-uid
+  parentFolderUID: aws-uid
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

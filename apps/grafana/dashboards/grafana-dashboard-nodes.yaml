@@ -978,4 +978,4 @@ spec:
         "uid": "7d57716318ee0dddbac5a7f451fb7753",
         "version": 0
     }
-  folderRef: kubernetes
+  folderUID: kubernetes-uid

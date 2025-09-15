@@ -1261,4 +1261,4 @@ spec:
         "title": "Kubernetes / Kubelet",
         "uid": "3138fa155d5915769fbded898ac09fd9"
     }
-  folderRef: kubernetes
+  folderUID: kubernetes-uid

@@ -1219,4 +1219,4 @@ spec:
       "uid": "TvuRo2iMk",
       "version": 1
     }
-  folderRef: cert-manager
+  folderUID: cert-manager-uid

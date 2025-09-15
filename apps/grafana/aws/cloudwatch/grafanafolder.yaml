@@ -3,7 +3,8 @@ kind: GrafanaFolder
 metadata:
   name: cloudwatch
 spec:
-  parentFolderRef: aws
+  uid: cloudwatch-uid
+  parentFolderUID: aws-uid
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

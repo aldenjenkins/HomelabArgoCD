@@ -10,5 +10,5 @@ spec:
   datasources:
     - inputName: "DS_CLOUDWATCH"
       datasourceName: "cloudwatch"
-  folderRef: dynamodb
+  folderUID: dynamodb-uid
   url: https://grafana.com/api/dashboards/21974/revisions/9/download

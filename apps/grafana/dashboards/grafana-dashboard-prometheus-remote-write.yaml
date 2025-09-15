@@ -1459,4 +1459,4 @@ spec:
         "title": "Prometheus / Remote Write",
         "version": 0
     }
-  folderRef: prometheus
+  folderUID: prometheus-uid

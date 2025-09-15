@@ -818,4 +818,4 @@ spec:
         "title": "Kubernetes / Networking / Cluster",
         "uid": "ff635a025bcfea7bc3dd4f508990a3e9"
     }
-  folderRef: control-plane
+  folderUID: control-plane-uid

@@ -659,4 +659,4 @@ spec:
         "title": "Kubernetes / Proxy",
         "uid": "632e265de029684c40b21cb76bca4f94"
     }
-  folderRef: control-plane
+  folderUID: control-plane-uid

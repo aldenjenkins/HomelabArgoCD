@@ -3,7 +3,8 @@ kind: GrafanaFolder
 metadata:
   name: s3
 spec:
-  parentFolderRef: aws
+  uid: s3-uid
+  parentFolderUID: aws-uid
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

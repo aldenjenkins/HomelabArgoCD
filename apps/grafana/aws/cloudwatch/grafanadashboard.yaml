@@ -11,5 +11,5 @@ spec:
   datasources:
     - inputName: "DS_CLOUDWATCH"
       datasourceName: "CloudWatch"
-  folderRef: cloudwatch
+  folderUID: cloudwatch-uid
   url: https://grafana.com/api/dashboards/20303/revisions/2/download

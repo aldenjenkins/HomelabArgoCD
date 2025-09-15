@@ -119,7 +119,7 @@ spec:
 #     - name: grafana-piechart-panel
 #       version: 1.3.9
 #   url: "https://grafana.com/api/dashboards/10176/revisions/latest/download"
-#   folderRef: networking
+#   folderUID: networking-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard

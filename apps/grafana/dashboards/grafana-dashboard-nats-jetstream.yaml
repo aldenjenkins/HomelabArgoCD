@@ -1255,4 +1255,4 @@ spec:
       "weekStart": "",
       "gnetId": 14725
     }
-  folderRef: nats
+  folderUID: nats-uid

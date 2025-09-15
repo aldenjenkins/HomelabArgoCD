@@ -886,4 +886,4 @@ spec:
         "title": "Kubernetes / API server",
         "uid": "09ec8aa1e996d6ffcd6817bbaff4db1b"
     }
-  folderRef: control-plane
+  folderUID: control-plane-uid

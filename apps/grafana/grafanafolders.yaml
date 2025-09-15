@@ -25,7 +25,7 @@ kind: GrafanaFolder
 metadata:
   name: istio
 spec:
-  parentFolderRef: networking
+  parentFolderUID: networking-uid
   uid: istio-uid
   instanceSelector:
     matchLabels:
@@ -46,7 +46,7 @@ kind: GrafanaFolder
 metadata:
   name: control-plane
 spec:
-  parentFolderRef: kubernetes
+  parentFolderUID: kubernetes-uid
   uid: control-plane-uid
   instanceSelector:
     matchLabels:

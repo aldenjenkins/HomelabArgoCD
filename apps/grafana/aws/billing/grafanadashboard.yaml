@@ -7,5 +7,5 @@ spec:
     matchLabels:
       dashboards: "grafana"
   resyncPeriod: 5m
-  folderRef: aws
+  folderUID: aws-uid
   url: https://grafana.com/api/dashboards/139/revisions/18/download

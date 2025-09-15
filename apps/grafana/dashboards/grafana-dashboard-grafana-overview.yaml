@@ -569,4 +569,4 @@ spec:
         "uid": "6be0s85Mk",
         "version": 2
     }
-  folderRef: grafana
+  folderUID: grafana-uid
