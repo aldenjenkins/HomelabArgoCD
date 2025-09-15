@@ -1,7 +1,5 @@
 resources:
-  - grafana-dashboard-alertmanager-overview.yaml
   - grafana-dashboard-apiserver.yaml
-  - grafana-dashboard-cert-manager.yaml
   - grafana-dashboard-cluster-total.yaml
   - grafana-dashboard-controller-manager.yaml
   - grafana-dashboard-grafana-overview.yaml

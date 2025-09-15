@@ -12,5 +12,6 @@ resources:
   - authorizationpolicy.yaml
   - virtualservice.yaml
   - grafanadatasource.yaml
+  - grafanadashboard.yaml
 generators:
   - sopsgenerator.yaml

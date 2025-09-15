@@ -1,13 +1,15 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: grafana-dashboard-alertmanager-overview
+  name: alertmanager-overview
   labels:
     app.kubernetes.io/component: grafana
     app.kubernetes.io/name: grafana
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 11.2.1
 spec:
+  allowCrossNamespaceImport: true
+  folderUID: prometheus-uid
   instanceSelector:
     matchLabels:
       dashboards: grafana
@@ -537,4 +539,3 @@ spec:
         "uid": "alertmanager-overview",
         "version": 0
     }
-  folderUID: prometheus-uid

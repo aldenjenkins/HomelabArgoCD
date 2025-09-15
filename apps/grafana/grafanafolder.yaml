@@ -34,16 +34,6 @@ spec:
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaFolder
 metadata:
-  name: cert-manager
-spec:
-  uid: cert-manager-uid
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaFolder
-metadata:
   name: grafana
 spec:
   uid: grafana-uid

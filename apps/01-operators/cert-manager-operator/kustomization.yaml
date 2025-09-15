@@ -1,6 +1,8 @@
 resources:
   - https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
   - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
 # patches:
 # - patch: |-
 #     $patch: delete
