@@ -3,6 +3,7 @@ kind: GrafanaFolder
 metadata:
   name: metallb
 spec:
+  uid: metallb-uid
   allowCrossNamespaceImport: true
   parentFolderUID: networking-uid
   instanceSelector:

@@ -12,4 +12,4 @@ spec:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/20162/revisions/6/download"
-  folderRef: metallb
+  folderUID: metallb-uid
