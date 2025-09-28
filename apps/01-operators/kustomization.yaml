@@ -1,9 +1,15 @@
 resources:
-  - cert-manager-operator
-  - prometheus-operator
-  - grafana-operator
-  - external-secrets-operator
-  - redis-operator
-  - opentelemetry-operator
+- cert-manager-operator
+- prometheus-operator
+- grafana-operator
+- external-secrets-operator
+- redis-operator
+- opentelemetry-operator
+
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-1"
+
+patches:
+- path: crd-patch.yaml
+  target:
+    kind: CustomResourceDefinition
