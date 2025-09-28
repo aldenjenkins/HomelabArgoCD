@@ -133,3 +133,8 @@ spec:
             - /spec/strategy
             - /spec/template/metadata/creationTimestamp
             - /status
+        - group: "apps"
+          kind: Deployment
+          name: redis-operator-redis-operator
+          jsonPointers:
+            - /spec/template/spec/serviceAccount
