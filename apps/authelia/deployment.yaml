@@ -42,7 +42,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: authelia
-          image: authelia/authelia:4.39.10
+          image: authelia/authelia:4.39.13
           imagePullPolicy: IfNotPresent
           command: ["authelia"]
           resources:
