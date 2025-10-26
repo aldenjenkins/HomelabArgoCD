@@ -19,35 +19,159 @@ spec:
         sidecar.istio.io/inject: "true"
         app.kubernetes.io/name: gitea
     spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: copy-config
+          image: busybox:latest # Use a minimal image
+          command: ["sh", "-c", "cp /config-base/app.ini /config-writable/app.ini && chmod 644 /config-writable/app.ini"]
+          volumeMounts:
+            - name: gitea-config-secret # Mount the Secret (read-only)
+              mountPath: /config-base
+              readOnly: true
+            - name: gitea-config-writable # Mount the writable emptyDir
+              mountPath: /config-writable
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+        - name: never
+          image: ghcr.io/containeroo/never:v0.8.6
+          imagePullPolicy: IfNotPresent
+          args:
+            # Wait for postgres
+            - --http.postgres.address=https://gitea-postgres-healthz:8000/healthz
+            - --http.postgres.skip-tls-verify=true
+            # And wait for redis
+            - --tcp.redis.address=gitea-standalone.gitea.svc.cluster.local:6379
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 10m
+              memory: 16Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
       containers:
         - name: gitea
-          image: "gitea/gitea:latest"
+          image: gitea/gitea:1.25.0-rc0-rootless
+          imagePullPolicy: IfNotPresent
           # Required for otel injection
           # securityContext:
           #   privileged: true
           #   runAsUser: 0
-          imagePullPolicy: Always
           ports:
             - name: ssh
               containerPort: 22
             - name: http
               containerPort: 3000
-          # env:
-          #   - name: GITEA_APP_INI
-          #     value: /etc/gitea/conf/app.ini
+          env:
+            - name: GITEA__database__DB_TYPE
+              value: "postgres"
+            
+            # # Point to the CNPG read-write service
+            # - name: GITEA__database__HOST
+            #   value: "gitea-postgres-18-rw.gitea.svc.cluster.local:5432"
+            # 
+            # - name: GITEA__database__NAME
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: gitea-postgres-18-app
+            #       key: dbname
+            # 
+            # - name: GITEA__database__USER
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: gitea-postgres-18-app
+            #       key: username
+            # - name: GITEA__database__PASSWD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       # The secret is named <cluster-name>-app by default
+            #       name: gitea-postgres-18-app
+            #       key: password
+            # Point to the CNPG read-write service
+            - name: GITEA__database__HOST
+              value: "gitea-cluster-rw.gitea.svc.cluster.local:5432"
+            
+            - name: GITEA__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-cluster-app
+                  key: dbname
+            
+            - name: GITEA__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-cluster-app
+                  key: username
+            - name: GITEA__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  # The secret is named <cluster-name>-app by default
+                  name: gitea-cluster-app
+                  key: password
+                  
+            - name: GITEA__database__SSL_MODE
+              value: "disable" # Or 'require' if you've configured SSL
+            - name: GITEA__storage__MINIO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-storage-creds
+                  key: access-id
+            - name: GITEA__storage__MINIO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-storage-creds
+                  key: secret-key
+
+            - name: USER
+              value: git
+            - name: USER_UID
+              value: "1000"
+            - name: USER_GID
+              value: "1000"
+            - name: GITEA_APP_INI
+              value: /data/gitea/conf/app.ini
+            - name: GITEA_WORK_DIR
+              value: /data/gitea
+            - name: GITEA_CUSTOM
+              value: /data/gitea
+            - name: GITEA_TEMP
+              value: /tmp/gitea
+            - name: TMPDIR
+              value: /tmp/gitea
+            - name: HOME
+              value: /data/git
+
           livenessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 23
-            timeoutSeconds: 5
-            periodSeconds: 15
+            initialDelaySeconds: 200
+            timeoutSeconds: 1
+            periodSeconds: 10
             successThreshold: 1
             failureThreshold: 10
           readinessProbe:
             tcpSocket:
               port: http
-            initialDelaySeconds: 20
-            timeoutSeconds: 5
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
@@ -55,37 +179,29 @@ spec:
             - name: gitea-data
               mountPath: /data
               subPath: data
-            - name: gitea-config
+            # --- Change this mount to use the emptyDir ---
+            - name: gitea-config-writable # Mount the writable emptyDir here
               mountPath: /data/gitea/conf
-              readOnly: true
-              #        - name: memcached
-              #          image: "memcached:alpine"
-              #          imagePullPolicy: Always
-              #          command:
-              #            - memcached
-              #            - -m 64
-              #            - -o
-              #            - modern
-              #            - -v
-              #          ports:
-              #            - name: memcache
-              #              containerPort: 11211
-              #          livenessProbe:
-              #            tcpSocket:
-              #              port: memcache
-              #            initialDelaySeconds: 30
-              #            timeoutSeconds: 5
-              #          readinessProbe:
-              #            tcpSocket:
-              #              port: memcache
-              #            initialDelaySeconds: 5
-              #            timeoutSeconds: 1
-              #          securityContext:
-              #            runAsUser: 1000
+              # readOnly: false # Not needed for emptyDir, it's writable by default
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: gitea-data
           persistentVolumeClaim:
             claimName: gitea-data
-        - name: gitea-config
+        - name: gitea-config-secret
           secret:
-            secretName: gitea-config-secret
+            secretName: gitea-app-ini
+        # --- Add the emptyDir volume ---
+        - name: gitea-config-writable # Define the writable emptyDir
+          emptyDir: {}           
+        - name: temp
+          emptyDir: {}

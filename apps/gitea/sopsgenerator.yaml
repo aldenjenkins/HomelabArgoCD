@@ -9,3 +9,12 @@ metadata:
 files:
   - './secret.yaml'
   - './authorizationpolicy.yaml'
+secretFrom:
+  - metadata:
+      name: gitea-app-ini
+      namespace: gitea
+      annotations:
+        kustomize.config.k8s.io/needs-hash: "false"
+    type: Opaque
+    files:
+      - app.ini=./app.ini
