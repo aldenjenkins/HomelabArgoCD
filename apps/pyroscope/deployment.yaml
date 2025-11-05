@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pyroscope
-          image: grafana/pyroscope:1.14.1
+          image: grafana/pyroscope:1.16.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
