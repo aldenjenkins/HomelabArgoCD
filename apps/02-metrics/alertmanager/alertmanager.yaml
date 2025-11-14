@@ -34,20 +34,29 @@ spec:
   secrets: []
   storage:
     volumeClaimTemplate:
+      # metadata:
+      #   name: alertmanager-data
+      #   annotations:
+      #     nfs.io/storage-path: "alertmanager-data/"
+      # spec:
+      #   storageClassName: nfs-monitoring-retain
+      #   resources:
+      #     requests:
+      #       storage: 50Gi
+      #   accessModes:
+      #     - ReadWriteMany
       metadata:
-        name: alertmanager-data
-        annotations:
-          nfs.io/storage-path: "alertmanager-data/"
+        name: alertmanager
       spec:
-        storageClassName: nfs-monitoring-retain
+        storageClassName: longhorn
         resources:
           requests:
-            storage: 50Gi
+            storage: 10Gi
         accessModes:
-          - ReadWriteMany
+          - ReadWriteOnce
   securityContext:
     fsGroup: 2000
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: alertmanager-main
-  version: v0.28.1
+  version: v0.29.0 # renovate: docker=quay.io/prometheus/alertmanager

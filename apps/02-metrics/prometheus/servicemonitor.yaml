@@ -1,6 +1,28 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  name: prometheus-k8s-thanos-sidecar
+  labels:
+    app: prometheus-k8s-thanos-sidecar
+    app.kubernetes.io/instance: prometheus
+    app.kubernetes.io/version: "65.3.1"
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    release: "prometheus"
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-k8s-thanos-discovery
+      app.kubernetes.io/instance: prometheus
+  namespaceSelector:
+    matchNames:
+      - "prometheus"
+  endpoints:
+  - port: http
+    path: "/metrics"
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
   labels:
     app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: k8s

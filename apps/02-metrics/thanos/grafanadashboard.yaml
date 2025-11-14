@@ -1,0 +1,12 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: thanos-overview
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/thanos-io/thanos/refs/heads/main/examples/dashboards/overview.json"
+  folderUID: thanos-uid

@@ -2,6 +2,7 @@ namespace: prometheus
 resources:
   - namespace.yaml
   - kubePrometheus-prometheusRule.yaml
+  - kubernetesControlPlane-prometheusRule.yaml
   - prometheus-clusterRole.yaml
   - prometheus-clusterRoleBinding.yaml
   - prometheus-networkPolicy.yaml
@@ -14,9 +15,13 @@ resources:
   - prometheus-roleSpecificNamespaces.yaml
   - prometheus-service.yaml
   - prometheus-serviceAccount.yaml
-  - prometheus-serviceMonitor.yaml
   - virtualservice.yaml
   - authorizationpolicy.yaml
   - grafanadatasource.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - thanos-sidecar-service.yaml
+  - servicemonitor.yaml
+
+generators:
+  - sopsgenerator.yaml

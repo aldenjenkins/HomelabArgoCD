@@ -4,5 +4,7 @@ resources:
   - prometheus
   - prometheus-adapter
   - alertmanager
+  - thanos
   - blackbox-exporter
   - namespaces/kube-system
+

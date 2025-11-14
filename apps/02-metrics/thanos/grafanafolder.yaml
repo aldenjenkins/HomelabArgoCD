@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: thanos
+spec:
+  allowCrossNamespaceImport: true
+  uid: thanos-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

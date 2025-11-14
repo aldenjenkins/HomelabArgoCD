@@ -1,0 +1,9 @@
+resources:
+  - redis.yaml
+  - deployment.yaml
+  - servicemonitor.yaml
+  - serviceaccount.yaml
+  - service.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - grafanadashboard.yaml

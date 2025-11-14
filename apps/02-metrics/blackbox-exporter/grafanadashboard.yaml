@@ -61,8 +61,8 @@ spec:
       datasourceName: "prometheus"
   plugins:
     - name: grafana-clock-panel
-      version: 2.1.3
+      version: latest
     - name: pierosavi-imageit-panel
-      version: 1.0.5
+      version: latest
   url: "https://grafana.com/api/dashboards/21275/revisions/1/download"
   folderUID: blackbox-exporter

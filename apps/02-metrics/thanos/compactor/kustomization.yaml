@@ -1,0 +1,7 @@
+namespace: thanos
+resources:
+  - statefulset.yaml
+  - service.yaml
+  - servicemonitor.yaml
+  - serviceaccount.yaml
+  - grafanadashboard.yaml

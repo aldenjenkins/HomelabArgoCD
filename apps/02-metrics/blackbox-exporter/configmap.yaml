@@ -12,6 +12,13 @@ data:
         "http":
           "preferred_ip_protocol": "ip4"
         "prober": "http"
+      "https_skip_verify_30s":
+        "prober": "http"
+        "timeout": "30s"
+        "http":
+          "preferred_ip_protocol": "ip4"
+          "tls_config":
+            "insecure_skip_verify": true
       "http_post_2xx":
         "http":
           "method": "POST"

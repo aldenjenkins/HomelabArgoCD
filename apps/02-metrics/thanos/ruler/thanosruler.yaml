@@ -1,0 +1,51 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ThanosRuler
+metadata:
+  name: thanos-ruler
+  labels:
+    app: thanos-ruler
+spec:
+  image: quay.io/thanos/thanos:v0.40.1
+  securityContext:
+    # run as nobody, required for CR's default strict securitycontext + storage below
+    fsGroup: 65534
+  replicas: 2  # HA; Alertmanager will dedupe alerts
+  # Which PrometheusRule CRs this ruler should load
+  ruleNamespaceSelector: {}  # all namespaces
+  ruleSelector: {}  # all rules
+
+  podMetadata:
+    labels:
+      sidecar.istio.io/inject: "true"
+
+  # Where to query data from – the Thanos Query service
+  queryEndpoints:
+    - dnssrv+_http._tcp.thanos-query.thanos.svc.cluster.local
+
+  # How to talk to Alertmanager – reference a Secret with alertmanagers.yaml
+  alertmanagersConfig:
+    name: thanosruler-alertmanager-config
+    key: alertmanager-configs.yaml
+
+  objectStorageConfig:
+    key: thanos.yaml
+    name: thanos-objectstorage
+
+  # Optional but nice: external URL of the Ruler UI (for generatorURL in alerts)
+  externalPrefix: https://ruler.home.alden.ai
+
+  alertQueryUrl: https://thanos.home.alden.ai
+
+  storage:
+    disableMountSubPath: true
+    volumeClaimTemplate:
+      spec:
+        storageClassName: longhorn
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+
+  tracingConfig:
+    name: thanosruler-tracing-config
+    key: tracing.yaml

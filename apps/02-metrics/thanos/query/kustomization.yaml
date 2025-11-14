@@ -1,0 +1,8 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - grafanadashboard.yaml

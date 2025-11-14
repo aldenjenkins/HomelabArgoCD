@@ -9,7 +9,8 @@ spec:
     uid: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus-k8s.prometheus.svc:9090  # The central Prometheus server
+    # url: http://prometheus-k8s.prometheus.svc:9090  # The central Prometheus server
+    url: http://thanos-query.thanos.svc:9090  # The central Prometheus server
     isDefault: true
     jsonData:
       timeInterval: 15s
@@ -24,12 +25,3 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  plugins:
-    - name: grafana-lokiexplore-app
-      version: 1.0.2
-    - name: grafana-pyroscope-app
-      version: 0.1.14
-    - name: grafana-exploretraces-app
-      version: 0.1.2
-    - name: grafana-piechart-panel
-      version: 1.3.9

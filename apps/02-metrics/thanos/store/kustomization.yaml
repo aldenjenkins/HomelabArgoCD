@@ -1,0 +1,6 @@
+resources:
+  - service.yaml
+  - statefulset.yaml
+  - servicemonitor.yaml
+  - serviceaccount.yaml
+  - grafanadashboard.yaml

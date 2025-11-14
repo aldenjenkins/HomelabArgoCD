@@ -1,0 +1,13 @@
+namespace: thanos
+resources:
+  - namespace.yaml
+  - compactor
+  - query
+  - query-frontend
+  - store
+  - ruler
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+
+generators:
+  - sopsgenerator.yaml
