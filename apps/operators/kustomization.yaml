@@ -6,9 +6,6 @@ resources:
 - redis-operator
 - opentelemetry-operator
 
-commonAnnotations:
-  argocd.argoproj.io/sync-wave: "-1"
-
 patches:
 - path: crd-patch.yaml
   target:
