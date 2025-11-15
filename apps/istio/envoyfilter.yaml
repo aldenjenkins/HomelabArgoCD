@@ -1,0 +1,277 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: istio-ingress-envoy-middleware
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          portNumber: 8443
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.lua
+          typed_config:
+            "@type": "type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua"
+            defaultSourceCode:
+              inlineString: |
+                -- Request middleware logic goes here
+                function envoy_on_request(request_handle)
+                  -- Add path-without-query-params
+                  local path = request_handle:headers():get(":path")
+                  local path_without_query = string.match(path, "([^?]*)")
+                  request_handle:headers():add("x-envoy-path-without-query", path_without_query)
+
+                  -- Add client-ip specific header to access log
+                  local xff_header = request_handle:headers():get("x-forwarded-for")
+                  if xff_header then
+                    local first_ip = string.gmatch(xff_header, '(%d+.%d+.%d+.%d+)')()
+                    if first_ip then
+                      -- Set specific client-ip header for use in logging
+                      request_handle:headers():add("client-ip", first_ip)
+                    end
+                  end
+                end
+
+                -- Response middleware logic goes here
+                function envoy_on_response(response_handle)
+                    response_handle:headers():add("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+                end
+---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: EnvoyFilter
+# metadata:
+#   name: custom-503-error-page
+# spec:
+#   workloadSelector:
+#     labels:
+#       istio: ingressgateway  # Adjust if you're targeting a sidecar
+#   configPatches:
+#     - applyTo: NETWORK_FILTER
+#       match:
+#         context: GATEWAY  # Use SIDECAR_INBOUND or SIDECAR_OUTBOUND if needed
+#         listener:
+#           portNumber: 8443  # Adjust the port number as necessary
+#           filterChain:
+#             filter:
+#               name: "envoy.filters.network.http_connection_manager"
+#       patch:
+#         operation: MERGE
+#         value:
+#           name: "envoy.filters.network.http_connection_manager"
+#           typed_config:
+#             "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+#             local_reply_config:
+#               mappers:
+#                 - filter:
+#                     status_code_filter:
+#                       comparison:
+#                         op: EQ
+#                         value:
+#                           default_value: 503
+#                           runtime_key: status_code
+#                   body:
+#                     inline_string: |
+#                       <html>
+#                       <body>
+#                         <h1>Service Unavailable</h1>
+#                         <p>Sorry, the service is temporarily unavailable. Please try again later.</p>
+#                       </body>
+#                       </html>
+#                   headers_to_add:
+#                     - header:
+#                         key: "Content-Type"
+#                         value: "text/html; charset=utf-8"
+#                       append: false
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: custom-error-pages
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+    - applyTo: NETWORK_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          portNumber: 8443
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+      patch:
+        operation: MERGE
+        value:
+          name: "envoy.filters.network.http_connection_manager"
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+            local_reply_config:
+              mappers:
+                # 404 Not Found - No matching VirtualService
+                - filter:
+                    status_code_filter:
+                      comparison:
+                        op: EQ
+                        value:
+                          default_value: 404
+                          runtime_key: status_code
+                  body:
+                    inline_string: |
+                      <!DOCTYPE html>
+                      <html>
+                      <head>
+                        <title>404 - No Route Found</title>
+                        <style>
+                          body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            text-align: center; 
+                            padding: 50px; 
+                            background: #0f0f0f; 
+                            color: #e0e0e0;
+                            margin: 0;
+                          }
+                          .container {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            background: #1a1a1a;
+                            padding: 40px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                          }
+                          h1 { 
+                            font-size: 96px; 
+                            margin: 0; 
+                            color: #ff6b6b;
+                            font-weight: 300;
+                          }
+                          h2 {
+                            font-size: 24px;
+                            margin: 20px 0;
+                            color: #fff;
+                            font-weight: 400;
+                          }
+                          p { 
+                            font-size: 16px; 
+                            color: #aaa;
+                            line-height: 1.6;
+                            margin: 15px 0;
+                          }
+                          .technical {
+                            background: #0a0a0a;
+                            padding: 20px;
+                            border-radius: 4px;
+                            margin: 20px 0;
+                            text-align: left;
+                            border-left: 4px solid #ff6b6b;
+                          }
+                          .technical strong {
+                            color: #ff6b6b;
+                          }
+                          code {
+                            background: #2a2a2a;
+                            padding: 2px 6px;
+                            border-radius: 3px;
+                            font-family: 'Courier New', monospace;
+                            color: #6bc4ff;
+                          }
+                          .footer {
+                            margin-top: 30px;
+                            font-size: 14px;
+                            color: #666;
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="container">
+                          <h1>404</h1>
+                          <h2>No Route Configured</h2>
+                          <p>The Istio Gateway received your request, but no VirtualService is configured to handle it.</p>
+                          
+                          <div class="technical">
+                            <p><strong>What this means:</strong></p>
+                            <p>• The hostname or path you requested doesn't match any configured <code>VirtualService</code></p>
+                            <p>• The Istio ingress gateway is working, but this route isn't defined</p>
+                            <p>• If you're a cluster admin, check your <code>VirtualService</code> resources</p>
+                          </div>
+                          
+                          <div class="technical">
+                            <p><strong>Common causes:</strong></p>
+                            <p>• VirtualService not created for this host</p>
+                            <p>• VirtualService exists but the <code>hosts</code> field doesn't match</p>
+                            <p>• VirtualService not attached to the correct <code>Gateway</code></p>
+                            <p>• DNS pointing to the gateway but no matching route configuration</p>
+                          </div>
+                          
+                          <div class="footer">
+                            Istio Gateway • home.alden.ai
+                          </div>
+                        </div>
+                      </body>
+                      </html>
+                  headers_to_add:
+                    - header:
+                        key: "Content-Type"
+                        value: "text/html; charset=utf-8"
+                      append_action: OVERWRITE_IF_EXISTS_OR_ADD
+                # 503 Service Unavailable
+                - filter:
+                    status_code_filter:
+                      comparison:
+                        op: EQ
+                        value:
+                          default_value: 503
+                          runtime_key: status_code
+                  body:
+                    inline_string: |
+                      <!DOCTYPE html>
+                      <html>
+                      <head>
+                        <title>503 Service Unavailable</title>
+                        <style>
+                          body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            text-align: center; 
+                            padding: 50px; 
+                            background: #0f0f0f; 
+                            color: #e0e0e0;
+                          }
+                          .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background: #1a1a1a;
+                            padding: 40px;
+                            border-radius: 8px;
+                          }
+                          h1 { 
+                            font-size: 96px; 
+                            margin: 0; 
+                            color: #ffd93d;
+                            font-weight: 300;
+                          }
+                          p { font-size: 18px; color: #aaa; }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="container">
+                          <h1>503</h1>
+                          <p>Service Unavailable</p>
+                          <p>The backend service is temporarily unavailable. Please try again later.</p>
+                        </div>
+                      </body>
+                      </html>
+                  headers_to_add:
+                    - header:
+                        key: "Content-Type"
+                        value: "text/html; charset=utf-8"
+                      append_action: OVERWRITE_IF_EXISTS_OR_ADD
