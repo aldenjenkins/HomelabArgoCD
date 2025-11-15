@@ -9,7 +9,8 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: "100%"
-  image: otel/opentelemetry-collector-contrib:latest
+  image: otel/opentelemetry-collector-contrib:0.139.0
+  imagePullPolicy: IfNotPresent
   # Unfortunately the operator doesnt automatically expose zpages in the correlated service automatically. 
   # Maybe that will change in the future, but for now, we have to define all exposed ports to add it.
   ports:

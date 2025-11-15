@@ -88,6 +88,8 @@ rules:
       - "/metrics/cadvisor"
       - "/metrics/probes"
       - "/metrics/resource"
+      - "/metrics/slis"
+      - "/minio/v2/metrics/cluster"
     verbs: ["get"]
 
 ---
@@ -108,6 +110,7 @@ rules:
   - apiGroups: [""]
     resources:
       - configmaps
+      - secrets
     verbs: ["get"]
   - apiGroups:
       - discovery.k8s.io
@@ -135,5 +138,5 @@ rules:
     # - probes
     # - scrapeconfigs
     verbs: ["get", "list", "watch"]
-  - nonResourceURLs: ["/metrics"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor", "/metrics/slis"]
     verbs: ["get"]

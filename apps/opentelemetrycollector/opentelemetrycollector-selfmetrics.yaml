@@ -1,0 +1,358 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: selfmetrics
+spec:
+  serviceAccount: otel-collector
+  mode: statefulset
+  image: otel/opentelemetry-collector-contrib:0.139.0
+  imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  autoscaler:
+    maxReplicas: 2
+    minReplicas: 1
+    targetCPUUtilization: 90
+  config:
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+      otlphttp/prometheus:
+        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        sending_queue:
+          num_consumers: 50
+        timeout: 30s
+    extensions:
+      pprof: {}
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      attributes/kube_state_metrics:
+        actions:
+          - action: delete
+            key: container_id
+          - action: delete
+            key: image_id
+          - action: delete
+            key: image_spec
+          - action: delete
+            key: uid
+          - action: upsert
+            from_attribute: container
+            key: k8s_container_name
+          - action: upsert
+            from_attribute: pod
+            key: k8s_pod_name
+          - action: upsert
+            from_attribute: namespace
+            key: k8s_namespace_name
+          - action: delete
+            key: container
+          - action: delete
+            key: pod
+          - action: delete
+            key: namespace
+        include:
+          match_type: regexp
+          metric_names: ^kube_.+
+      batch:
+        send_batch_max_size: 2000
+        send_batch_size: 1000
+        timeout: 1s
+      filter/drop_metrics:
+        error_mode: ignore
+        metrics:
+          metric:
+            - IsMatch(name, "otelcol.+") and type == METRIC_DATA_TYPE_HISTOGRAM
+            - IsMatch(name, "otelcol_otelsvc.+")
+      filter/kube_state_metrics:
+        metrics:
+          metric:
+            - name == "kube_configmap_info"
+            - name == "kube_configmap_metadata_resource_version"
+            - name == "kube_configmap_created"
+            - name == "kube_deployment_status_replicas_updated"
+            - name == "kube_deployment_spec_replicas"
+            - name == "kube_deployment_status_observed_generation"
+            - name == "kube_deployment_metadata_generation"
+            - name == "kube_deployment_status_replicas_ready"
+            - name == "kube_deployment_spec_paused"
+            - name == "kube_deployment_spec_strategy_rollingupdate_max_unavailable"
+            - name == "kube_deployment_spec_strategy_rollingupdate_max_surge"
+            - name == "kube_endpoint_address"
+            - name == "kube_endpoint_address_available"
+            - name == "kube_endpoint_address_not_ready"
+            - name == "kube_endpoint_created"
+            - name == "kube_endpoint_info"
+            - name == "kube_endpoint_ports"
+            - name == "kube_horizontalpodautoscaler_spec_target_metric"
+            - name == "kube_horizontalpodautoscaler_status_target_metric"
+            - name == "kube_ingress_path"
+            - IsMatch(name, "kube_job_.+")
+            - name == "kube_lease_owner"
+            - name == "kube_lease_renew_time"
+            - name == "kube_namespace_created"
+            - name == "kube_node_spec_unschedulable"
+            - name == "kube_node_created"
+            - name == "kube_persistentvolume_status_phase"
+            - name == "kube_persistentvolumeclaim_status_phase"
+            - name == "kube_persistentvolumeclaim_access_mode"
+            - name == "kube_persistentvolumeclaim_info"
+            - name == "kube_persistentvolume_capacity_bytes"
+            - name == "kube_persistentvolume_claim_ref"
+            - name == "kube_persistentvolumeclaim_created"
+            - name == "kube_persistentvolumeclaim_resource_requests_storage_bytes"
+            - name == "kube_pod_completion_time"
+            - name == "kube_pod_container_status_terminated"
+            - name == "kube_pod_container_status_waiting"
+            - name == "kube_pod_container_state_started"
+            - name == "kube_pod_created"
+            - name == "kube_pod_init_container_resource_requests"
+            - name == "kube_pod_init_container_resource_limits"
+            - name == "kube_pod_init_container_status_running"
+            - name == "kube_pod_init_container_status_terminated"
+            - name == "kube_pod_init_container_status_terminated_reason"
+            - name == "kube_pod_init_container_status_waiting"
+            - name == "kube_pod_init_container_status_ready"
+            - name == "kube_pod_init_container_info"
+            - name == "kube_pod_init_container_status_restarts_total"
+            - name == "kube_pod_ips"
+            - name == "kube_pod_labels"
+            - name == "kube_pod_owner"
+            - name == "kube_pod_restart_policy"
+            - name == "kube_pod_start_time"
+            - name == "kube_pod_status_scheduled"
+            - name == "kube_pod_status_qos_class"
+            - name == "kube_pod_status_scheduled_time"
+            - name == "kube_pod_status_initialized_time"
+            - name == "kube_pod_service_account"
+            - name == "kube_pod_status_container_ready_time"
+            - name == "kube_pod_status_ready_time"
+            - name == "kube_pod_tolerations"
+            - name == "kube_poddisruptionbudget_status_observed_generation"
+            - name == "kube_poddisruptionbudget_status_pod_disruptions_allowed"
+            - name == "kube_poddisruptionbudget_status_current_healthy"
+            - name == "kube_poddisruptionbudget_status_expected_pods"
+            - name == "kube_poddisruptionbudget_created"
+            - name == "kube_poddisruptionbudget_status_desired_healthy"
+            - name == "kube_replicaset_owner"
+            - name == "kube_replicaset_metadata_generation"
+            - name == "kube_replicaset_spec_replicas"
+            - name == "kube_replicaset_status_replicas"
+            - name == "kube_replicaset_status_ready_replicas"
+            - name == "kube_replicaset_status_fully_labeled_replicas"
+            - name == "kube_replicaset_created"
+            - name == "kube_replicaset_status_observed_generation"
+            - IsMatch(name, "kube_secret_.+")
+            - name == "kube_service_created"
+            - name == "kube_service_spec_type"
+            - name == "kube_validatingwebhookconfiguration_webhook_clientconfig_service"
+            - IsMatch(name, "kube_volumeattachment_.+")
+      groupbyattrs:
+        keys:
+          - k8s_pod_name
+          - k8s_namespace_name
+      k8sattributes:
+        auth_type: serviceAccount
+        extract:
+          labels:
+            - from: pod
+              key: app.homelab/environment
+              tag_name: homelab.environment
+            - from: pod
+              key: app.homelab/huid
+              tag_name: homelab.huid
+            - from: pod
+              key: app.homelab/owner
+              tag_name: homelab.owner
+            - from: pod
+              key: app.homelab/service
+              tag_name: homelab.service
+          metadata:
+            - k8s.deployment.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+        passthrough: false
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 30s
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 90
+        spike_limit_percentage: 10
+      metricstransform/add_standard_labels:
+        transforms:
+          - action: update
+            include: .+
+            match_type: regexp
+            operations:
+              - action: add_label
+                new_label: aws_account
+                new_value: homelab-live
+              - action: add_label
+                new_label: homelab_source
+                new_value: aws_account:homelab-live
+              - action: add_label
+                new_label: homelab_otel_source
+                new_value: selfmetrics-collector
+      resource/set_known_attributes:
+        attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: homelab-live
+      transform/label_metrics:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - delete_key(attributes, "service_name")
+              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"])
+              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
+              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
+              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"])
+              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"])
+              - set(attributes["service.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
+              - set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
+              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"])
+              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"])
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+              - set(attributes["service.version"], resource.attributes["service.version"])
+              - set(attributes["homelab.tenant"], "prometheus-k8s")
+      transform/normalize_service_name:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["service.name"], attributes["service.name"])
+      transform/set_match_resource_attributes:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"])
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
+    receivers:
+      prometheus:
+        config:
+          global:
+            scrape_interval: 30s
+            scrape_timeout: 10s
+          scrape_configs:
+            - job_name: scrape-collector-metrics
+              kubernetes_sd_configs:
+                - role: pod
+              relabel_configs:
+                # - action: drop
+                #   regex: observability;sumologic-sumologic-otelcol-logs-collector
+                #   source_labels:
+                #   - __meta_kubernetes_namespace
+                #   - __meta_kubernetes_pod_label_app_kubernetes_io_name
+                - action: keep
+                  regex: observability;(.+)-collector
+                  source_labels:
+                    - __meta_kubernetes_namespace
+                    - __meta_kubernetes_pod_label_app_kubernetes_io_name
+                - action: replace
+                  regex: (.+)
+                  source_labels:
+                    - __meta_kubernetes_pod_annotation_prometheus_io_path
+                  target_label: __metrics_path__
+                - action: replace
+                  regex: (https?)
+                  source_labels:
+                    - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+                  target_label: __scheme__
+                - action: keep
+                  regex: '[0-9]+'
+                  source_labels:
+                    - __meta_kubernetes_pod_container_port_number
+                - action: replace
+                  regex: ([0-9]+)
+                  source_labels:
+                    - __meta_kubernetes_pod_container_port_number
+                  target_label: __tmp_determined_target_port
+                - action: replace
+                  regex: ([0-9]+)
+                  source_labels:
+                    - __meta_kubernetes_pod_annotation_prometheus_io_port
+                  target_label: __tmp_determined_target_port
+                - action: keepequal
+                  source_labels:
+                    - __meta_kubernetes_pod_container_port_number
+                  target_label: __tmp_determined_target_port
+                - action: replace
+                  source_labels:
+                    - __meta_kubernetes_pod_namespace
+                  target_label: k8s_namespace_name
+                - action: replace
+                  source_labels:
+                    - __meta_kubernetes_pod_name
+                  target_label: k8s_pod_name
+                  # - job_name: kube-state-metrics
+                  #   kubernetes_sd_configs:
+                  #     - role: pod
+                  #   metric_relabel_configs:
+                  #     - action: keep
+                  #       regex: observability
+                  #       source_labels:
+                  #         - namespace
+                  #   relabel_configs:
+                  #     - action: keep
+                  #       regex: observability;exporter;kube-state-metrics
+                  #       source_labels:
+                  #         - __meta_kubernetes_namespace
+                  #         - __meta_kubernetes_pod_label_app_kubernetes_io_component
+                  #         - __meta_kubernetes_pod_label_app_kubernetes_io_name
+    service:
+      pipelines:
+        metrics:
+          exporters:
+            - otlphttp/prometheus
+          processors:
+            - memory_limiter
+            - attributes/kube_state_metrics
+            - metricstransform/add_standard_labels
+            - resource/set_known_attributes
+            - filter/drop_metrics
+            - filter/kube_state_metrics
+            - batch
+            - groupbyattrs
+            - transform/set_match_resource_attributes
+            - k8sattributes
+            - transform/label_metrics
+            - transform/normalize_service_name
+          receivers:
+            - prometheus
+      telemetry:
+        logs:
+          encoding: json
+          level: info
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true
+        resource:
+          homelab_otel_component: selfmetrics-collector
+

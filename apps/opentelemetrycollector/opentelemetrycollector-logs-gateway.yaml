@@ -5,47 +5,34 @@ metadata:
 spec:
   replicas: 1
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:latest
-  ports:
-    - name: metrics
-      port: 8888
-      protocol: TCP
-      targetPort: 0
-    - name: zpages
-      port: 55679
-      protocol: TCP
-      targetPort: 0
-    - name: pprof
-      port: 1777
-      protocol: TCP
-      targetPort: 0
+  image: otel/opentelemetry-collector-contrib:0.139.0
+  imagePullPolicy: IfNotPresent
   podSecurityContext:
     fsGroup: 999
-  nodeSelector:
-    kubernetes.io/hostname: control-plane-03
-  # volumeClaimTemplates:
-  #   - apiVersion: v1
-  #     kind: PersistentVolumeClaim
-  #     metadata: 
-  #       name: file-storage
-  #     spec:
-  #       accessModes:
-  #         - ReadWriteOnce
-  #       resources:
-  #         requests:
-  #           storage: 10Gi
-  #       storageClassName: local-storage
-  #       volumeMode: Filesystem
-  # volumeMounts:
-  #   - mountPath: /var/lib/storage/otc
-  #     name: file-storage
+  # nodeSelector:
+  #   kubernetes.io/hostname: control-plane-03
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata: 
+        name: file-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: longhorn
+        volumeMode: Filesystem
+  volumeMounts:
+    - mountPath: /var/lib/storage/otc
+      name: file-storage
   resources:
     limits:
-      cpu: "1200m"
-      memory: 3Gi
+      memory: "768Mi"
     requests:
       cpu: "500m"
-      memory: 1Gi
+      memory: 512Mi
   serviceAccount: otel-collector
   config:
     # Define exporters to data stores.
@@ -53,8 +40,8 @@ spec:
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
 
-      debug:
-        verbosity: detailed
+      # debug:
+      #   verbosity: detailed
 
       # Exporter for sending logs via otlphttp to the logs gateway 
       otlphttp/loki:
@@ -68,29 +55,25 @@ spec:
         sending_queue:
           enabled: true
           num_consumers: 10
-          queue_size: 1000
-          # storage: file_storage
+          queue_size: 10000
+          storage: file_storage
 
     extensions:
-      # file_storage:
-      #   compaction:
-      #     directory: /var/lib/storage/otc/compaction
-      #     on_rebound: true
-      #   create_directory: true
-      #   directory: /var/lib/storage/otc
-      #   timeout: 10s
-      zpages:
-        endpoint: 0.0.0.0:55679
+      file_storage:
+        compaction:
+          directory: /var/lib/storage/otc/compaction
+          on_rebound: true
+        create_directory: true
+        directory: /var/lib/storage/otc
+        timeout: 10s
       health_check:
         endpoint: 0.0.0.0:13133
         path: /
       pprof: {}
 
-
     # Define processors to process received data.
     # See https://opentelemetry.io/docs/collector/configuration/#processors
     processors:
-
 
       # Use the in-built `batch` processor to batch up data before writing it for export.
       batch:
@@ -399,6 +382,8 @@ spec:
               - set(attributes["category"], body["category"]) where IsMap(body)
               # - delete_key(attributes, "category") where attributes["category"] != nil
               #   and not IsMatch(attributes["category"], "(access|application)")
+              
+      #{"level":"warn","ts":"2025-11-15T00:38:06.909Z","caller":"ottl@v0.139.0/parser.go:410","msg":"failed to execute statement","resource":{"service.instance.id":"5d996f2b-0da5-4668-8d0f-c3039335dd75","service.name":"otelcol-contrib","service.version":"0.139.0"},"otelcol.component.id":"transform/containers_parse_json","otelcol.component.kind":"processor","otelcol.pipeline.id":"logs/otlp/containers","otelcol.signal":"logs","error":"invalid character 'W' after top-level value","statement":"set(log.body, ParseJSON(log.body)) where IsMatch(log.body, \"^{\")"}
       transform/containers_parse_json:
         error_mode: ignore
         log_statements:
@@ -490,9 +475,8 @@ spec:
     service:
       extensions:
         - health_check
-        # - file_storage
+        - file_storage
         - pprof
-        - zpages
 
       pipelines:
         logs/otlp/containers:

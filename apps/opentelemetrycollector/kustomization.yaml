@@ -7,6 +7,9 @@ resources:
   - opentelemetrycollector-logs-agent.yaml
   - opentelemetrycollector-kubernetes-events.yaml
   - opentelemetrycollector-trace.yaml
+  - opentelemetrycollector-core-prometheus.yaml
+  - opentelemetrycollector-kubeletstats.yaml
+  - opentelemetrycollector-selfmetrics.yaml
   - instrumentation.yaml
   - serviceaccount.yaml
   - clusterrole.yaml

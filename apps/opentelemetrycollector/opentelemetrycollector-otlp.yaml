@@ -17,26 +17,20 @@ spec:
       cpu: "1"
       memory: 512Mi
   serviceAccount: otel-collector
-  ports:
-    - name: metrics
-      port: 8888
-      protocol: TCP
-      targetPort: 0
-    - name: zpages
-      port: 55679
-      protocol: TCP
-      targetPort: 0
-    - name: pprof
-      port: 1777
-      protocol: TCP
-      targetPort: 0
-  image: otel/opentelemetry-collector-contrib:latest
+  image: otel/opentelemetry-collector-contrib:0.139.0
   config:
+    # Define connectors which connect two pipelines, acting as both exporter and receiver.
+    # see: https://opentelemetry.io/docs/collector/components/connector/
+    # and: https://opentelemetry.io/docs/collector/configuration/#connectors
+    # connectors:
+    #   forward/keda: {}
+
     # Define exporters to data stores.
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
 
+      # Unused ATM.
       debug:
         verbosity: detailed
 
@@ -52,20 +46,21 @@ spec:
         tls:
           insecure: true
 
-      # # TODO: add keda in cluster and uncomment this exporter after creating a keda collector
-      # otlp/keda-collector:
-      #   endpoint: http://keda-collector.observability.svc.cluster.local:4317
-      #   retry_on_failure:
+      # prometheusremotewrite/keda:
+      #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      #   max_batch_size_bytes: 3000000
+      #   remote_write_queue:
       #     enabled: true
-      #   tls:
-      #     insecure: true
+      #     num_consumers: 5
+      #     queue_size: 1000
+      #   timeout: 1s
+      #
 
     extensions:
       pprof: {}
-      zpages:
-        endpoint: 0.0.0.0:55679
       health_check:
         endpoint: 0.0.0.0:13133
+        path: /healthz
 
 
     # Define processors to process received data.
@@ -73,9 +68,17 @@ spec:
     processors:
       # Use the in-built `batch` processor to batch up data before writing it for export.
       batch:
-        timeout: 5s  # Reduce if too high
-        send_batch_size: 1024  # Ensure it's reasonable
-        send_batch_max_size: 2048
+        timeout: 1s
+        send_batch_size: 1000
+        send_batch_max_size: 2000
+      filter/keda_metrics:
+        metrics:
+          include:
+            match_type: regexp
+            metric_names:
+              - keda_.+
+              - http.server.duration
+              - http.server.request.duration
 
       # cardinality:
       #   aggregation_keys:
@@ -100,18 +103,20 @@ spec:
       #     - service.instance.id
       #   max_cardinality_per_metric_aggregation: 5000
 
+      # For k8sattributes to properly decorate pods, metrics must be grouped under the same resource attributes.
+      # This step should be applied AFTER batching.
       groupbyattrs:
         keys:
           - k8s.pod.name
           - k8s.namespace.name
 
-      resourcedetection/homelab:
-        detectors: [env, system]
-        timeout: 5s
-        override: false
-        attributes:
-          - k8s.cluster.name
-          - k8s.node.name
+      # resourcedetection/homelab:
+      #   detectors: [env, system]
+      #   timeout: 5s
+      #   override: false
+      #   attributes:
+      #     - k8s.cluster.name
+      #     - k8s.node.name
 
       # Most of these below processors were taken from this: https://github.com/softwaremill/meerkat/blob/3d5d8590fac865d4d672210475019e8b7c330ae0/otel/jvm-collector.yaml#L87-L102
       k8sattributes:
@@ -122,7 +127,6 @@ spec:
         # filter:
           # node_from_env_var: KUBE_NODE_NAME
         pod_association:
-          # - sources:
           #     # This rule associates all resources containing the 'k8s.pod.ip' attribute with the matching pods.
           #     # If this attribute is not present in the resource, this rule will not be able to find the matching pod.
           #     - from: resource_attribute
@@ -171,7 +175,25 @@ spec:
             - tag_name: app  # extracts value of label from pods with key `app` and inserts it as a tag with key `app`
               key: app
               from: pod
-
+            - from: pod
+              key: app.homelab/environment
+              tag_name: homelab.environment
+            - from: pod
+              key: app.homelab/huid
+              tag_name: homelab.huid
+            - from: pod
+              key: app.homelab/owner
+              tag_name: homelab.owner
+            - from: pod
+              key: app.homelab/service
+              tag_name: homelab.service
+            - from: pod
+              key: app.homelab/argo-rollout-name
+              tag_name: argo.rollout.name
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 90
+        spike_limit_percentage: 10
       metricstransform/add_standard_labels:
         transforms:
           - action: update
@@ -179,9 +201,19 @@ spec:
             match_type: regexp
             operations:
               - action: add_label
-                new_label: otel_source
+                new_label: aws_account
+                new_value: homelab-live
+              - action: add_label
+                new_label: homelab_source
+                new_value: aws_account:homelab-live
+              - action: add_label
+                new_label: homelab_otel_source
                 new_value: otlp-collector
-
+      resource/drop_attributes:
+        attributes:
+          - action: delete
+            key: process.command_args # drop this long attribute generated by otel auto-instrumentation, which makes target_info too large to write
+      # required to send metrics to chronosphere, but might be able to remove for prometheus
       resource/service-instance:
         attributes:
           - action: insert
@@ -196,7 +228,11 @@ spec:
           - action: insert
             value: unknown
             key: service.instance.id
-
+      resource/set_known_attributes:
+        attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: homelab-live
       transform/label_metrics:
         metric_statements:
           - context: datapoint
@@ -223,6 +259,13 @@ spec:
               - set(attributes["nodeName"], resource.attributes["k8s.node.name"])
               - set(attributes["podName"], resource.attributes["k8s.pod.name"])
               - set(attributes["clusterName"], resource.attributes["k8s.cluster.name"])
+              - set(attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil
+              - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil
+              - set(attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil
+              - set(attributes["homelab.env"], resource.attributes["homelab.env"]) where resource.attributes["homelab.env"] != nil
+              - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil
+              - set(attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil
+              - set(attributes["homelab.tenant"], "prometheus-k8s")
 
       transform/set_match_resource_attributes:
         metric_statements:
@@ -245,43 +288,43 @@ spec:
                 max_connection_age_grace: 5s
           http:
             endpoint: 0.0.0.0:4318
-
+            max_request_body_size: 41943040
 
     # Define the full service graph for the OpenTelemetry collector.
     service:
-
-      # A pipeline can exist for each of the signals received.
+      extensions:
+        - health_check
       pipelines:
-        # Define the metrics pipeline.
-        # metrics/spanmetrics:
         metrics:
-          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, servicegraph, exceptions]
           receivers: 
           - otlp
-          # Use the `batch` processor to process received metrics, use the transform metric to ensure that spanmetric
-          # metrics are in the correct format for Grafana Cloud (doesn't take effect unless receivers above are used.)
           processors: 
-          # - filter/healthchecks
+          - memory_limiter
+          - resource/set_known_attributes
+          - resource/drop_attributes
           - metricstransform/add_standard_labels
           - resource/service-instance
           - batch 
           - transform/set_match_resource_attributes
           - groupbyattrs
           - k8sattributes
-          - resourcedetection/homelab
+          # - resourcedetection/homelab
           - transform/label_metrics
-          # - cardinality
-          # Export to the `prometheusremotewrite` exporter.
           exporters: 
+          # - forward/keda
           - prometheusremotewrite
-
-      extensions:
-        - zpages
-        - health_check
-
+        # metrics/keda:
+        #   exporters:
+        #     - prometheusremotewrite/keda
+        #   processors:
+        #     - filter/keda_metrics
+        #     - batch
+        #   receivers:
+        #     - forward/keda
       telemetry:
         logs:
           encoding: json
+          level: info
         # Push collector internal metrics to Prometheus
         metrics:
           readers:
@@ -291,15 +334,5 @@ spec:
                     host: 0.0.0.0
                     port: 8888
                     without_units: true
-        # metrics:
-        #   level: detailed
-        #   readers:
-        #     - periodic:
-        #         interval: 10000
-        #         exporter:
-        #           otlp:
-        #             protocol: grpc
-        #             endpoint: localhost:14317
-        #             insecure: true
-
-
+        resource:
+          homelab_otel_component: otlp-collector

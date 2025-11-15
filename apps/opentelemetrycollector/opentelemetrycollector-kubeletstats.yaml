@@ -1,0 +1,236 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: kubeletstats
+spec:
+  serviceAccount: otel-collector
+  mode: daemonset
+  image: otel/opentelemetry-collector-contrib:0.139.0
+  imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+  config:
+    # # Define connectors which connect two pipelines, acting as both exporter and receiver.
+    # # see: https://opentelemetry.io/docs/collector/components/connector/
+    # # and: https://opentelemetry.io/docs/collector/configuration/#connectors
+    # connectors:
+    #   forward/keda: {}
+
+    # Define exporters to data stores.
+    # See https://opentelemetry.io/docs/collector/configuration/#exporters
+    # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
+    exporters:
+
+      otlphttp/prometheus:
+        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        sending_queue:
+          num_consumers: 50
+        timeout: 10s
+    extensions:
+      pprof: {}
+    # Define processors to process received data.
+    # See https://opentelemetry.io/docs/collector/configuration/#processors
+    processors:
+      batch:
+        send_batch_max_size: 2000
+        send_batch_size: 1000
+        timeout: 1s
+      filter/toggled_metrics:
+        metrics:
+          metric:
+            - IsMatch(name, "k8s\\.volume\\..+") and (resource.attributes["homelab.observability.detailed_volume_metrics"] == nil or resource.attributes["homelab.observability.detailed_volume_metrics"] != "true")
+      groupbyattrs:
+        keys:
+          - k8s.pod.name
+          - k8s.namespace.name
+
+      k8sattributes:
+        auth_type: serviceAccount
+        extract:
+          annotations:
+            - from: pod
+              key: observability.home.alden.ai/detailed_volume_metrics_enabled
+              tag_name: homelab.observability.detailed_volume_metrics
+          labels:
+            - from: pod
+              key: app.homelab/environment
+              tag_name: homelab.environment
+            - from: pod
+              key: app.homelab/huid
+              tag_name: homelab.huid
+            - from: pod
+              key: app.homelab/owner
+              tag_name: homelab.owner
+            - from: pod
+              key: app.homelab/service
+              tag_name: homelab.service
+            - from: pod
+              key: app.homelab/argo-rollout-name
+              tag_name: argo.rollout.name
+          metadata:
+            - k8s.deployment.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+        filter:
+          node_from_env_var: K8S_NODE_NAME
+        passthrough: false
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+        wait_for_metadata: true
+        wait_for_metadata_timeout: 30s
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 90
+        spike_limit_percentage: 10
+      metricstransform/add_standard_labels:
+        transforms:
+          - action: update
+            include: .+
+            match_type: regexp
+            operations:
+              - action: add_label
+                new_label: aws_account
+                new_value: homelab-live
+              - action: add_label
+                new_label: homelab_source
+                new_value: aws_account:homelab-live
+              - action: add_label
+                new_label: homelab_otel_source
+                new_value: kubeletstats-collector
+      metricstransform/rename_cpu_metrics:
+        transforms:
+          - action: update
+            include: container.cpu.usage
+            new_name: container.cpu.utilization
+          - action: update
+            include: k8s.pod.cpu.usage
+            new_name: k8s.pod.cpu.utilization
+          - action: update
+            include: k8s.node.cpu.usage
+            new_name: k8s.node.cpu.utilization
+      resource/set_known_attributes:
+        attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: homelab-live
+      resourcedetection/homelab:
+        detectors: [env, system]
+        timeout: 5s
+        override: false
+        attributes:
+          - k8s.node.name
+      transform/cleanup:
+        metric_statements:
+          - context: resource
+            statements:
+              - delete_key(attributes, "host.name")
+              - delete_matching_keys(attributes, "^k8s.+?uid")
+      transform/label_metrics:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(attributes["instance"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil
+              - set(attributes["instance"], "${env:K8S_NODE_NAME}") where resource.attributes["k8s.pod.name"] == nil
+              - set(attributes["container.image.name"], resource.attributes["container.image.name"])
+              - set(attributes["container.image.tag"], resource.attributes["container.image.tag"])
+              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
+              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
+              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"])
+              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"])
+              - set(attributes["argo.rollout.name"], resource.attributes["argo.rollout.name"])
+              - set(attributes["service.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil
+              - set(attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
+              - set(attributes["service.name"], resource.attributes["argo.rollout.name"]) where resource.attributes["argo.rollout.name"] != nil
+              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"])
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+              - set(attributes["k8s.node.name"], "${env:K8S_NODE_NAME}")
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"])
+              - set(attributes["host.image.id"], resource.attributes["host.image.id"])
+              - set(attributes["homelab_source"], "cloud_system_metrics") where resource.attributes["k8s.namespace.name"] == "homelab-system"
+              - set(attributes["homelab_source"], "cloud_system_metrics") where resource.attributes["k8s.namespace.name"] == "kube-system"
+              - set(attributes["cloud.availability_zone"], resource.attributes["cloud.availability_zone"]) where IsMatch(metric.name, "k8s.node.+")
+              - set(attributes["cloud.region"], resource.attributes["cloud.region"]) where IsMatch(metric.name, "k8s.node.+")
+              - set(attributes["host.type"], resource.attributes["host.type"]) where IsMatch(metric.name, "k8s.node.+")
+              - set(attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil
+              - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil
+              - set(attributes["homelab.euid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.euid"] != nil
+              - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil
+              - set(attributes["homelab.tenant"], "prometheus") where resource.attributes["k8s.namespace.name"] != "homelab-system" and resource.attributes["k8s.namespace.name"] != "kube-system"
+              - set(attributes["homelab.tenant"], "core-tech") where resource.attributes["k8s.namespace.name"] == "homelab-system" or resource.attributes["k8s.namespace.name"] == "kube-system"
+      transform/set_match_resource_attributes:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+              - set(attributes["k8s.volume.name"], resource.attributes["k8s.volume.name"]) where resource.attributes["k8s.volume.name"] != nil
+              - set(attributes["k8s.volume.type"], resource.attributes["k8s.volume.type"]) where resource.attributes["k8s.volume.type"] != nil
+    receivers:
+      kubeletstats:
+        auth_type: serviceAccount
+        collection_interval: 30s
+        endpoint: https://${env:K8S_NODE_NAME}:10250
+        insecure_skip_verify: false
+        metric_groups:
+          - node
+          - pod
+          - container
+          - volume
+        metrics:
+          k8s.pod.uptime:
+            enabled: true
+    service:
+      extensions:
+        - pprof
+      pipelines:
+        metrics:
+          exporters:
+            - otlphttp/prometheus
+          processors:
+            - memory_limiter
+            - metricstransform/add_standard_labels
+            - resource/set_known_attributes
+            - resourcedetection/homelab
+            - batch
+            - transform/set_match_resource_attributes
+            - groupbyattrs
+            - k8sattributes
+            - filter/toggled_metrics
+            - transform/label_metrics
+            - transform/cleanup
+            - metricstransform/rename_cpu_metrics
+          receivers:
+            - kubeletstats
+      telemetry:
+        logs:
+          encoding: json
+          level: info
+        metrics:
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: 0.0.0.0
+                    port: 8888
+                    without_units: true
+        resource:
+          homelab_otel_component: kubeletstats-collector
+
