@@ -28,6 +28,3 @@ replacements:
         fieldPaths:
           - spec.template.spec.containers.0.env.2.value
           - spec.template.spec.volumes.0.nfs.path
-
-commonAnnotations:
-  argocd.argoproj.io/sync-wave: "-1"
