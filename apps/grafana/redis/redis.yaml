@@ -11,7 +11,7 @@ metadata:
   annotations:
 spec:
   kubernetesConfig:
-    image: "quay.io/opstree/redis:v8.2.1"
+    image: "quay.io/opstree/redis:v8.4.0"
     imagePullPolicy: "IfNotPresent"
   redisExporter:
     enabled: true
@@ -33,7 +33,7 @@ metadata:
   annotations:
 spec:
   kubernetesConfig:
-    image: "quay.io/opstree/redis:v8.2.1"
+    image: "quay.io/opstree/redis:v8.4.0"
     imagePullPolicy: "IfNotPresent"
   redisExporter:
     enabled: true
