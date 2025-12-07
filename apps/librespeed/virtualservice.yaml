@@ -2,7 +2,6 @@ apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: librespeed
-  namespace: librespeed
 spec:
   hosts:
     - librespeed.home.alden.ai
