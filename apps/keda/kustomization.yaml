@@ -1,0 +1,6 @@
+namespace: keda
+resources:
+  - https://github.com/kedacore/keda/releases/download/v2.18.0/keda-2.18.0.yaml
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "-1"
