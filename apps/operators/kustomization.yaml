@@ -5,6 +5,7 @@ resources:
 - external-secrets-operator
 - redis-operator
 - opentelemetry-operator
+# - minio-operator
 
 patches:
 - path: crd-patch.yaml
