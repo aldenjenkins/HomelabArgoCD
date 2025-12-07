@@ -1,0 +1,13 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: disable-access-logs
+spec:
+  # Target your specific app's pods
+  selector:
+    matchLabels:
+      app: pyroscope
+  
+  # This is the override
+  accessLogging:
+    - disabled: true

@@ -8,3 +8,12 @@ resources:
   - authorizationpolicy.yaml
   - python-fast-slow.yaml
   - grafanadatasource.yaml
+  - telemetry.yaml
+  - probe.yaml
+
+configMapGenerator:
+- files:
+  - files/pyroscope.yaml
+  name: config
+  options:
+    immutable: true

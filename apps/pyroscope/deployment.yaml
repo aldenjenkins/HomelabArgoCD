@@ -15,8 +15,18 @@ spec:
     spec:
       containers:
         - name: pyroscope
+          args:
+            - -config.file=/etc/pyroscope/pyroscope.yaml
           image: grafana/pyroscope:1.16.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 4040
+          volumeMounts:
+            - mountPath: /etc/pyroscope
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            defaultMode: 420
+            name: config
