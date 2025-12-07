@@ -6,3 +6,4 @@ resources:
   - grafanadashboard.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+  - probe.yaml
