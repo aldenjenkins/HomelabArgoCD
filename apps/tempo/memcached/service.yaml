@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-memcached
+  labels:
+    helm.sh/chart: tempo-distributed-1.52.9
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: memcached
+    app.kubernetes.io/version: "2.9.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ipFamilies: [IPv4]
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: memcached-client
+    port: 11211
+    targetPort: client
+  - name: http-metrics
+    port: 9150
+    targetPort: http-metrics
+  selector:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: memcached
+---
+# workaround until https://github.com/grafana/helm-charts/pull/2894 is merged
+# used to do DNS Service Discovery by the memcache client
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-memcached-discovery
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: memcached
+    app.kubernetes.io/version: "2.9.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: memcached-client
+    port: 11211
+    targetPort: 11211
+  - name: http-metrics
+    port: 9150
+    targetPort: http-metrics
+  selector:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: memcached

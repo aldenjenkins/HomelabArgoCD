@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-gateway
+  labels:
+    helm.sh/chart: tempo-distributed-1.52.9
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/version: "2.9.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 80
+      targetPort: http-metrics
+      protocol: TCP
+    - name: grpc-otlp
+      port: 4317
+      targetPort: grpc-otlp
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: gateway

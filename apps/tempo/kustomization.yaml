@@ -1,14 +1,39 @@
 namespace: tempo
 resources:
   - namespace.yaml
-  - configmap.yaml
-  - service.yaml
+  # - redis
+  # - service.yaml
   - serviceaccount.yaml
-  - servicemonitor.yaml
-  - deployment.yaml
+  # - deployment.yaml
+  - gateway
+  - gossipring
+  - memcached
+  - metricsgenerator
+  - ingester
+  - distributor
+  - compactor
+  - querier
+  - query-frontend
   - virtualservice.yaml
   - authorizationpolicy.yaml
-  - redis.yaml
   - grafanadatasource.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml
+configMapGenerator:
+- files:
+  - files/gateway/nginx.conf
+  name: tempo-gateway
+  options:
+    immutable: true
+- files:
+  - files/tempo.yaml
+  - files/tempo-query.yaml
+  name: tempo-config
+  options:
+    immutable: true
+- files:
+  - files/overrides.yaml
+  name: tempo-runtime
+  options:
+    immutable: true

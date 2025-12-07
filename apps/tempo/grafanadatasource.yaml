@@ -9,7 +9,9 @@ spec:
     uid: tempo
     type: tempo
     access: proxy
-    url: http://tempo.tempo.svc:3100
+    # url: http://tempo.tempo.svc:3100
+    url: http://tempo-gateway.tempo.svc:80
+    # url: http://tempo-query-frontend.tempo.svc:9095
     isDefault: false
     jsonData:
       tracesToLogsV2:
@@ -31,9 +33,9 @@ spec:
       spanBar:
         type: 'Tag'
         tag: 'http.path'
-      streamingEnabled:
-        search: true
-        metrics: true
+      # streamingEnabled:
+      #   search: true
+      #   metrics: true
       traceQuery:
         timeShiftEnabled: true
         spanStartTimeShift: '-10m'
@@ -57,28 +59,3 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDatasource
-metadata:
-  name: tempo-redis
-spec:
-  instanceSelector:
-    matchLabels:
-      dashboards: grafana
-  allowCrossNamespaceImport: true
-  datasource:
-    access: proxy
-    jsonData:
-      client: standalone
-      poolSize: 5
-      timeout: 10
-      pingInterval: 0
-      pipelineWindow: 0
-    name: tempo-redis
-    type: redis-datasource
-    url: redis://tempo-cache-redis.tempo.svc.cluster.local:6379
-  plugins:
-    - name: redis-datasource
-      version: 2.2.0
----

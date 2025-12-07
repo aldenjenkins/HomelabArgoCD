@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo-gateway
+  labels:
+    helm.sh/chart: tempo-distributed-1.52.9
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/version: "2.9.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: gateway
+  template:
+    metadata:
+      annotations:
+        checksum/config: 3fc32ad94c92aa0d9cbdb23c7ae4fe7f6d1cd49cd0b14e7b3c5f3484527d27d9
+        prometheus.io/path: /metrics
+        prometheus.io/port: "3200"
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/name: tempo
+        app.kubernetes.io/instance: tempo
+        app.kubernetes.io/component: gateway
+        app.homelab/environment: prod
+        app.homelab/huid: huid-ovz6vtlh
+        app.homelab/owner: homelab.techservices.data.observability
+        app.homelab/service: Tempo
+    spec:
+      serviceAccountName: tempo
+      securityContext:
+        fsGroup: 1000
+      terminationGracePeriodSeconds: 30
+      enableServiceLinks: false
+      
+      containers:
+        - name: nginx
+          image: "docker.io/nginxinc/nginx-unprivileged:1.19-alpine"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-metrics
+              containerPort: 8080
+              protocol: TCP
+            - name: grpc-otlp
+              containerPort: 4317
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http-metrics
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http-metrics
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx
+            # - name: auth
+            #   mountPath: /etc/nginx/secrets
+            - name: tmp
+              mountPath: /tmp
+            - name: docker-entrypoint-d-override
+              mountPath: /docker-entrypoint.d
+          # resources:
+          #   limits:
+          #     memory: 768Mi
+          #   requests:
+          #     cpu: 1
+          #     memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+        
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/name: tempo
+      #             app.kubernetes.io/instance: tempo
+      #             app.kubernetes.io/component: gateway
+      #         topologyKey: kubernetes.io/hostname
+        
+      volumes:
+        - name: config
+          configMap:
+            name: tempo-gateway
+        # - name: auth
+        #   secret:
+        #     secretName: tempo-auth-credentials
+        - name: tmp
+          emptyDir: {}
+        - name: docker-entrypoint-d-override
+          emptyDir: {}
