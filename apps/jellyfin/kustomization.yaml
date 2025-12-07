@@ -9,5 +9,6 @@ resources:
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

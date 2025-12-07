@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: jellyfin-exporter
-          image: rebelcore/jellyfin-exporter:latest
+          image: rebelcore/jellyfin-exporter:v1.3.9
+          imagePullPolicy: IfNotPresent
           args:
             - "--jellyfin.address=http://jellyfin.jellyfin:8096"
             - "--jellyfin.token=$(JELLYFIN_TOKEN)"
