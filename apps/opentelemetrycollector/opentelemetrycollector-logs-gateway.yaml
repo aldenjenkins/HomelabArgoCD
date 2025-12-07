@@ -3,7 +3,8 @@ kind: OpenTelemetryCollector
 metadata:
   name: logs-gateway
 spec:
-  replicas: 1
+  # replicas: 2
+  replicas: 2
   mode: statefulset
   image: otel/opentelemetry-collector-contrib:0.139.0
   imagePullPolicy: IfNotPresent
@@ -21,8 +22,8 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
-        storageClassName: longhorn
+            storage: 5Gi
+        storageClassName: local-path
         volumeMode: Filesystem
   volumeMounts:
     - mountPath: /var/lib/storage/otc
@@ -46,7 +47,7 @@ spec:
       # Exporter for sending logs via otlphttp to the logs gateway 
       otlphttp/loki:
         compression: gzip
-        endpoint: http://loki-gateway.loki/otlp
+        endpoint: http://loki-gateway.loki.svc.cluster.local./otlp
         tls:
           insecure: true
         retry_on_failure:
@@ -55,7 +56,7 @@ spec:
         sending_queue:
           enabled: true
           num_consumers: 10
-          queue_size: 10000
+          queue_size: 1000
           storage: file_storage
 
     extensions:
@@ -78,7 +79,7 @@ spec:
       # Use the in-built `batch` processor to batch up data before writing it for export.
       batch:
         timeout: 1s  # Reduce if too high
-        send_batch_size: 1024  # Ensure it's reasonable
+        send_batch_size: 1024
         send_batch_max_size: 2048
 
       attributes/extract_systemd_source_fields:
@@ -291,14 +292,17 @@ spec:
         wait_for_metadata_timeout: 30s
 
       memory_limiter:
-        check_interval: 5s
+        check_interval: 1s
         limit_percentage: 90
-        spike_limit_percentage: 20
+        spike_limit_percentage: 10
 
       resource/add_cluster:
         attributes:
           - action: upsert
             key: k8s.cluster.name
+            value: homelab-live
+          - action: upsert
+            key: cluster
             value: homelab-live
       resource/containers_copy_node_to_host:
         attributes:
@@ -322,6 +326,23 @@ spec:
             key: container_image
           - action: delete
             key: k8s.container.image
+
+      transform/remove_high_cardinality_resource_attrs:
+        log_statements:
+          - context: resource
+            statements:
+              - delete_key(attributes, "k8s.pod.name")
+              - delete_key(attributes, "k8s.pod.uid")
+              - delete_key(attributes, "k8s.pod.ip")
+              - delete_key(attributes, "k8s.container.id") # Just in case
+
+      transform/remove_high_cardinality_log_attrs:
+        log_statements:
+          - context: log
+            statements:
+              - delete_key(attributes, "trace_id")
+              - delete_key(attributes, "traceId")
+              - delete_key(attributes, "trace.id")
 
       transform/add_bloom_fields:
         error_mode: ignore
@@ -470,6 +491,7 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
+            # max_request_body_size: 41943040
 
     # Define the full service graph for the OpenTelemetry collector.
     service:
@@ -494,8 +516,11 @@ spec:
           - resource/remove_redundant_extracted
           - transform/add_homelab_attributes
           - transform/add_label_fields
+          # test removing this for loki ingester to not be overwhelmed
           - transform/add_bloom_fields
           - groupbyattrs/label_fields
+          # test adding this for loki ingester to not be overwhelmed
+          # - transform/remove_high_cardinality_resource_attrs
           - batch
           exporters: 
           - otlphttp/loki

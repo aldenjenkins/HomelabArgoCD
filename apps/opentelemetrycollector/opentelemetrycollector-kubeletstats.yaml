@@ -9,10 +9,15 @@ spec:
   imagePullPolicy: IfNotPresent
   resources:
     limits:
-      memory: 256Mi
+      memory: 512Mi
     requests:
       cpu: 10m
       memory: 64Mi
+  env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
   config:
     # # Define connectors which connect two pipelines, acting as both exporter and receiver.
     # # see: https://opentelemetry.io/docs/collector/components/connector/
@@ -24,13 +29,14 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
-
+      debug:
+        verbosity: detailed
       otlphttp/prometheus:
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/otlp
         tls:
           insecure: true
         retry_on_failure:
-          enabled: true
+          enabled: false
         sending_queue:
           num_consumers: 50
         timeout: 10s
@@ -42,11 +48,11 @@ spec:
       batch:
         send_batch_max_size: 2000
         send_batch_size: 1000
-        timeout: 1s
-      filter/toggled_metrics:
-        metrics:
-          metric:
-            - IsMatch(name, "k8s\\.volume\\..+") and (resource.attributes["homelab.observability.detailed_volume_metrics"] == nil or resource.attributes["homelab.observability.detailed_volume_metrics"] != "true")
+        timeout: 10s
+      # filter/toggled_metrics:
+      #   metrics:
+      #     metric:
+      #       - IsMatch(name, "k8s\\.volume\\..+") and (resource.attributes["homelab.observability.detailed_volume_metrics"] == nil or resource.attributes["homelab.observability.detailed_volume_metrics"] != "true")
       groupbyattrs:
         keys:
           - k8s.pod.name
@@ -102,12 +108,12 @@ spec:
             include: .+
             match_type: regexp
             operations:
-              - action: add_label
-                new_label: aws_account
-                new_value: homelab-live
-              - action: add_label
-                new_label: homelab_source
-                new_value: aws_account:homelab-live
+              # - action: add_label
+              #   new_label: aws_account
+              #   new_value: homelab-live
+              # - action: add_label
+              #   new_label: homelab_source
+              #   new_value: aws_account:homelab-live
               - action: add_label
                 new_label: homelab_otel_source
                 new_value: kubeletstats-collector
@@ -184,45 +190,292 @@ spec:
               - set(attributes["k8s.volume.name"], resource.attributes["k8s.volume.name"]) where resource.attributes["k8s.volume.name"] != nil
               - set(attributes["k8s.volume.type"], resource.attributes["k8s.volume.type"]) where resource.attributes["k8s.volume.type"] != nil
     receivers:
-      kubeletstats:
-        auth_type: serviceAccount
-        collection_interval: 30s
-        endpoint: https://${env:K8S_NODE_NAME}:10250
-        insecure_skip_verify: false
-        metric_groups:
-          - node
-          - pod
-          - container
-          - volume
-        metrics:
-          k8s.pod.uptime:
-            enabled: true
+      # kubeletstats:
+      #   auth_type: serviceAccount
+      #   collection_interval: 20s
+      #   endpoint: https://${env:K8S_NODE_NAME}:10250
+      #   insecure_skip_verify: true
+      #   metric_groups:
+      #     - node
+      #     - pod
+      #     - container
+      #     - volume
+      #   metrics:
+      #     k8s.pod.uptime:
+      #       enabled: true
+      # prometheus/kubelet-raw:
+      #   config:
+      #     scrape_configs:
+      #       - job_name: 'kubelet'  # <-- Sets the job label required by your rule
+      #         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      #         kubernetes_sd_configs:
+      #           - role: node
+      #         relabel_configs:
+      #           - replacement: kubernetes.default.svc:443
+      #             target_label: __address__
+      #           - regex: (.+)
+      #             replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
+      #             source_labels:
+      #               - __meta_kubernetes_node_name
+      #             target_label: __metrics_path__
+      #           - target_label: metrics_path
+      #             replacement: /metrics/cadvisor  # <-- Explicitly set for your PromQL rule
+      #           - source_labels: [__meta_kubernetes_node_name]
+      #             target_label: instance
+      #         scheme: https
+      #         tls_config:
+      #           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      #           insecure_skip_verify: true
+      prometheus/kubelet-and-node-exporter:
+        config:
+          scrape_configs:
+            # ---------- /metrics ----------
+            - job_name: 'kubelet'
+              honor_labels: true
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              scheme: https
+              tls_config:
+                insecure_skip_verify: true
+              metrics_path: /metrics
+              scrape_interval: 30s
+
+              static_configs:
+                - targets: ['${env:K8S_NODE_NAME}:10250']
+
+              # Ensure "job" label matches ServiceMonitor jobLabel behavior
+              relabel_configs:
+                - action: replace
+                  target_label: job
+                  replacement: kubelet
+                - action: replace
+                  target_label: cluster
+                  replacement: homelab-live
+                - action: replace
+                  source_labels: [__metrics_path__]
+                  target_label: metrics_path
+
+              # metricRelabelings from ServiceMonitor endpoint #1
+              metric_relabel_configs:
+                - action: drop
+                  source_labels: [__name__]
+                  regex: kubelet_(pod_worker_latency_microseconds|pod_start_latency_microseconds|cgroup_manager_latency_microseconds|pod_worker_start_latency_microseconds|pleg_relist_latency_microseconds|pleg_relist_interval_microseconds|runtime_operations|runtime_operations_latency_microseconds|runtime_operations_errors|eviction_stats_age_microseconds|device_plugin_registration_count|device_plugin_alloc_latency_microseconds|network_plugin_operations_latency_microseconds)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: scheduler_(e2e_scheduling_latency_microseconds|scheduling_algorithm_predicate_evaluation|scheduling_algorithm_priority_evaluation|scheduling_algorithm_preemption_evaluation|scheduling_algorithm_latency_microseconds|binding_latency_microseconds|scheduling_latency_seconds)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: apiserver_(request_count|request_latencies|request_latencies_summary|dropped_requests|storage_data_key_generation_latencies_microseconds|storage_transformation_failures_total|storage_transformation_latencies_microseconds|proxy_tunnel_sync_latency_secs|longrunning_gauge|registered_watchers|storage_db_total_size_in_bytes|flowcontrol_request_concurrency_limit|flowcontrol_request_concurrency_in_use)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: kubelet_docker_(operations|operations_latency_microseconds|operations_errors|operations_timeout)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: reflector_(items_per_list|items_per_watch|list_duration_seconds|lists_total|short_watches_total|watch_duration_seconds|watches_total)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: etcd_(helper_cache_hit_count|helper_cache_miss_count|helper_cache_entry_count|object_counts|request_cache_get_latencies_summary|request_cache_add_latencies_summary|request_latencies_summary)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: transformation_(transformation_latencies_microseconds|failures_total)
+                - action: drop
+                  source_labels: [__name__]
+                  regex: (admission_quota_controller_adds|admission_quota_controller_depth|admission_quota_controller_longest_running_processor_microseconds|admission_quota_controller_queue_latency|admission_quota_controller_unfinished_work_seconds|admission_quota_controller_work_duration|APIServiceOpenAPIAggregationControllerQueue1_adds|APIServiceOpenAPIAggregationControllerQueue1_depth|APIServiceOpenAPIAggregationControllerQueue1_longest_running_processor_microseconds|APIServiceOpenAPIAggregationControllerQueue1_queue_latency|APIServiceOpenAPIAggregationControllerQueue1_retries|APIServiceOpenAPIAggregationControllerQueue1_unfinished_work_seconds|APIServiceOpenAPIAggregationControllerQueue1_work_duration|APIServiceRegistrationController_adds|APIServiceRegistrationController_depth|APIServiceRegistrationController_longest_running_processor_microseconds|APIServiceRegistrationController_queue_latency|APIServiceRegistrationController_retries|APIServiceRegistrationController_unfinished_work_seconds|APIServiceRegistrationController_work_duration|autoregister_adds|autoregister_depth|autoregister_longest_running_processor_microseconds|autoregister_queue_latency|autoregister_retries|autoregister_unfinished_work_seconds|autoregister_work_duration|AvailableConditionController_adds|AvailableConditionController_depth|AvailableConditionController_longest_running_processor_microseconds|AvailableConditionController_queue_latency|AvailableConditionController_retries|AvailableConditionController_unfinished_work_seconds|AvailableConditionController_work_duration|crd_autoregistration_controller_adds|crd_autoregistration_controller_depth|crd_autoregistration_controller_longest_running_processor_microseconds|crd_autoregistration_controller_queue_latency|crd_autoregistration_controller_retries|crd_autoregistration_controller_unfinished_work_seconds|crd_autoregistration_controller_work_duration|crdEstablishing_adds|crdEstablishing_depth|crdEstablishing_longest_running_processor_microseconds|crdEstablishing_queue_latency|crdEstablishing_retries|crdEstablishing_unfinished_work_seconds|crdEstablishing_work_duration|crd_finalizer_adds|crd_finalizer_depth|crd_finalizer_longest_running_processor_microseconds|crd_finalizer_queue_latency|crd_finalizer_retries|crd_finalizer_unfinished_work_seconds|crd_finalizer_work_duration|crd_naming_condition_controller_adds|crd_naming_condition_controller_depth|crd_naming_condition_controller_longest_running_processor_microseconds|crd_naming_condition_controller_queue_latency|crd_naming_condition_controller_retries|crd_naming_condition_controller_unfinished_work_seconds|crd_naming_condition_controller_work_duration|crd_openapi_controller_adds|crd_openapi_controller_depth|crd_openapi_controller_longest_running_processor_microseconds|crd_openapi_controller_queue_latency|crd_openapi_controller_retries|crd_openapi_controller_unfinished_work_seconds|crd_openapi_controller_work_duration|DiscoveryController_adds|DiscoveryController_depth|DiscoveryController_longest_running_processor_microseconds|DiscoveryController_queue_latency|DiscoveryController_retries|DiscoveryController_unfinished_work_seconds|DiscoveryController_work_duration|kubeproxy_sync_proxy_rules_latency_microseconds|non_structural_schema_condition_controller_adds|non_structural_schema_condition_controller_depth|non_structural_schema_condition_controller_longest_running_processor_microseconds|non_structural_schema_condition_controller_queue_latency|non_structural_schema_condition_controller_retries|non_structural_schema_condition_controller_unfinished_work_seconds|non_structural_schema_condition_controller_work_duration|rest_client_request_latency_seconds|storage_operation_errors_total|storage_operation_status_count)
+
+            # ---------- /metrics/cadvisor ----------
+            - job_name: 'kubelet-cadvisor'
+              honor_labels: true
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              scheme: https
+              tls_config:
+                insecure_skip_verify: true
+              metrics_path: /metrics/cadvisor
+              scrape_interval: 30s
+              honor_timestamps: false
+
+              static_configs:
+                - targets: ['${env:K8S_NODE_NAME}:10250']
+
+              relabel_configs:
+                - action: replace
+                  target_label: job
+                  replacement: kubelet
+                - action: replace
+                  target_label: cluster
+                  replacement: homelab-live
+                - action: replace
+                  source_labels: [__metrics_path__]
+                  target_label: metrics_path
+
+              metric_relabel_configs:
+                - action: drop
+                  source_labels: [__name__]
+                  regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
+                - action: drop
+                  source_labels: [__name__, pod, namespace]
+                  regex: (container_spec_.*|container_file_descriptors|container_sockets|container_threads_max|container_threads|container_start_time_seconds|container_last_seen);;
+                - action: drop
+                  source_labels: [__name__, container]
+                  regex: (container_blkio_device_usage_total);.+
+
+            # ---------- /metrics/probes ----------
+            - job_name: 'kubelet-probes'
+              honor_labels: true
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              scheme: https
+              tls_config:
+                insecure_skip_verify: true
+              metrics_path: /metrics/probes
+              scrape_interval: 30s
+
+              static_configs:
+                - targets: ['${env:K8S_NODE_NAME}:10250']
+
+              relabel_configs:
+                - action: replace
+                  target_label: job
+                  replacement: kubelet
+                - action: replace
+                  target_label: cluster
+                  replacement: homelab-live
+                - action: replace
+                  source_labels: [__metrics_path__]
+                  target_label: metrics_path
+
+            # ---------- /metrics/slis ----------
+            - job_name: 'kubelet-slis'
+              honor_labels: true
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              scheme: https
+              tls_config:
+                insecure_skip_verify: true
+              metrics_path: /metrics/slis
+              scrape_interval: 5s
+
+              static_configs:
+                - targets: ['${env:K8S_NODE_NAME}:10250']
+
+              relabel_configs:
+                - action: replace
+                  target_label: job
+                  replacement: kubelet
+                - action: replace
+                  target_label: cluster
+                  replacement: homelab-live
+                - action: replace
+                  source_labels: [__metrics_path__]
+                  target_label: metrics_path
+
+              metric_relabel_configs:
+                - action: drop
+                  source_labels: [__name__]
+                  regex: process_start_time_seconds
+
+            # ========= node-exporter (replaces ServiceMonitor/node-exporter) =========
+            - job_name: node-exporter
+              kubernetes_sd_configs:
+                - role: pod
+
+              relabel_configs:
+                # Match ServiceMonitor .spec.selector.matchLabels
+                - action: keep
+                  regex: exporter
+                  source_labels:
+                    - __meta_kubernetes_pod_label_app_kubernetes_io_component
+                - action: keep
+                  regex: node-exporter
+                  source_labels:
+                    - __meta_kubernetes_pod_label_app_kubernetes_io_name
+                - action: keep
+                  regex: kube-prometheus
+                  source_labels:
+                    - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
+                - action: keep
+                  regex: node-exporter
+                  source_labels:
+                    - __meta_kubernetes_namespace
+
+                # **Only scrape the node-exporter pod on *this* node**
+                - action: keep
+                  source_labels:
+                    - __meta_kubernetes_pod_node_name
+                  regex: ${env:K8S_NODE_NAME}
+
+                # Only scrape the "https" port on the node-exporter pod
+                - action: keep
+                  regex: https
+                  source_labels:
+                    - __meta_kubernetes_pod_container_port_name
+
+                # Use HTTPS, like the ServiceMonitor
+                - action: replace
+                  target_label: __scheme__
+                  replacement: https
+
+                # Build podIP:port as the target address
+                - action: replace
+                  source_labels:
+                    - __meta_kubernetes_pod_ip
+                    - __meta_kubernetes_pod_container_port_number
+                  regex: (.*);(.*)
+                  replacement: $1:$2
+                  target_label: __address__
+
+                # Set cluster label (ServiceMonitor relabelings[0])
+                - action: replace
+                  target_label: cluster
+                  replacement: homelab-live
+
+                # Set instance label from node name (ServiceMonitor relabelings[1])
+                - action: replace
+                  source_labels:
+                    - __meta_kubernetes_pod_node_name
+                  target_label: instance
+
+                # Match jobLabel: app.kubernetes.io/name → job="node-exporter"
+                - action: replace
+                  target_label: job
+                  replacement: node-exporter
+
+              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              scheme: https
+              tls_config:
+                insecure_skip_verify: true
+              scrape_interval: 15s
+
     service:
-      extensions:
-        - pprof
+      # extensions:
+      #   - pprof
       pipelines:
         metrics:
           exporters:
             - otlphttp/prometheus
+            # - debug
           processors:
             - memory_limiter
-            - metricstransform/add_standard_labels
-            - resource/set_known_attributes
-            - resourcedetection/homelab
+            ############
+            # - metricstransform/add_standard_labels
+            # - resource/set_known_attributes
+            # - resourcedetection/homelab
+            ########
             - batch
-            - transform/set_match_resource_attributes
-            - groupbyattrs
-            - k8sattributes
-            - filter/toggled_metrics
-            - transform/label_metrics
-            - transform/cleanup
-            - metricstransform/rename_cpu_metrics
+            ############
+            # - transform/set_match_resource_attributes
+            # - groupbyattrs
+            # - k8sattributes
+            ###########
+            # - filter/toggled_metrics
+            # #######################################
+            # - transform/label_metrics
+            # - transform/cleanup
+            # ############################
+            # - metricstransform/rename_cpu_metrics
           receivers:
-            - kubeletstats
+            # - kubeletstats
+            - prometheus/kubelet-and-node-exporter
       telemetry:
         logs:
           encoding: json
-          level: info
+          # level: debug
         metrics:
           readers:
             - pull:

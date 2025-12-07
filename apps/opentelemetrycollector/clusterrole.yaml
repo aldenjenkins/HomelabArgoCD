@@ -129,14 +129,15 @@ rules:
       - podmonitors
       - probes
       - scrapeconfigs
-    verbs: ["get", "list", "watch"]
-  - apiGroups:
-      - monitoring.coreos.com
-    resources: ["*"]
-    # - servicemonitors
-    # - podmonitors
-    # - probes
-    # - scrapeconfigs
-    verbs: ["get", "list", "watch"]
-  - nonResourceURLs: ["/metrics", "/metrics/cadvisor", "/metrics/slis"]
+    # verbs: ["get", "list", "watch"]
+    verbs: ["*"]
+  # - apiGroups:
+  #     - monitoring.coreos.com
+  #   resources: ["*"]
+  #   # - servicemonitors
+  #   # - podmonitors
+  #   # - probes
+  #   # - scrapeconfigs
+  #   verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor", "/metrics/slis", "/apis", "/apis/*", "/api", "/api/*"]
     verbs: ["get"]

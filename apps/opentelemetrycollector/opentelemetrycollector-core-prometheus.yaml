@@ -5,7 +5,7 @@ metadata:
 spec:
   autoscaler:
     maxReplicas: 5
-    minReplicas: 1
+    minReplicas: 2
     targetCPUUtilization: 75
     targetMemoryUtilization: 75
   mode: statefulset
@@ -15,12 +15,12 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-            - control-plane-02
-            - control-plane-03
-            - worker-03
+          # - key: kubernetes.io/hostname
+          #   operator: In
+          #   values:
+          #   - control-plane-02
+          #   - control-plane-03
+          #   - worker-03
           - key: kubernetes.io/os
             operator: In
             values:
@@ -72,9 +72,21 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
+      prometheusremotewrite:
+        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/write
+        add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
 
       otlphttp/prometheus:
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/otlp
         tls:
           insecure: true
         retry_on_failure:
@@ -293,19 +305,19 @@ spec:
         extract:
           labels:
             - from: pod
-              key: app.home.alden.ai/environment
+              key: app.homelab/environment
               tag_name: homelab.environment
             - from: pod
-              key: app.home.alden.ai/huid
+              key: app.homelab/huid
               tag_name: homelab.environment
             - from: pod
-              key: app.home.alden.ai/owner
+              key: app.homelab/owner
               tag_name: homelab.owner
             - from: pod
-              key: app.home.alden.ai/service
+              key: app.homelab/service
               tag_name: homelab.service
             - from: pod
-              key: app.home.alden.ai/argo-rollout-name
+              key: app.homelab/argo-rollout-name
               tag_name: argo.rollout.name
           metadata:
             - k8s.deployment.name
@@ -332,12 +344,12 @@ spec:
             include: .+
             match_type: regexp
             operations:
-              - action: add_label
-                new_label: aws_account
-                new_value: homelab-live
-              - action: add_label
-                new_label: homelab_source
-                new_value: aws_account:homelab-live
+              # - action: add_label
+              #   new_label: aws_account
+              #   new_value: homelab-live
+              # - action: add_label
+              #   new_label: homelab_source
+              #   new_value: aws_account:homelab-live
               - action: add_label
                 new_label: homelab_otel_source
                 new_value: core-prometheus-collector
@@ -457,18 +469,18 @@ spec:
                   regex: kubecost-.+
                   source_labels:
                     - __meta_kubernetes_pod_name
-                - action: drop
-                  regex: .*kube-state-metrics.*
-                  source_labels:
-                    - __meta_kubernetes_pod_name
-                - action: drop
-                  regex: .*prometheus-node-exporter.*
-                  source_labels:
-                    - __meta_kubernetes_pod_name
-                - action: drop
-                  regex: .*cadvisor.*
-                  source_labels:
-                    - __meta_kubernetes_pod_name
+                # - action: drop
+                #   regex: .*kube-state-metrics.*
+                #   source_labels:
+                #     - __meta_kubernetes_pod_name
+                # - action: drop
+                #   regex: .*prometheus-node-exporter.*
+                #   source_labels:
+                #     - __meta_kubernetes_pod_name
+                # - action: drop
+                #   regex: .*cadvisor.*
+                #   source_labels:
+                #     - __meta_kubernetes_pod_name
                 - action: keep
                   regex: (true;|true;\d+|;\d+)
                   source_labels:
@@ -640,6 +652,11 @@ spec:
               kubernetes_sd_configs:
                 - role: node
               relabel_configs:
+                # --- NEW: DROP THIS CADVISOR JOB ENTIRELY ---
+                - action: drop
+                  regex: .+(cadvisor) # Drops any target whose metrics_path indicates cAdvisor
+                  source_labels: [__metrics_path__]
+                # --------------------------------------------
                 - replacement: kubernetes.default.svc:443
                   target_label: __address__
                 - regex: (.+)
@@ -664,7 +681,7 @@ spec:
             # - transform/standardize_ksm_attributes
             - attributes/kube_state_metrics
             - attributes/cadvisor
-            # - metricstransform/add_standard_labels
+            - metricstransform/add_standard_labels
             - resource/set_known_attributes
             - batch
             - groupbyattrs
@@ -672,10 +689,11 @@ spec:
             - k8sattributes
             - transform/label_metrics
             - transform/normalize_service_name
-            - filter/drop_observability_ksm
+            # - filter/drop_observability_ksm
           exporters:
             # - forward/keda
-            - otlphttp/prometheus
+            # - otlphttp/prometheus
+            - prometheusremotewrite
         # metrics/keda:
         #   exporters:
         #     - prometheusremotewrite/keda
