@@ -1,0 +1,5 @@
+namespace: haproxy
+resources:
+  - namespace.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
