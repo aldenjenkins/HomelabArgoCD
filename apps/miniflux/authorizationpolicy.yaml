@@ -1,0 +1,17 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: miniflux
+spec:
+  action: CUSTOM
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: miniflux
+      app.kubernetes.io/component: web
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - miniflux.home.alden.ai

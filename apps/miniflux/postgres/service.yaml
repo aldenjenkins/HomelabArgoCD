@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: miniflux-postgres-healthz
+spec:
+  type: ClusterIP
+  ports:
+    - name: healthz
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    cnpg.io/cluster: miniflux-postgres-18
+    cnpg.io/instanceRole: primary
