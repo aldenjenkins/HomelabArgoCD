@@ -8,5 +8,6 @@ resources:
   - prometheusrule.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

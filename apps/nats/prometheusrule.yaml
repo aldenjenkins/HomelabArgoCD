@@ -54,7 +54,7 @@ spec:
             summary: Nats slow consumers (instance {{ $labels.instance }})
             description: "There are slow consumers in NATS for {{ $labels.instance }}\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
         - alert: NatsServerDown
-          expr: 'absent(up{job="nats"})'
+          expr: 'absent(up{job="nats-jetstream"})'
           for: 5m
           labels:
             severity: critical

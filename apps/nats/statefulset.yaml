@@ -14,14 +14,52 @@ spec:
     metadata:
       labels: *labels
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        fsGroup: 10000
+      initContainers:
+        - name: create-dir-if-not-exists
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 10001
+            runAsGroup: 10000
+            capabilities:
+              drop: ["ALL"]
+          image: busybox:1.36.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              if [ ! -d /data/natsData ]; then
+                mkdir -p /data/natsData
+                chown -R 10001:10000 /data/natsData
+                echo "created directory /data/natsData"
+              else
+                echo "directory /data/natsData already exists"
+              fi
+          volumeMounts:
+            - mountPath: /data
+              name: nats-data
       containers:
         - name: nats-jetstream
-          image: nats:2.12.0-alpine
+          image: nats:2.12.1-alpine
           imagePullPolicy: IfNotPresent
+          securityContext: &containerSecurity
+            allowPrivilegeEscalation: false
+            runAsUser: 10001
+            runAsGroup: 10000
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           args:
             - -D
             - --jetstream
             - --port=4222
+            - --store_dir=/data/natsData
             - --config=/etc/nats-jetstream/jetstream.conf
           # Required to be able to define an environment variable
           # that refers to other environment variables.  This env var
@@ -52,8 +90,10 @@ spec:
               name: monitoring
               protocol: TCP
           volumeMounts:
-            - mountPath: /data/nats-server
+            - mountPath: /data
               name: nats-data
+            - name: pid
+              mountPath: /var/run/nats
             - mountPath: /etc/nats-jetstream/
               name: config-volume
           resources:
@@ -69,6 +109,7 @@ spec:
         - name: nats-exporter
           image: natsio/prometheus-nats-exporter:0.17.3
           imagePullPolicy: IfNotPresent
+          securityContext: *containerSecurity
           args:
             - -varz
             - -jsz=all
@@ -80,18 +121,18 @@ spec:
         - configMap:
             name: nats-jetstream
           name: config-volume
+        - name: pid
+          emptyDir: {}
       nodeSelector:
         kubernetes.io/os: linux
-        kubernetes.io/hostname: control-plane-03
+        kubernetes.io/hostname: control-plane-01
   volumeClaimTemplates:
     - metadata:
         name: nats-data
-        annotations:
-          nfs.io/storage-path: "nats/"
       spec:
         accessModes:
-          - "ReadWriteMany"
-        storageClassName: nfs-appdata-retain
+          - ReadWriteOnce
+        storageClassName: local-path
         resources:
           requests:
-            storage: "25Gi"
+            storage: "10Gi"
