@@ -13,27 +13,3 @@ spec:
     matchLabels:
       app.kubernetes.io/name: gitea
       app.kubernetes.io/component: http
----
-# Source: redis/templates/servicemonitor.yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: gitea-redis
-  labels:
-    app.kubernetes.io/name: redis
-    app.kubernetes.io/instance: redis
-    app.kubernetes.io/version: 0.16.5
-    app.kubernetes.io/component: middleware
-spec:
-  selector:
-    matchLabels:
-      app: gitea-standalone
-      redis_setup_type: standalone
-      role: standalone
-  endpoints:
-    - port: redis-exporter
-      interval: 30s
-      scrapeTimeout: 10s
-  namespaceSelector:
-    matchNames:
-      - gitea

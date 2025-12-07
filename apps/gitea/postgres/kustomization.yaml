@@ -4,5 +4,6 @@ resources:
   - cnpg-cluster.yaml
   - service.yaml
   - scheduledbackup.yaml
+  - grafanadatasource.yaml
 generators:
   - sopsgenerator.yaml

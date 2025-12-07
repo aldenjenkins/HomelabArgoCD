@@ -1,14 +1,14 @@
 namespace: gitea
 resources:
   - namespace.yaml
-  - redis.yaml
+  - postgres
+  - redis
   - deployment.yaml
   - service.yaml
   - gateway.yaml
   - virtualservice.yaml
   - persistentvolumeclaim.yaml
   - servicemonitor.yaml
-  - grafanadatasource.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - probe.yaml

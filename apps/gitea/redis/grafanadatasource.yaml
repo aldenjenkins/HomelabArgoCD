@@ -1,7 +1,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: gitea-redis
+  name: forgejo-redis
 spec:
   instanceSelector:
     matchLabels:
@@ -15,9 +15,9 @@ spec:
       timeout: 10
       pingInterval: 0
       pipelineWindow: 0
-    name: gitea-redis
+    name: forgejo-redis
     type: redis-datasource
-    url: redis://gitea-standalone.gitea.svc.cluster.local:6379
+    url: redis://forgejo-redis.forgejo.svc.cluster.local:6379
   plugins:
     - name: redis-datasource
-      version: 2.2.0
+      version: latest
