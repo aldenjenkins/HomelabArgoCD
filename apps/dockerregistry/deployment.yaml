@@ -14,13 +14,32 @@ spec:
       labels:
         app: registry
     spec:
+      securityContext:
+        runAsUser: 45454
+        runAsGroup: 45454
+        fsGroup: 45454
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: registry
           image: registry:3
           imagePullPolicy: Always
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 45454
+            runAsGroup: 45454
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
           env:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://trace-collector.observability.svc.cluster.local:4318"
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+              value: "http://trace-collector.observability.svc.cluster.local:4318/v1/traces"
           ports:
             - containerPort: 5000
               name: tcp

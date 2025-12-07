@@ -8,3 +8,4 @@ resources:
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - servicemonitor.yaml
+  - probe.yaml
