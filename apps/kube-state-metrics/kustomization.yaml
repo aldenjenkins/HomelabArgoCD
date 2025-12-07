@@ -8,4 +8,6 @@ resources:
   - prometheusrule.yaml
   - service.yaml
   - serviceaccount.yaml
-  - servicemonitor.yaml
+  # Disable servicemonitor now so that the selfmetrics collector can scrape this pod explicitly
+  # and the core-prometheus collector doesnt also scrape it.
+  # - servicemonitor.yaml
