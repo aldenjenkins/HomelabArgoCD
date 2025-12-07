@@ -1,0 +1,9 @@
+namespace: vaultwarden
+resources:
+  - namespace.yaml
+  - postgres
+  - statefulset.yaml
+  - service.yaml
+  - virtualservice.yaml
+generators:
+  - sopsgenerator.yaml

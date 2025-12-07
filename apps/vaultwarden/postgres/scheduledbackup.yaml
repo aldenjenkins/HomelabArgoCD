@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: vaultwarden-postgres-18
+spec:
+  schedule: "0 10 0 * * *"
+  cluster:
+    name: vaultwarden-postgres-18

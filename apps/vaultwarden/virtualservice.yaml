@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: vaultwarden-virtualservice
+spec:
+  hosts:
+    - vaultwarden.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: vaultwarden.vaultwarden.svc.cluster.local
+            port:
+              number: 8080

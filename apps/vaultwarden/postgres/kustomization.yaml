@@ -1,0 +1,7 @@
+resources:
+  - objectstore.yaml
+  - cnpg-cluster.yaml
+  - service.yaml
+  - scheduledbackup.yaml
+generators:
+  - sopsgenerator.yaml
