@@ -1,6 +1,6 @@
 namespace: metallb-system
 resources:
-  - github.com/metallb/metallb/config/frr-k8s?ref=v0.15.2
+  - github.com/metallb/metallb/config/frr-k8s?ref=v0.15.3
   # - l2advertisement.yaml
   - bgppeer.yaml
   - bgpadvertisement.yaml
