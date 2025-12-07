@@ -4,6 +4,7 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - servicemonitor.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml
 labels:
