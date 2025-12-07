@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-query-frontend
+spec:
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels: &labels
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/component: query-frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        <<: *labels
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: query-frontend
+          resources:
+            requests:
+              cpu: 100m
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: grafana/loki:3.5.5
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=query-frontend
+            - -config.file=/mnt/loki.yaml
+            - -config.expand-env=true
+          env:
+            - name: JAEGER_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local.:4317
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.memory
+            - name: GOMAXPROCS
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.cpu
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 1
+            successThreshold: 3
+            failureThreshold: 1
+            timeoutSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "3"]
+          volumeMounts:
+            - name: loki
+              mountPath: /mnt
+      volumes:
+        - name: loki
+          configMap:
+            name: loki

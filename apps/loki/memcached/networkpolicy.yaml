@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    variant: loki
+  name: loki-memcached-peer
+spec:
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: mcrouter
+          variant: loki
+    ports:
+    - port: 11211
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: memcached
+      variant: loki

@@ -1,17 +1,36 @@
 namespace: loki
 resources:
   - namespace.yaml
+  - memcached
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - serviceaccount.yaml
-  - deployment.yaml
   - virtualservice.yaml
-  - configmap.yaml
-  - statefulset.yaml
   - service.yaml
   - servicemonitor.yaml
-  - podmonitor.yaml
+  # - podmonitor.yaml
   - prometheusrule.yaml
   - grafanadatasource.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  # - metrics-grafanadashboard.yaml
+  - probe.yaml
+  - compactor
+  - distributor
+  - gateway
+  - index-gateway
+  - ingester
+  - pattern-ingester
+  - querier
+  - query-frontend
+  - query-scheduler
+  - ruler
+generators:
+  - sopsgenerator.yaml
+
+configMapGenerator:
+- files:
+  - files/loki.yaml
+  name: loki
+  options:
+    immutable: true

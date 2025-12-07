@@ -1,0 +1,25 @@
+# apiVersion: policy/v1
+# kind: PodDisruptionBudget
+# metadata:
+#   labels:
+#     variant: loki
+#   name: loki-mcrouter
+# spec:
+#   maxUnavailable: 1
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: mcrouter
+#       variant: loki
+# ---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    variant: loki
+  name: loki-results-cache
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: memcached
+      variant: loki

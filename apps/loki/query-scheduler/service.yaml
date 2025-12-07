@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-query-scheduler-discovery
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 3100
+      protocol: TCP
+      targetPort: http
+    - name: grpclb
+      port: 9095
+      protocol: TCP
+      targetPort: grpc
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/component: query-scheduler
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-query-scheduler
+  labels:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: query-scheduler
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 3100
+      protocol: TCP
+      targetPort: http
+    - name: grpclb
+      port: 9095
+      protocol: TCP
+      targetPort: grpc
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/component: query-scheduler

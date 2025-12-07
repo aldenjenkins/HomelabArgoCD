@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-ruler
+spec:
+  serviceName: loki-ruler
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels: &labels
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/component: ruler
+  template:
+    metadata:
+      labels:
+        <<: *labels
+        app.kubernetes.io/part-of: memberlist
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 10001  #  matches Loki's expected GID
+        fsGroupChangePolicy: "OnRootMismatch"  # Only chown if needed
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: ruler
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: grafana/loki:3.5.5
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=ruler
+            - -config.file=/mnt/loki.yaml
+            - -config.expand-env=true
+          envFrom:
+            - secretRef:
+                name: minio-loki-storage-creds
+          env:
+            - name: JAEGER_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local.:4317
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.memory
+            - name: GOMAXPROCS
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.cpu
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: gossip
+              containerPort: 7946
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 1
+            successThreshold: 3
+            failureThreshold: 1
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: rules
+              mountPath: /etc/loki/rules
+              readOnly: true
+            - name: loki
+              mountPath: /mnt
+            - name: data
+              mountPath: /var/loki
+            - name: tmp
+              mountPath: /tmp/loki
+      volumes:
+        - name: loki
+          configMap:
+            name: loki
+        - name: rules
+          emptyDir:
+            medium: Memory
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: data
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       storageClassName: longhorn
+  #       resources:
+  #         requests:
+  #           storage: 10Gi

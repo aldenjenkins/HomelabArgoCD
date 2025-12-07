@@ -1,0 +1,4 @@
+namespace: loki
+resources:
+  - service.yaml
+  - statefulset.yaml

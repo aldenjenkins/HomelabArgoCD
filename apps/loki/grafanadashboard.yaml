@@ -1,7 +1,23 @@
+# apiVersion: grafana.integreatly.org/v1beta1
+# kind: GrafanaDashboard
+# metadata:
+#   name: loki-overview
+# spec:
+#   allowCrossNamespaceImport: true
+#   instanceSelector:
+#     matchLabels:
+#       dashboards: "grafana"
+#   resyncPeriod: 10m
+#   datasources:
+#     - inputName: "DS_PROMETHEUS"
+#       datasourceName: "prometheus"
+#   url: "https://grafana.com/api/dashboards/17781/revisions/1/download"
+#   folderUID: loki-uid
+# ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: loki-overview
+  name: loki-query-fair-usage-drilldown
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -11,7 +27,9 @@ spec:
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
-  url: "https://grafana.com/api/dashboards/17781/revisions/1/download"
+    - inputName: "DS_LOKI"
+      datasourceName: "loki"
+  url: "https://grafana.com/api/dashboards/21936/revisions/29/download"
   folderUID: loki-uid
 ---
 apiVersion: grafana.integreatly.org/v1beta1
@@ -71,9 +89,2129 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 10m
+  resyncPeriod: 1m
   datasources:
     - inputName: "DS_LOKI"
       datasourceName: "loki"
-  url: "https://grafana.com/api/dashboards/14876/revisions/3/download"
+  # url: "https://grafana.com/api/dashboards/14876/revisions/3/download"
   folderUID: loki-uid
+  suspend: false
+  json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Parsing Envoy access logs with Grafana Loki",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 11,
+          "options": {
+            "dedupStrategy": "signature",
+            "enableInfiniteScrolling": false,
+            "enableLogDetails": false,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": false
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n| pattern `<_> \"<method> <path> <protocol>\" <status_code> <response_flags> <response_code_details> <connection_termination_details> \"<failure_reason>\" <bytes_received> <bytes_sent> <duration> <upstream_time> \"<forward_for>\" \"<agent>\" \"<req_id>\" \"<authority>\" \"<upstream_host>\" <upstream_cluster> <upstream_local_address> <downstream_local_address> <downstream_remote_address> <requested_server_name> <route_name>`\n| line_format \"{{ .method }} request to {{ .path }} with HTTP status: {{.status_code }}\"",
+              "hide": false,
+              "queryType": "range",
+              "refId": "B"
+            }
+          ],
+          "title": "Recent requests",
+          "type": "logs"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "id": 24,
+          "panels": [],
+          "title": "KPI's",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 0,
+            "y": 14
+          },
+          "id": 4,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}[$__range]))  ",
+              "legendFormat": "{{server_address}}",
+              "queryType": "instant",
+              "refId": "A"
+            }
+          ],
+          "title": "Total requests  ",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "rgba(110, 157, 228, 0.76)",
+                    "value": 0
+                  },
+                  {
+                    "color": "rgba(73, 124, 202, 1)",
+                    "value": 20
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 7,
+            "x": 5,
+            "y": 14
+          },
+          "id": 5,
+          "maxDataPoints": 20,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by (http_response_status_code) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} \n | __error__=\"\"\n | http_response_status_code =~\"0|2..|3..|4..|5..\" \n[$__interval])) ",
+              "legendFormat": "{{status_code}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Requests per status code",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "semi-dark-orange",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 12,
+            "y": 14
+          },
+          "id": 30,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(bytes_over_time({category=\"access\", service_name=~\"$service_name\", instance=~\"$instance\"}[$__range]))",
+              "instant": true,
+              "legendFormat": "$label_value",
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Istio logs in bytes",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 15,
+            "y": 14
+          },
+          "id": 8,
+          "interval": "1m",
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(sum_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n| pattern `<downstream_ip> - - [<timestamp>] \"<method> <path> <protocol>\" <status_code> <bytes_sent> <bytes_received>`\n| unwrap bytes_received\n|  __error__=\"\"\n[$__range]))",
+              "hide": false,
+              "legendFormat": "{{bytes_sent}}",
+              "queryType": "instant",
+              "refId": "B"
+            }
+          ],
+          "title": "Total Request Bytes",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 14
+          },
+          "id": 39,
+          "interval": "1m",
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(sum_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n| pattern `<downstream_ip> - - [<timestamp>] \"<method> <path> <protocol>\" <status_code> <bytes_sent> <bytes_received>`\n| unwrap bytes_sent\n|  __error__=\"\"\n[$__range]))",
+              "hide": false,
+              "legendFormat": "{{bytes_sent}}",
+              "queryType": "instant",
+              "refId": "B"
+            }
+          ],
+          "title": "Total Response Bytes",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 5,
+            "x": 0,
+            "y": 18
+          },
+          "id": 22,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "count (sum by (downstream_remote_address) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n[$__range])))",
+              "hide": false,
+              "queryType": "instant",
+              "refId": "B"
+            }
+          ],
+          "title": "Realtime visitors ",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "semi-dark-orange",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 12,
+            "y": 18
+          },
+          "id": 31,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}[$__range]))",
+              "instant": true,
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "# Istio log lines",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 15,
+            "y": 18
+          },
+          "hideTimeOverride": true,
+          "id": 19,
+          "maxDataPoints": 1,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | pattern `<_> \"<method> <path> <protocol>\" <status_code> <response_flags> <response_code_details> <connection_termination_details> \"<failure_reason>\" <bytes_received> <bytes_sent> <duration> <upstream_time> \"<forward_for>\" \"<agent>\" \"<req_id>\" \"<authority>\" \"<upstream_host>\" <upstream_cluster> <upstream_local_address> <downstream_local_address> <downstream_remote_address> <requested_server_name> <route_name>` \n| status_code >= 500 |__error__=\"\" [$__interval]))\n/\n(sum(count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | pattern `<_> \"<method> <path> <protocol>\" <status_code> <response_flags> <response_code_details> <connection_termination_details> \"<failure_reason>\" <bytes_received> <bytes_sent> <duration> <upstream_time> \"<forward_for>\" \"<agent>\" \"<req_id>\" \"<authority>\" \"<upstream_host>\" <upstream_cluster> <upstream_local_address> <downstream_local_address> <downstream_remote_address> <requested_server_name> <route_name>` \n| __error__=\"\" [$__interval])) / 100)",
+              "hide": false,
+              "queryType": "range",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "1h",
+          "title": "% of 5xx requests ",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 18
+          },
+          "hideTimeOverride": true,
+          "id": 35,
+          "interval": "10m",
+          "maxDataPoints": 1,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum(count_over_time(({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} |~ \"Googlebot|Slack.+\")[$__interval])) / (sum(count_over_time(({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} !~ \"Googlebot|Slack.+\")[$__interval])) / 100)",
+              "instant": true,
+              "legendFormat": "",
+              "queryType": "range",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "timeFrom": "1h",
+          "title": "% of requests by bots",
+          "type": "stat"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 22
+          },
+          "id": 26,
+          "panels": [],
+          "title": "Request statistics over time",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "Request Duration",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "red",
+                    "value": 100
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "id": 16,
+          "interval": "1m",
+          "maxDataPoints": 50,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Max",
+              "sortDesc": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "quantile_over_time(0.95,\n  {\n    $label_name=~\"$label_value\", \n    service_name=~\"$service_name\", \n    instance=~\"$instance\"\n  } \n  | unwrap http_request_duration\n  | __error__=\"\"  \n  [$__interval]\n) \nby (service_name, url_path)",
+              "hide": false,
+              "legendFormat": "{{service_name}} {{url_path}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "95th percentile of duration",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "red",
+                    "value": 100
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 15,
+            "w": 24,
+            "x": 0,
+            "y": 38
+          },
+          "id": 38,
+          "maxDataPoints": 50,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Max",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "max by (service_name, url_path) (max_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n| unwrap http_request_duration \n|  __error__=\"\"  [$__interval]))",
+              "hide": false,
+              "legendFormat": "{{service_name}} {{url_path}}",
+              "queryType": "range",
+              "refId": "B"
+            }
+          ],
+          "title": "Max Latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 37,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 4,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "rgba(110, 157, 228, 0.76)",
+                    "value": 0
+                  },
+                  {
+                    "color": "rgba(73, 124, 202, 1)",
+                    "value": 20
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "{status_code=\"404\"}"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 53
+          },
+          "id": 33,
+          "maxDataPoints": 20,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by (http_response_status_code) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} \n | __error__=\"\"\n | http_response_status_code =~\"0|2..|3..|4..|5..\" \n[$__interval])) ",
+              "legendFormat": "{{http_response_status_code}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Requests per status code",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "HTTP Request Size",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Request Bytes",
+                "axisPlacement": "left",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 63
+          },
+          "id": 9,
+          "maxDataPoints": 50,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by (server_address) (sum_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | http_response_status_code=200 | unwrap http_request_size |  __error__=\"\" [$__range]))",
+              "hide": false,
+              "legendFormat": "{{server_address}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Request Size",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "HTTP Response Size",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "Response Bytes",
+                "axisPlacement": "left",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "showValues": false,
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "decbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 63
+          },
+          "id": 37,
+          "interval": "1m",
+          "maxDataPoints": 50,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "sum by (server_address, service_name) (sum_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | http_response_status_code=200 | unwrap http_response_size |  __error__=\"\" [$__interval]))",
+              "hide": false,
+              "legendFormat": "{{server_address}} {{service_name}}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Response Size",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 72
+          },
+          "id": 28,
+          "panels": [],
+          "title": "Acquisition and Behaviour",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Request Count",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "displayName": "Request Duration",
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ms"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 16,
+            "x": 0,
+            "y": 73
+          },
+          "id": 7,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xField": "Path",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "topk(20,\n  max_over_time({\n    $label_name=~\"$label_value\", \n    service_name=~\"$service_name\", \n    instance=~\"$instance\"\n  } \n  !~ `.ico|.svg|.css|.png|.txt|.js|.xml`\n  | unwrap http_request_duration \n  | __error__=\"\" \n  [$__range]) \n  by (url_path, service_name)\n)",
+              "hide": false,
+              "legendFormat": "{{url_path}} ",
+              "queryType": "instant",
+              "refId": "B"
+            }
+          ],
+          "title": "Top 10 paths by duration",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "includeByName": {},
+                "indexByName": {},
+                "orderBy": [
+                  {
+                    "desc": false,
+                    "type": "name"
+                  }
+                ],
+                "orderByMode": "auto",
+                "renameByName": {
+                  "Time": "",
+                  "Value #B": "Duration",
+                  "service_name": "Service Name",
+                  "url_path": "Path"
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Duration"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "left",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "footer": {
+                  "reducers": []
+                },
+                "inspect": false
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "NL": {
+                      "index": 1,
+                      "text": "??"
+                    },
+                    "US": {
+                      "index": 0,
+                      "text": "??"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Requests"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 300
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "gradient",
+                      "type": "gauge"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "continuous-BlPu"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Country"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 74
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 73
+          },
+          "id": 3,
+          "interval": "5m",
+          "options": {
+            "cellHeight": "sm",
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "Request Count"
+              }
+            ]
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "topk(10, sum by (http_request_header_x_forwarded_for) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} |  __error__=\"\" [$__range])))",
+              "instant": true,
+              "legendFormat": "{{http_request_header_x_forwarded_for}}",
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 visitor IPs",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "includeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "Value #A": "Request Count",
+                  "http_request_header_x_forwarded_for": ""
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": true,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "Request Count",
+                "axisPlacement": "left",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 0,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 81
+          },
+          "id": 12,
+          "interval": "5m",
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "colorByField": "Request Count",
+            "fullHighlight": true,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "maxHeight": -1,
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "xField": "Path",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "topk(10, sum by (service_name) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} \n!~ `.ico|.svg|.css|.png|.txt|.js|.xml`\n| __error__=\"\" [$__range])))",
+              "instant": true,
+              "legendFormat": "{{service_name}}",
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 Requested Services",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "includeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "Value #A": 1,
+                  "service_name": 3,
+                  "url_path": 2
+                },
+                "renameByName": {
+                  "Value #A": "Request Count",
+                  "service_name": "Service Name",
+                  "url_path": "Path"
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Request Count"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": true,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "Request Count",
+                "axisPlacement": "left",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 0,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 89
+          },
+          "id": 40,
+          "interval": "5m",
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "colorByField": "Request Count",
+            "fullHighlight": true,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "maxHeight": -1,
+              "mode": "multi",
+              "sort": "desc"
+            },
+            "xField": "Path",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "topk(10, sum by (service_name, url_path) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} \n!~ `.ico|.svg|.css|.png|.txt|.js|.xml`\n| __error__=\"\" [$__range])))",
+              "instant": true,
+              "legendFormat": "{{url_path}} {{service_name}}",
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 Requested Pages",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "includeByName": {},
+                "indexByName": {
+                  "Time": 0,
+                  "Value #A": 1,
+                  "service_name": 3,
+                  "url_path": 2
+                },
+                "renameByName": {
+                  "Value #A": "Request Count",
+                  "service_name": "Service Name",
+                  "url_path": "Path"
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Request Count"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "uid": "$datasource"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Request Count",
+                "axisPlacement": "left",
+                "axisSoftMin": 0,
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 97
+          },
+          "id": 36,
+          "interval": "5m",
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.96,
+            "colorByField": "Request Count",
+            "fullHighlight": true,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xField": "User Agent",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 200
+          },
+          "pluginVersion": "12.3.0-19020365962",
+          "targets": [
+            {
+              "datasource": {
+                "uid": "$datasource"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "topk(10, sum by (user_agent_original) (count_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"}\n| __error__=\"\" [$__range])))",
+              "instant": true,
+              "legendFormat": "{{user_agent_original}}",
+              "queryType": "instant",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Top 10 User Agents",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true
+                },
+                "includeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "Value #A": "Request Count",
+                  "user_agent_original": "User Agent"
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "Request Count"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        }
+      ],
+      "preload": false,
+      "refresh": "1m",
+      "schemaVersion": 42,
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": "loki",
+              "value": "loki"
+            },
+            "includeAll": false,
+            "label": "Datasource",
+            "name": "datasource",
+            "options": [],
+            "query": "loki",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "text": "category",
+              "value": "category"
+            },
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "label_names()",
+            "includeAll": false,
+            "label": "Label name",
+            "name": "label_name",
+            "options": [],
+            "query": "label_names()",
+            "refresh": 1,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": [
+                "access"
+              ],
+              "value": [
+                "access"
+              ]
+            },
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "label_values($label_name)",
+            "includeAll": true,
+            "label": "Label Value",
+            "multi": true,
+            "name": "label_value",
+            "options": [],
+            "query": "label_values($label_name)",
+            "refresh": 1,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": "All",
+              "value": [
+                "$__all"
+              ]
+            },
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "",
+            "description": "service_name structured metadata from access logs",
+            "includeAll": true,
+            "label": "Service Name",
+            "multi": true,
+            "name": "service_name",
+            "options": [],
+            "query": {
+              "label": "service_name",
+              "refId": "LokiVariableQueryEditor-VariableQuery",
+              "stream": "{$label_name=~\"$label_value\"}",
+              "type": 1
+            },
+            "refresh": 1,
+            "regex": "",
+            "type": "query"
+          },
+          {
+            "current": {
+              "text": "All",
+              "value": "$__all"
+            },
+            "datasource": {
+              "uid": "$datasource"
+            },
+            "definition": "",
+            "includeAll": true,
+            "label": "Instance",
+            "multi": true,
+            "name": "instance",
+            "options": [],
+            "query": {
+              "label": "host",
+              "refId": "LokiVariableQueryEditor-VariableQuery",
+              "stream": "{$label_name=~\"$label_value\"}",
+              "type": 1
+            },
+            "refresh": 1,
+            "regex": "",
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ]
+      },
+      "timezone": "",
+      "title": "Grafana Loki Dashboard for Istio Service Mesh",
+      "uid": "al8tvtp",
+      "version": 52
+    }

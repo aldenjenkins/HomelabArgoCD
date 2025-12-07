@@ -2,20 +2,14 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: loki-service-monitor
-  labels:
-    serviceMonitoring: enabled
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: loki
       app.kubernetes.io/name: loki
-      app.kubernetes.io/component: single-binary
+      app.kubernetes.io/component: metrics
   endpoints:
     - port: http-metrics
       path: /metrics
       interval: 30s
       scheme: http
-      relabelings:
-        - action: replace
-          replacement: homelab-live
-          targetLabel: cluster

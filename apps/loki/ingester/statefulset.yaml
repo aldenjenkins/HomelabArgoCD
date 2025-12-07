@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loki-ingester
+spec:
+  serviceName: loki-ingester
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels: &labels
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/component: ingester
+  template:
+    metadata:
+      labels:
+        <<: *labels
+        app.kubernetes.io/part-of: memberlist
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 10001  #  matches Loki's expected GID
+        fsGroupChangePolicy: "OnRootMismatch"  # Only chown if needed
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: ingester
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          image: grafana/loki:3.5.5
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=ingester
+            - -config.file=/mnt/loki.yaml
+            - -config.expand-env=true
+          envFrom:
+            - secretRef:
+                name: minio-loki-storage-creds
+          env:
+            - name: JAEGER_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local.:4317
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  divisor: "1" # use 100% of limit (Go will GC before hitting it)
+                  resource: limits.memory
+            - name: GOGC
+              value: "75" # more aggressive GC (default is 100)
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+            - name: grpc
+              containerPort: 9095
+              protocol: TCP
+            - name: gossip
+              containerPort: 7946
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 900Mi
+            requests:
+              cpu: 120m
+              memory: 200Mi
+          volumeMounts:
+            - name: loki
+              mountPath: /mnt
+            - name: data
+              mountPath: /var/loki
+      volumes:
+        - name: loki
+          configMap:
+            name: loki
+        - name: data
+          emptyDir: {}
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: data
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       storageClassName: longhorn
+  #       resources:
+  #         requests:
+  #           storage: 10Gi

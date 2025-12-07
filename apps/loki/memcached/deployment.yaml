@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    variant: loki
+  name: loki-mcrouter
+spec:
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mcrouter
+      variant: loki
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/proxyCPU: 30m
+        sidecar.istio.io/proxyCPULimit: 1000m
+        sidecar.istio.io/proxyMemory: 64Mi
+        sidecar.istio.io/proxyMemoryLimit: 128Mi
+      labels:
+        app.kubernetes.io/name: mcrouter
+        sidecar.istio.io/inject: "true"
+        variant: loki
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - -p
+        - "5000"
+        - --config-file
+        - /etc/mcrouter/config.json
+        - --num-proxies
+        - $(REQUESTS_CPU_COUNT)
+        command:
+        - mcrouter
+        env:
+        - name: REQUESTS_CPU_COUNT
+          valueFrom:
+            resourceFieldRef:
+              containerName: mcrouter
+              resource: limits.cpu
+        image: jphalip/mcrouter:0.36.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - bash
+            - /mnt/liveness-probe.sh
+          failureThreshold: 20
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: mcrouter
+        ports:
+        - containerPort: 5000
+          name: tcp
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 1
+          initialDelaySeconds: 5
+          periodSeconds: 1
+          successThreshold: 3
+          tcpSocket:
+            port: tcp
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /var/mcrouter
+          name: data
+        - mountPath: /etc/mcrouter
+          name: config
+          readOnly: true
+        - mountPath: /mnt
+          name: mcrouter-probe
+          readOnly: true
+        - mountPath: /var/spool/mcrouter
+          name: spool
+      initContainers:
+      - command:
+        - bash
+        - /mnt/init-mcrouter.sh
+        env:
+        - name: SERVICE_NAME
+          value: loki-memcached
+        - name: MEMCACHED_REPLICAS
+          value: "3"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: jphalip/mcrouter:0.36.0
+        imagePullPolicy: IfNotPresent
+        name: config-init
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /etc/mcrouter
+          name: config
+        - mountPath: /mnt
+          name: mcrouter
+          readOnly: true
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      # topologySpreadConstraints:
+      # - labelSelector:
+      #     matchLabels:
+      #       app.kubernetes.io/name: mcrouter
+      #       variant: loki
+      #   maxSkew: 1
+      #   topologyKey: kubernetes.io/hostname
+      #   whenUnsatisfiable: ScheduleAnyway
+      # - labelSelector:
+      #     matchLabels:
+      #       app.kubernetes.io/name: mcrouter
+      #       variant: loki
+      #   maxSkew: 1
+      #   topologyKey: topology.kubernetes.io/zone
+      #   whenUnsatisfiable: ScheduleAnyway
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: tmp
+      - emptyDir:
+          medium: Memory
+        name: data
+      - emptyDir:
+          medium: Memory
+        name: config
+      - configMap:
+          name: loki-mcrouter
+        name: mcrouter
+      - configMap:
+          name: loki-mcrouter-probe
+        name: mcrouter-probe
+      - emptyDir:
+          medium: Memory
+        name: spool

@@ -1,0 +1,20 @@
+namespace: loki
+resources:
+  - service.yaml
+  - statefulset.yaml
+  # - deployment.yaml
+  - poddisruptionbudget.yaml
+  # - horizontalpodautoscaler.yaml
+  - networkpolicy.yaml
+
+# configMapGenerator:
+# - files:
+#   - files/init-mcrouter.sh
+#   name: loki-mcrouter
+#   options:
+#     immutable: true
+# - files:
+#   - files/liveness-probe.sh
+#   name: loki-mcrouter-probe
+#   options:
+#     immutable: true

@@ -1,0 +1,42 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   annotations:
+#     service.kubernetes.io/topology-mode: auto
+#   labels:
+#     variant: loki
+#   name: loki-mcrouter
+# spec:
+#   ports:
+#   - name: tcp
+#     port: 5000
+#     protocol: TCP
+#     targetPort: tcp
+#   selector:
+#     app.kubernetes.io/name: mcrouter
+#     variant: loki
+# ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-results-cache
+  labels:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/version: "3.5.7"
+    app.kubernetes.io/component: "memcached-results-cache"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: memcached-client
+      port: 11211
+      targetPort: client
+    - name: http-metrics
+      port: 9150
+      targetPort: http-metrics
+
+  selector:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/component: "memcached-results-cache"

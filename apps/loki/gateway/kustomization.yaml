@@ -1,0 +1,12 @@
+namespace: loki
+resources:
+  - deployment.yaml
+  - horizontalpodautoscaler.yaml
+  - service.yaml
+
+configMapGenerator:
+- files:
+  - files/nginx.conf
+  name: loki-gateway
+  options:
+    immutable: true

@@ -22,27 +22,37 @@ data:
       enabled: false
     chunk_store_config:
       chunk_cache_config:
-        background:
-          writeback_buffer: 500000
-          writeback_goroutines: 1
-          writeback_size_limit: 500MB
-        default_validity: 0s
-        memcached:
-          batch_size: 4
-          parallelism: 5
-        memcached_client:
-          addresses: dnssrvnoa+_memcached-client._tcp.loki-chunks-cache.loki.svc
-          consistent_hash: true
-          max_idle_conns: 72
-          timeout: 2000ms
+        redis:
+          endpoint: loki-redis.loki.svc.cluster.local:6379
+          expiration: 1h
+      write_dedupe_cache_config:
+       redis:
+          endpoint: loki-redis.loki.svc.cluster.local:6379
+          expiration: 1h
+    compactor:
+      working_directory: /tmp/retention
+      delete_request_store: s3
+      retention_enabled: true
+      compaction_interval: 10m
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150
     common:
       compactor_address: 'http://loki:3100'
-      path_prefix: /var/loki
+      #path_prefix: /var/loki
+      path_prefix: /loki
       replication_factor: 1
-      storage:
-        filesystem:
-          chunks_directory: /var/loki/chunks
-          rules_directory: /var/loki/rules
+      ring:
+        instance_addr: 127.0.0.1
+        kvstore:
+          store: inmemory
+      # ---
+      # The 'common.storage' block is deprecated and replaced by 'storage_config.aws'
+      # We have removed the 'storage.filesystem' block
+      # ---
+      #storage:
+      #  filesystem:
+      #    chunks_directory: /var/loki/chunks
+      #    rules_directory: /var/loki/rules
     distributor:
       otlp_config:
         default_resource_attributes_as_index_labels:
@@ -70,6 +80,7 @@ data:
       mode: simple
     limits_config:
       allow_structured_metadata: true
+      max_line_size: 3MB  # Default is 256KB and i'd like to batch more using my logs-gateway otel collector. currently getting errors with the default 
       max_cache_freshness_per_query: 10m
       query_timeout: 300s
       reject_old_samples: true
@@ -89,25 +100,25 @@ data:
       enabled: true
     query_range:
       align_queries_with_step: true
-      cache_results: true
       results_cache:
         cache:
-          background:
-            writeback_buffer: 500000
-            writeback_goroutines: 1
-            writeback_size_limit: 500MB
-          default_validity: 12h
-          memcached_client:
-            addresses: dnssrvnoa+_memcached-client._tcp.loki-results-cache.loki.svc
-            consistent_hash: true
-            timeout: 500ms
-            update_interval: 1m
+          redis:
+            endpoint: loki-redis.loki.svc.cluster.local:6379
+            expiration: 1h
+      cache_results: true
+
     ruler:
       alertmanager_url: http://alertmanager-main.alertmanager.svc.cluster.local:9093
       enable_alertmanager_v2: true
       enable_api: true
       storage:
-        type: local
+        type: s3
+        s3:
+          s3: http://loki-rules-user:${LOKI_S3_SECRET_ACCESS_KEY}@minio-api.minio.svc.cluster.local:9000/loki-rules
+          s3forcepathstyle: true
+          insecure: true
+          http_config:
+            insecure_skip_verify: true
       ring:
         kvstore:
           store: inmemory
@@ -118,9 +129,10 @@ data:
       - from: "2024-01-01"
         index:
           period: 24h
-          prefix: loki_index_
-        object_store: filesystem
+          prefix: index_
+        object_store: aws
         schema: v13
+        # store: boltdb-shipper
         store: tsdb
     server:
       grpc_listen_port: 9095
@@ -129,20 +141,46 @@ data:
       http_server_write_timeout: 600s
       log_level: "info"
     storage_config:
+      aws:
+        s3: http://${LOKI_S3_ACCESS_KEY_ID}:${LOKI_S3_SECRET_ACCESS_KEY}@minio-api.minio.svc.cluster.local:9000/loki-app
+        # endpoint: "minio-api.minio.svc.cluster.local:9000"
+        # bucketnames: "loki-app"
+        region: us-east-1
+        # access_key_id: ${LOKI_S3_ACCESS_KEY_ID}
+        # secret_access_key: ${LOKI_S3_SECRET_ACCESS_KEY}
+        s3forcepathstyle: true
+        insecure: true # Because your endpoint is http
+        http_config:
+          insecure_skip_verify: true
+      index_queries_cache_config:
+        redis:
+          endpoint: loki-redis.loki.svc.cluster.local:6379
+          expiration: 1h
       bloom_shipper:
         working_directory: /var/loki/data/bloomshipper
       boltdb_shipper:
-        index_gateway_client:
-          server_address: ""
-      hedging:
-        at: 250ms
-        max_per_second: 20
-        up_to: 3
-      tsdb_shipper:
-        index_gateway_client:
-          server_address: ""
+        active_index_directory: /loki/index
+        cache_location: /loki/boltdb-cache
+        # Tell the shippers to use s3 as their shared store
+        # shared_store: aws
+      # hedging:
+      #   at: 250ms
+      #   max_per_second: 20
+      #   up_to: 3
+      # tsdb_shipper:
+      #   # index_gateway_client:
+      #   #   server_address: ""
+      #   # # Tell the shippers to use s3 as their shared store
+      #   # shared_store: s3
+      #   active_index_directory: /loki/index
+      #   cache_location: /loki/index_cache
     tracing:
-      enabled: false
+      enabled: true
+      # otlp:
+      #   endpoint: "trace-collector.observability.svc.cluster.local:4317"
+      #   insecure: true
+      #   protocol: "grpc"
+      #   service_name: "loki" # This will label your traces in your collector
 ---
 # Source: loki/templates/gateway/configmap-gateway.yaml
 apiVersion: v1

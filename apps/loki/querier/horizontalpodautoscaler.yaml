@@ -1,0 +1,43 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: loki-querier
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: loki-querier
+  maxReplicas: 6
+  minReplicas: 3
+  metrics:
+    # TOOO: Maybe use istio metrics here? from https://github.com/hippocampus-dev/hippocampus/blob/6e99ea53281e8fb3be831f6dc9d08c5c95b961aa/cluster/manifests/loki/overlays/dev/patches/horizontal_pod_autoscaler.loki-querier.yaml#L12
+    # - type: External
+    #   external:
+    #     metric:
+    #       name: cortex_query_scheduler_inflight_requests_per_2m
+    #     target:
+    #       type: AverageValue
+    #       averageValue: "10"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 90
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max

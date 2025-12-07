@@ -13,26 +13,23 @@ metadata:
     app: loki
     component: gateway
 spec:
-  replicas: 1
   strategy:
     type: RollingUpdate
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/name: loki
-      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki-gateway
+      app.kubernetes.io/instance: nginx
       app.kubernetes.io/component: gateway
   template:
     metadata:
-      annotations:
-        checksum/config: f882656617d43644d30d2a2a10ae29a4fac62f9b4fadf26ae0cc513f29d555a5
       labels:
-        app.kubernetes.io/name: loki
-        app.kubernetes.io/instance: loki
+        app.kubernetes.io/name: loki-gateway
+        app.kubernetes.io/instance: nginx
         app.kubernetes.io/component: gateway
         app: loki
         component: gateway
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
     spec:
       serviceAccountName: loki
       enableServiceLinks: true
@@ -41,6 +38,8 @@ spec:
         runAsGroup: 101
         runAsNonRoot: true
         runAsUser: 101
+        seccompProfile:
+          type: RuntimeDefault
       terminationGracePeriodSeconds: 30
       containers:
         - name: nginx
@@ -80,6 +79,7 @@ spec:
       volumes:
         - name: config
           configMap:
+            defaultMode: 420
             name: loki-gateway
         - name: tmp
           emptyDir: {}
