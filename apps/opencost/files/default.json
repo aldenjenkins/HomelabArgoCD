@@ -1,0 +1,13 @@
+{
+  "CPU": "1.25",
+  "GPU": "0.95",
+  "RAM": "0.5",
+  "description": "Modified prices based on your internal pricing",
+  "internetNetworkEgress": "0.12",
+  "regionNetworkEgress": "0.01",
+  "spotCPU": "0.006655",
+  "spotRAM": "0.000892",
+  "storage": "0.25",
+  "zoneNetworkEgress": "0.01",
+  "provider": "custom"
+}

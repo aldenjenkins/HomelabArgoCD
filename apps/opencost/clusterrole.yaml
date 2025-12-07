@@ -16,6 +16,7 @@ rules:
       - configmaps
       - deployments
       - nodes
+      - nodes/proxy
       - pods
       - services
       - resourcequotas

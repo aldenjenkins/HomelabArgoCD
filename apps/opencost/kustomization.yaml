@@ -11,3 +11,11 @@ resources:
   - authorizationpolicy.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - probe.yaml
+
+configMapGenerator:
+  - files:
+    - files/default.json
+    name: custom-pricing-model
+    options:
+      immutable: true
