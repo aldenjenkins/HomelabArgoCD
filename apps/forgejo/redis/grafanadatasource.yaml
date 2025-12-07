@@ -1,0 +1,23 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: forgejo-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: forgejo-redis
+    type: redis-datasource
+    url: redis://forgejo-redis.forgejo.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: latest

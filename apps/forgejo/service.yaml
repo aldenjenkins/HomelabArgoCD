@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo
+  labels:
+    app.kubernetes.io/name: forgejo
+    app.kubernetes.io/component: http
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: forgejo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-ssh
+  labels:
+    app.kubernetes.io/name: forgejo
+    app.kubernetes.io/component: ssh
+spec:
+  type: ClusterIP
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: ssh
+  selector:
+    app.kubernetes.io/name: forgejo

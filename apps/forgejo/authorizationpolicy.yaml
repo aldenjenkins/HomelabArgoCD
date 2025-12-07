@@ -1,0 +1,35 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+    name: forgejo
+spec:
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: ENC[AES256_GCM,data:U6dSmp5dKA==,iv:bcQBA4IgANvwhhlXw+orZq9xrlRT1A0y69hXHD8Xv4k=,tag:wm+8rGEIX4HLCetdp31Olg==,type:str]
+    action: ENC[AES256_GCM,data:1LCNMq6X,iv:cMhl9c0SM2+pZHrdA/0cEswIOUz32ECyNdu8khqgSjU=,tag:XsP7JYCi6JhG5HfK0QP3CA==,type:str]
+    provider:
+        name: ENC[AES256_GCM,data:JwWd6fJaLSE=,iv:Sxpecg31J1GY7T3fH62orQBIMMnpPrKWOrkH/DEmDA8=,tag:4Rl2D9RU/ZUndlyDh3A2EQ==,type:str]
+    rules:
+        - to:
+            - operation:
+                paths:
+                    - ENC[AES256_GCM,data:Pjs=,iv:2L3+sJGJ69f0y9K3vuscYwxPttENuknzOoPD9wKjaHg=,tag:agRoaU845c1FQnH8ju3itw==,type:str]
+                hosts:
+                    - ENC[AES256_GCM,data:zVZTGWKD+gHzfM8X8CB1UHAMDlhy,iv:LhbrA1vLJO6nGRvLBapT+Ez4I3qZCUwx5iSS24nIYA4=,tag:31bxa9L5hhCYmwUhFKErLQ==,type:str]
+                notPaths:
+                    - ENC[AES256_GCM,data:EFIGozhPhz4NC85c0B+f4w==,iv:XvRfgu9Xs8JKGo9o2tYKppMzCs1KN8I0C1i09Nf8r84=,tag:DTtnWApfo+XPa52VA0+ffA==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBMVXo5eVlYemVhV0lqazBp
+            NnpheURLdUpPZ1g2UFNDbXBFbTE3bElEeFJNClFUekh5WDRFRTROT3VXV2wxbHpF
+            dGovM3BLYzI2UEswc0FyM2h4eDVtZVkKLS0tIHRiMHQwVUJkOGIyMnB2OXV4ZU92
+            cEVPQ0krQnh2Nk10TjdTVkE4bE8wSDAKnELOMveOahZ2wqeShqlHgIfK6OB+J9xY
+            +XpfMCSGNyVr65/sz6DgqT2ebvv1q30nd835CixjGTxZyv1N4IBUBA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-11-09T00:41:39Z"
+    mac: ENC[AES256_GCM,data:m7O6fMcuJQACyKoHsl7+shY9enrtvm9HAlzPgKSMtq+mJhK1amYZfHlkGbbn2uRYWD8XOCV1XjLTSrEadr/90pBWF1UOJCIK3a1tAQ8Yzln8zOMIBMjWcuJ8m0SpfhY2SLudqkufKtrzVpUWHGTe9kE42afkLoJ/XgVFA4Ogt2A=,iv:MlsAbIT8Z5Ogr2hLElcPKPUjC7R04JPi7bLkRSufcBE=,tag:li4m79FUmqQApN+Dlk0w6g==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.11.0

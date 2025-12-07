@@ -1,0 +1,15 @@
+# SSH Gateway
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: forgejo-ssh-gateway
+spec:
+  selector:
+    istio: ingressgateway  # Use your Istio ingress gateway
+  servers:
+    - port:
+        number: 22
+        name: ssh
+        protocol: TCP
+      hosts:
+        - "forgejo.home.alden.ai"  # Or specify your Git domain

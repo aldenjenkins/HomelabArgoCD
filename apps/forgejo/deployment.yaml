@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo
+  labels:
+    app.kubernetes.io/name: forgejo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: forgejo
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "100%"
+      maxUnavailable: 25%
+  template:
+    metadata:
+      # annotations:
+      #   instrumentation.opentelemetry.io/inject-go: "true"
+      #   instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/app/gitea/gitea"
+      labels:
+        sidecar.istio.io/inject: "true"
+        app.kubernetes.io/name: forgejo
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      # initContainers:
+        # - name: copy-config
+        #   image: busybox:latest  # Use a minimal image
+        #   command: ["sh", "-c", "cp /config-base/app.ini /config-writable/app.ini && chmod 644 /config-writable/app.ini"]
+        #   volumeMounts:
+        #     - name: forgejo-config-secret  # Mount the Secret (read-only)
+        #       mountPath: /config-base
+        #       readOnly: true
+        #     - name: forgejo-config-writable  # Mount the writable emptyDir
+        #       mountPath: /config-writable
+        #   securityContext:
+        #     allowPrivilegeEscalation: false
+        #     capabilities:
+        #       drop:
+        #         - ALL
+        #     readOnlyRootFilesystem: true
+            # - name: never
+            #   image: ghcr.io/containeroo/never:v0.8.6
+            #   imagePullPolicy: IfNotPresent
+            #   args:
+            #     # Wait for postgres
+            #     - --http.postgres.address=https://forgejo-postgres-healthz:8000/healthz
+            #     - --http.postgres.skip-tls-verify=true
+            #     # And wait for redis
+            #     - --tcp.redis.address=forgejo-redis.forgejo.svc.cluster.local:6379
+            #   resources:
+            #     requests:
+            #       cpu: 10m
+            #       memory: 16Mi
+            #     limits:
+            #       cpu: 10m
+            #       memory: 16Mi
+            #   securityContext:
+            #     allowPrivilegeEscalation: false
+            #     capabilities:
+            #       drop:
+            #         - ALL
+            #     readOnlyRootFilesystem: true
+      containers:
+        - name: forgejo
+          image: codeberg.org/forgejo/forgejo:13-rootless
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: forgejo-env
+          # Required for otel injection
+          # securityContext:
+          #   privileged: true
+          #   runAsUser: 0
+          ports:
+            - name: ssh
+              containerPort: 22
+            - name: http
+              containerPort: 3000
+          env:
+            - name: FORGEJO__database__DB_TYPE
+              value: "postgres"
+            - name: FORGEJO__database__HOST
+              value: "forgejo-postgres-18-rw.forgejo.svc.cluster.local:5432"
+
+            - name: FORGEJO__database__NAME
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-postgres-18-app
+                  key: dbname
+
+            - name: FORGEJO__database__USER
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-postgres-18-app
+                  key: username
+            - name: FORGEJO__database__PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-postgres-18-app
+                  key: password
+            - name: FORGEJO__database__SSL_MODE
+              value: "disable"
+            - name: FORGEJO__lfs__MINIO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-storage-creds
+                  key: access-id
+            - name: FORGEJO__lfs__MINIO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-storage-creds
+                  key: secret-key
+            - name: FORGEJO__storage__MINIO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-storage-creds
+                  key: access-id
+            - name: FORGEJO__storage__MINIO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: forgejo-storage-creds
+                  key: secret-key
+            - name: SSH_LISTEN_PORT
+              value: "22"
+            - name: SSH_PORT
+              value: "22"
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 200
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            # - name: forgejo-config-writable # Mount the writable emptyDir here
+            #   mountPath: /var/lib/gitea/custom/conf
+            - name: tmp-config
+              mountPath: /var/lib/gitea/custom/conf
+            - name: forgejo-data
+              mountPath: /var/lib/gitea
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: forgejo-data
+          persistentVolumeClaim:
+            claimName: forgejo-data
+        # - name: forgejo-config-secret
+        #   secret:
+        #     secretName: forgejo-app-ini
+        # --- Add the emptyDir volume ---
+        # - name: forgejo-config-writable  # Define the writable emptyDir
+        #   emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: tmp-config
+          emptyDir: {}

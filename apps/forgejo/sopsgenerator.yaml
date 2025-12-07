@@ -1,0 +1,20 @@
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: sops-generator
+  annotations:
+    config.kubernetes.io/function: |
+      exec:
+        path: ksops
+files:
+  - './secret.yaml'
+  - './authorizationpolicy.yaml'
+# secretFrom:
+#   - metadata:
+#       name: forgejo-app-ini
+#       namespace: forgejo
+#       annotations:
+#         kustomize.config.k8s.io/needs-hash: "false"
+#     type: Opaque
+#     files:
+#       - app.ini=./app.ini

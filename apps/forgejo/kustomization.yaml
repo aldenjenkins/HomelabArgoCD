@@ -1,0 +1,17 @@
+namespace: forgejo
+resources:
+  - namespace.yaml
+  - postgres
+  - redis
+  - deployment.yaml
+  - service.yaml
+  - gateway.yaml
+  - virtualservice.yaml
+  - persistentvolumeclaim.yaml
+  - servicemonitor.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - probe.yaml
+  # - instrumentation.yaml
+generators:
+  - sopsgenerator.yaml

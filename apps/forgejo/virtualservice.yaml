@@ -1,0 +1,37 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: forgejo-http-virtualservice
+spec:
+  hosts:
+    - forgejo.home.alden.ai
+  gateways:
+    - istio-system/default-https-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: forgejo
+            port:
+              number: 3000
+---
+# SSH VirtualService
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: forgejo-ssh
+spec:
+  hosts:
+    - "forgejo.home.alden.ai"  # Or specify your Git domain
+  gateways:
+    - forgejo-ssh-gateway
+  tcp:
+    - match:
+        - port: 22
+      route:
+        - destination:
+            host: forgejo-ssh 
+            port:
+              number: 22 

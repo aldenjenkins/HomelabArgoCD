@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: forgejo-redis
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: redis
+    app.kubernetes.io/version: 0.16.5
+    app.kubernetes.io/component: middleware
+spec:
+  selector:
+    matchLabels:
+      app: forgejo-standalone
+      redis_setup_type: standalone
+      role: standalone
+  endpoints:
+    - port: redis-exporter
+      interval: 30s
+      scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+      - forgejo
