@@ -6,7 +6,7 @@ resources:
   - servicemonitor.yaml
   - virtualservice.yaml
   - authorizationpolicy.yaml
-  - python-fast-slow.yaml
+  # - python-fast-slow.yaml
   - grafanadatasource.yaml
   - telemetry.yaml
   - probe.yaml

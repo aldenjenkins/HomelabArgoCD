@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         app: pyroscope
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
     spec:
       containers:
         - name: pyroscope
