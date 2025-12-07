@@ -1,13 +1,14 @@
 namespace: authelia
 resources:
   - namespace.yaml
+  - postgres
+  - redis
   - deployment.yaml
-  - redis.yaml
   - service.yaml
   - virtualservice.yaml
   - servicemonitor.yaml
-  - grafanadatasource.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

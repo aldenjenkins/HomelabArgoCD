@@ -20,7 +20,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 25%
+      maxSurge: "100%"
       maxUnavailable: 25%
   template:
     metadata:
@@ -40,9 +40,16 @@ spec:
         podAffinity: {}
         podAntiAffinity: {}
       enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: authelia
-          image: authelia/authelia:4.39.10
+          image: authelia/authelia:4.39.13
           imagePullPolicy: IfNotPresent
           command: ["authelia"]
           resources:
@@ -55,13 +62,30 @@ spec:
               value: '/configuration.yaml'
             - name: X_AUTHELIA_CONFIG_FILTERS
               value: template
+            - name: AUTHELIA_STORAGE_POSTGRES_ADDRESS
+              value: authelia-postgres-18-rw.authelia.svc.cluster.local:5432
+            - name: AUTHELIA_STORAGE_POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: authelia-postgres-18-app
+            - name: AUTHELIA_STORAGE_POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: authelia-postgres-18-app
+                  key: username
+            - name: AUTHELIA_STORAGE_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authelia-postgres-18-app
+                  key: password
           startupProbe:
             failureThreshold: 6
             httpGet:
               path: /api/health
               port: http
               scheme: HTTP
-            initialDelaySeconds: 10
+            initialDelaySeconds: 3
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
@@ -92,6 +116,11 @@ spec:
             - name: http
               containerPort: 9091
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - mountPath: /config/users_database.yml
               name: secret-config
@@ -105,3 +134,4 @@ spec:
         - name: secret-config
           secret:
             secretName: authelia-config
+      automountServiceAccountToken: false

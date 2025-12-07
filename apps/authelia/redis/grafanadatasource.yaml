@@ -20,4 +20,4 @@ spec:
     url: redis://authelia-redis.authelia.svc.cluster.local:6379
   plugins:
     - name: redis-datasource
-      version: 2.2.0
+      version: latest

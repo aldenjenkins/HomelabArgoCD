@@ -1,0 +1,9 @@
+namespace: authelia
+resources:
+  - cnpg-cluster.yaml
+  - service.yaml
+  - objectstore.yaml
+  - scheduledbackup.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

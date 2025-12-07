@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+    name: authelia-http-60s
+spec:
+    jobName: authelia-http-60s
+    interval: 60s
+    scrapeTimeout: 60s
+    module: http_2xx_60s
+    prober:
+        url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+    targets:
+        staticConfig:
+            static:
+                - http://authelia.authelia.svc.cluster.local./api/health
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+    name: authelia-tcp-30s
+spec:
+    jobName: authelia-tcp-30s
+    interval: 30s
+    scrapeTimeout: 30s
+    module: tcp_connect
+    prober:
+        url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+    targets:
+        staticConfig:
+            static:
+                - authelia-redis.authelia.svc.cluster.local.:6379
