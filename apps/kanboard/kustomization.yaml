@@ -6,5 +6,6 @@ resources:
   - service.yaml
   - authorizationpolicy.yaml
   - virtualservice.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml
