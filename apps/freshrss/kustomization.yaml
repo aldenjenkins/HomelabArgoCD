@@ -1,8 +1,0 @@
-namespace: freshrss
-resources:
-  - namespace.yaml
-  - persistentvolumeclaim.yaml
-  - deployment.yaml
-  - service.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
