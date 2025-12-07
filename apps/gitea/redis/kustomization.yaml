@@ -1,4 +1,0 @@
-resources:
-  - redis.yaml
-  - servicemonitor.yaml
-  - grafanadatasource.yaml
