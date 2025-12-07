@@ -20,8 +20,8 @@ spec:
         #- |
         #  INSERT YOUR SQL QUERIES HERE
   storage:
-    size: 5Gi
-    storageClass: longhorn-local
+    size: 10Gi
+    storageClass: local-path
 
   monitoring:
     enablePodMonitor: true

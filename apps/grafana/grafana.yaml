@@ -10,24 +10,6 @@ spec:
     metadata:
       labels:
         app: grafana
-  persistentVolumeClaim:
-    # metadata:
-    #   annotations:
-    #     nfs.io/storage-path: "grafana/"
-    # spec:
-    #   storageClassName: nfs-appdata-retain
-    #   accessModes:
-    #     - ReadWriteMany
-    #   resources:
-    #     requests:
-    #       storage: 500Gi
-    spec:
-      storageClassName: longhorn
-      accessModes:
-        - ReadWriteMany
-      resources:
-        requests:
-          storage: 20Gi
   deployment:
     spec:
       replicas: 3
@@ -120,10 +102,10 @@ spec:
                 name: app-provisioning
               name: app-provisioning
             # The operator looks for this name keyword and volumeMounts to the "grafana" container automatically at /var/lib/grafana.
-            - name: grafana-data
-              persistentVolumeClaim:
-                # The operator automatically creates this pvc via the Grafana resource's `<metadata.name>-pvc` naming convention if the spec.persistentVolumeClaim definition exists.
-                claimName: grafana-pvc
+            # - name: grafana-data
+            #   persistentVolumeClaim:
+            #     # The operator automatically creates this pvc via the Grafana resource's `<metadata.name>-pvc` naming convention if the spec.persistentVolumeClaim definition exists.
+            #     claimName: grafana-pvc
   disableDefaultSecurityContext: All
   client:
     preferIngress: false
@@ -160,8 +142,8 @@ spec:
       name: grafana
       log_queries: "false"
     plugins:
-      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,pierosavi-imageit-panel,grafana-clock-panel"
-      preinstall: "redis-app,redis-datasource"
+      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,redis-explorer,pierosavi-imageit-panel,grafana-clock-panel"
+      preinstall: "redis-app,redis-datasource,redis-explorer"
     tracing.opentelemetry.otlp:
       address: "trace-collector.observability.svc.cluster.local:4317"
     users:
