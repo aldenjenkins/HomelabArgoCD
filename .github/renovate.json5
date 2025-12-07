@@ -35,6 +35,16 @@
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver",
       "autoReplaceStringTemplate": "image: {{{depName}}}:{{{newValue}}}"
+    },
+    // in something like grafana.yaml or prometheus.yaml we can set a # renovate: docker=docker.io/grafana/grafana comment on the same line as the spec.version (or whatever attribute has the docker image version)
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/\\.yaml$/",
+      ],
+      "matchStrings": [
+        "(?<currentValue>[\\w+\\.\\-]*)['\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?"
+      ]
     }
   ]
 }
