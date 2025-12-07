@@ -1,0 +1,33 @@
+namespace: longhorn-system
+resources:
+  - https://raw.githubusercontent.com/longhorn/longhorn/v1.10.0/deploy/longhorn.yaml
+  - virtualservice.yaml
+  - authorizationpolicy.yaml
+  - storageclass.yaml
+  # - backuptarget.yaml
+  - recurringjob.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+
+generators:
+  - sopsgenerator.yaml
+
+patches:
+  - path: patch_namespace.yaml
+  - path: patch_configmap.yaml
+
+# replacements:
+#   - source:
+#       kind: Secret
+#       name: slack-token
+#       namespace: argocd
+#       fieldPath: stringData
+#     targets:
+#       - select:
+#           kind: Secret
+#           name: argocd-notifications-secret
+#           namespace: argocd
+#         fieldPaths:
+#           - stringData

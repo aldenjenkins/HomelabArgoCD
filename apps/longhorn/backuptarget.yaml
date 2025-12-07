@@ -1,0 +1,10 @@
+apiVersion: longhorn.io/v1beta2
+kind: BackupTarget
+metadata:
+  name: minio-on-nas
+spec:
+  # This points to the bucket and region.
+  # The endpoint URL is taken from the global setting in Step 2.
+  backupTargetURL: "s3://longhorn-backups@us-east-1/" # Change to your bucket and region
+  credentialSecret: minio-backup-secret # The secret you created in Step 1
+  pollInterval: "5m0s" # How many seconds that longhorn waits before checking the backup store for new backups

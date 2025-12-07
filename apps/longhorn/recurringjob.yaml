@@ -1,0 +1,22 @@
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-all-except-cnpg
+spec:
+  # "0 2 * * *" = 2:00 AM every day. Change as needed.
+  cron: "23 0 * * *"
+  task: "backup"
+  retain: 20 # Keep 20 backups
+  concurrency: 2
+  groups:
+    - default
+
+  # # This is the "exclude" magic for not backing up the longhorn-local PVCs for cnpg clusters
+  # # because they already have their own backup system.
+  # selector:
+  #   labelSelector:
+  #     matchExpressions:
+  #       - key: storageclass.kubernetes.io/name
+  #         operator: NotIn
+  #         values:
+  #           - longhorn-local

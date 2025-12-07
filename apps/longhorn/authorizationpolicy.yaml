@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: longhorn-frontend
+spec:
+  selector:
+    matchLabels:
+      app: longhorn-ui
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - longhorn.home.alden.ai
