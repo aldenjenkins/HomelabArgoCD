@@ -2,7 +2,6 @@ apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: adminer-virtualservice
-  namespace: adminer
 spec:
   hosts:
     - adminer.home.alden.ai

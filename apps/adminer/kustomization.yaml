@@ -1,6 +1,8 @@
+namespace: adminer
 resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
   - virtualservice.yaml
   - authorizationpolicy.yaml
+  - probe.yaml
