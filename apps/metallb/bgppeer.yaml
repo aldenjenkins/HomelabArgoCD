@@ -1,0 +1,9 @@
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: router-peer
+spec:
+  myASN: 64513  # MetalLB's ASN
+  peerASN: 64512  # Router's ASN
+  peerAddress: 192.168.123.1  # Router LAN ip
+  # BFD is enabled by default with FRR-K8s for this peer, ensuring fast failover

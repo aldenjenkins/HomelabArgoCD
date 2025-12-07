@@ -1,10 +1,11 @@
 namespace: metallb-system
 resources:
-  - github.com/metallb/metallb/config/frr?ref=v0.15.2
-  - l2advertisement.yaml
+  - github.com/metallb/metallb/config/frr-k8s?ref=v0.15.2
+  # - l2advertisement.yaml
+  - bgppeer.yaml
+  - bgpadvertisement.yaml
+  - ipaddresspool.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - service.yaml
   - servicemonitor.yaml
-generators:
-  - sopsgenerator.yaml
