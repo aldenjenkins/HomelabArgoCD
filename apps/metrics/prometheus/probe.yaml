@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: prometheus-http-30s
+spec:
+  jobName: prometheus-http-30s
+  interval: 30s
+  module: http_2xx_30s
+  scrapeTimeout: 30s
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+  targets:
+    staticConfig:
+      static:
+        - http://prometheus-operated.prometheus.svc.cluster.local:9090/

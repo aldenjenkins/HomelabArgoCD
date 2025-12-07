@@ -1,0 +1,4 @@
+namespace: thanos
+resources:
+  - statefulset.yaml
+  - service.yaml

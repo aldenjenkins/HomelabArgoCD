@@ -22,6 +22,9 @@ resources:
   - grafanadashboard.yaml
   - thanos-sidecar-service.yaml
   - servicemonitor.yaml
+  - telemetry.yaml
+  - destinationrule.yaml
+  - probe.yaml
 
 generators:
   - sopsgenerator.yaml

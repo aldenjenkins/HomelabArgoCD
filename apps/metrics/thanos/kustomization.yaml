@@ -8,6 +8,7 @@ resources:
   - ruler
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 
 generators:
   - sopsgenerator.yaml

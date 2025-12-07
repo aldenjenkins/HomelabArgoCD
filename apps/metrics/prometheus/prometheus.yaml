@@ -46,8 +46,9 @@ spec:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - control-plane-02
-            - control-plane-03
+            - control-plane-01
+            # - control-plane-02
+            # - control-plane-03
           - key: kubernetes.io/os
             operator: In
             values:
@@ -116,10 +117,15 @@ spec:
     matchLabels:
       scraping-disabled: "true"
 
-  replicas: 3
+  # replicas: 2
+  replicas: 1
   resources:
     requests:
-      memory: 400Mi
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 4
+      memory: 10Gi
   tsdb:
     outOfOrderTimeWindow: 30m
   enableRemoteWriteReceiver: true
@@ -131,7 +137,7 @@ spec:
       type: RuntimeDefault
   serviceAccountName: prometheus-k8s
   serviceDiscoveryRole: EndpointSlice
-  retention: "12h"
+  retention: "14d"
   storage:
     volumeClaimTemplate:
       # metadata:
@@ -148,14 +154,15 @@ spec:
       metadata:
         name: prometheus
       spec:
-        storageClassName: longhorn
+        storageClassName: local-path
         resources:
           requests:
-            storage: 20Gi
+            storage: 200Gi
         accessModes:
           - ReadWriteOnce
   thanos:
-    blockSize: 2h
+    # blockSize: 2h
+    blockSize: 8h
     objectStorageConfig:
       key: thanos.yaml
       name: thanos-objectstore

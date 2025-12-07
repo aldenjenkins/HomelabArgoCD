@@ -13,5 +13,6 @@ resources:
   - virtualservice.yaml
   - grafanadatasource.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

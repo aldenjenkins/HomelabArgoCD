@@ -1,0 +1,16 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: disable-access-logs
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/instance: k8s
+      app.kubernetes.io/managed-by: prometheus-operator
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/part-of: kube-prometheus
+      prometheus: k8s
+  
+  accessLogging:
+    - disabled: true

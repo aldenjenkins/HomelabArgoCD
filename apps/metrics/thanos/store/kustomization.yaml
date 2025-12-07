@@ -1,6 +1,16 @@
+namespace: thanos
 resources:
+  - memcached
   - service.yaml
   - statefulset.yaml
   - servicemonitor.yaml
   - serviceaccount.yaml
   - grafanadashboard.yaml
+
+configMapGenerator:
+- name: thanos-store-index-cache-config
+  files:
+  - files/thanos-index-cache-config.yaml
+  options:
+    # Makes the ConfigMap immutable for better stability and performance
+    immutable: true

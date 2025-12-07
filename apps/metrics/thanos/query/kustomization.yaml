@@ -1,3 +1,4 @@
+namespace: thanos
 resources:
   - deployment.yaml
   - service.yaml
@@ -6,3 +7,5 @@ resources:
   - serviceaccount.yaml
   - servicemonitor.yaml
   - grafanadashboard.yaml
+  - prometheusrule.yaml
+  - telemetry.yaml

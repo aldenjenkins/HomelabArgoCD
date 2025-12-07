@@ -838,16 +838,16 @@ spec:
           for: 15m
           labels:
             severity: warning
-        - alert: KubeletDown
-          annotations:
-            description: Kubelet has disappeared from Prometheus target discovery.
-            runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeletdown
-            summary: Target disappeared from Prometheus target discovery.
-          expr: |
-            absent(up{job="kubelet", metrics_path="/metrics"} == 1)
-          for: 15m
-          labels:
-            severity: critical
+        # - alert: KubeletDown
+        #   annotations:
+        #     description: Kubelet has disappeared from Prometheus target discovery.
+        #     runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeletdown
+        #     summary: Target disappeared from Prometheus target discovery.
+        #   expr: |
+        #     absent(up{job="kubelet", metrics_path="/metrics"} == 1)
+        #   for: 15m
+        #   labels:
+        #     severity: critical
     - name: kubernetes-system-scheduler
       rules:
         - alert: KubeSchedulerDown

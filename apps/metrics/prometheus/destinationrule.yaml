@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: prometheus-thanos-plain-text-grpc
+spec:
+  host: prometheus-operated.prometheus.svc.cluster.local
+  trafficPolicy:
+    portLevelSettings:
+    - port:
+        number: 10901 # The gRPC port used by Thanos Sidecar
+      tls:
+        mode: DISABLE # Disable Istio mTLS for this port

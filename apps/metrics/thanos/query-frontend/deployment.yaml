@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/version: v0.30.2
   name: thanos-query-frontend
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/component: query-cache
@@ -16,6 +16,8 @@ spec:
       app.kubernetes.io/name: thanos-query-frontend
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/enable-access-logging: "false"
       labels:
         app.kubernetes.io/component: query-cache
         app.kubernetes.io/instance: thanos-query-frontend
@@ -65,7 +67,7 @@ spec:
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
-            "sampler_param": 100
+            "sampler_param": 10
             "sampler_type": "ratelimiting"
             "service_name": "thanos-query-frontend"
           "type": "OTLP"
@@ -74,7 +76,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
-        image: quay.io/thanos/thanos:v0.30.2
+        image: quay.io/thanos/thanos:v0.40.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 4
@@ -96,10 +98,9 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            cpu: 0.42
-            memory: 420Mi
+            memory: 400Mi
           requests:
-            cpu: 0.123
+            cpu: 30m
             memory: 123Mi
         securityContext:
           allowPrivilegeEscalation: false

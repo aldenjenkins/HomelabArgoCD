@@ -4,7 +4,6 @@ resources:
   - serviceaccount.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
-  - configmap.yaml
   - deployment.yaml
   - service.yaml
   - networkpolicy.yaml
@@ -12,5 +11,12 @@ resources:
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - prometheusrule.yaml
+  - telemetry.yaml
 generators:
   - sopsgenerator.yaml
+configMapGenerator:
+- files:
+  - files/config.yml
+  name: blackbox-exporter-configuration
+  options:
+    immutable: true

@@ -23,7 +23,7 @@ spec:
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 0.28.1
       sidecar.istio.io/inject: "true"
-  replicas: 1
+  replicas: 2
   resources:
     limits:
       cpu: 100m
@@ -34,24 +34,13 @@ spec:
   secrets: []
   storage:
     volumeClaimTemplate:
-      # metadata:
-      #   name: alertmanager-data
-      #   annotations:
-      #     nfs.io/storage-path: "alertmanager-data/"
-      # spec:
-      #   storageClassName: nfs-monitoring-retain
-      #   resources:
-      #     requests:
-      #       storage: 50Gi
-      #   accessModes:
-      #     - ReadWriteMany
       metadata:
         name: alertmanager
       spec:
         storageClassName: longhorn
         resources:
           requests:
-            storage: 10Gi
+            storage: 3Gi
         accessModes:
           - ReadWriteOnce
   securityContext:

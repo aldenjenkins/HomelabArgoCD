@@ -9,14 +9,16 @@ spec:
   securityContext:
     # run as nobody, required for CR's default strict securitycontext + storage below
     fsGroup: 65534
-  replicas: 2  # HA; Alertmanager will dedupe alerts
+  # TODO: alertmanager is not deduping alerts
+  # replicas: 2  # HA; Alertmanager will dedupe alerts
+  replicas: 1
   # Which PrometheusRule CRs this ruler should load
   ruleNamespaceSelector: {}  # all namespaces
   ruleSelector: {}  # all rules
 
-  podMetadata:
-    labels:
-      sidecar.istio.io/inject: "true"
+  # podMetadata:
+  #   labels:
+  #     sidecar.istio.io/inject: "true"
 
   # Where to query data from – the Thanos Query service
   queryEndpoints:
@@ -40,11 +42,11 @@ spec:
     disableMountSubPath: true
     volumeClaimTemplate:
       spec:
-        storageClassName: longhorn
+        storageClassName: local-path
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 10Gi
+            storage: 20Gi
 
   tracingConfig:
     name: thanosruler-tracing-config

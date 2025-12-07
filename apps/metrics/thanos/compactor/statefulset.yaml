@@ -50,13 +50,20 @@ spec:
         - --objstore.config=$(OBJSTORE_CONFIG)
         - --data-dir=/var/thanos/compact
         - --debug.accept-malformed-index
-        - --retention.resolution-raw=0d
-        - --retention.resolution-5m=0d
+        # Keep raw data in the bucket for 10d (0d = infinite)
+        - --retention.resolution-raw=10d
+        # Create 5-minute downsampled blocks and keep them for 120d
+        - --retention.resolution-5m=120d
+        # Create 1-hour downsampled blocks and keep them forever
         - --retention.resolution-1h=0d
         - --delete-delay=48h
-        - --compact.concurrency=1
-        - --downsample.concurrency=1
-        - --downsampling.disable
+        # - --compact.concurrency=1
+        # - --compact.concurrency=8
+        - --compact.concurrency=4
+        # - --downsample.concurrency=1
+        # - --downsample.concurrency=8
+        - --downsample.concurrency=4
+        # - --downsampling.disable
         - --deduplication.replica-label=prometheus_replica
         - --deduplication.replica-label=rule_replica
         - |-
@@ -64,7 +71,8 @@ spec:
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
-            "sampler_param": 100
+            # "sampler_param": 100
+            "sampler_param": 10
             "sampler_type": "ratelimiting"
             "service_name": "thanos-compact"
           "type": "OTLP"
@@ -78,7 +86,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
-        image: quay.io/thanos/thanos:v0.30.2
+        image: quay.io/thanos/thanos:v0.40.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 4
@@ -99,12 +107,9 @@ spec:
             scheme: HTTP
           periodSeconds: 5
         resources:
-          limits:
-            cpu: 0.42
-            memory: 420Mi
           requests:
-            cpu: 0.123
-            memory: 123Mi
+            cpu: 50m
+            memory: 100Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -125,17 +130,19 @@ spec:
           type: RuntimeDefault
       serviceAccountName: thanos-compact
       terminationGracePeriodSeconds: 120
-      volumes: []
-  volumeClaimTemplates:
-  - metadata:
-      labels:
-        app.kubernetes.io/component: database-compactor
-        app.kubernetes.io/instance: thanos-compact
-        app.kubernetes.io/name: thanos-compact
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
+      volumes:
+        - name: data
+          emptyDir: {}
+  # volumeClaimTemplates:
+  # - metadata:
+  #     labels:
+  #       app.kubernetes.io/component: database-compactor
+  #       app.kubernetes.io/instance: thanos-compact
+  #       app.kubernetes.io/name: thanos-compact
+  #     name: data
+  #   spec:
+  #     accessModes:
+  #     - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: 10Gi

@@ -1,11 +1,10 @@
 namespace: kube-system
 resources:
-  - kubescheduler-servicemonitor.yaml
-  - apiserver-servicemonitor.yaml
-  - coredns-servicemonitor.yaml
-  - controllermanager-servicemonitor.yaml
-  # Disable kubelet servicemonitor now so that the selfmetrics collector can scrape this pod explicitly
-  # and the core-prometheus collector doesnt also scrape it.
-  # - kubelet-servicemonitor.yaml
+  - scheduler
+  - apiserver
+  - coredns
+  - controllermanager
+  - kubelet
+  - proxy
   - rolebinding.yaml
   - role.yaml

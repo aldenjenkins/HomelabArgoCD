@@ -10,7 +10,7 @@ spec:
     type: prometheus
     access: proxy
     # url: http://prometheus-k8s.prometheus.svc:9090  # The central Prometheus server
-    url: http://thanos-query.thanos.svc:9090  # The central Prometheus server
+    url: http://thanos-query-frontend.thanos.svc:9090  # The central Prometheus server
     isDefault: true
     jsonData:
       timeInterval: 15s

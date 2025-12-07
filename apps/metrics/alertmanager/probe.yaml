@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: alertmanager-http-30s
+spec:
+  jobName: alertmanager-http-30s
+  interval: 30s
+  module: http_2xx_30s
+  scrapeTimeout: 30s
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+  targets:
+    staticConfig:
+      static:
+        - http://alertmanager-operated.alertmanager.svc.cluster.local.:9093/

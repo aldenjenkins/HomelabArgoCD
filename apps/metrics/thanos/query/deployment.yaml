@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/version: v0.31.0
   name: thanos-query
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/component: query-layer
@@ -21,6 +21,7 @@ spec:
         app.kubernetes.io/instance: thanos-query
         app.kubernetes.io/name: thanos-query
         app.kubernetes.io/version: v0.31.0
+        # sidecar.istio.io/inject: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -47,13 +48,15 @@ spec:
         - --query.replica-label=rule_replica
         - --endpoint=dnssrv+_grpc._tcp.thanos-store.thanos.svc.cluster.local:10901
         - --endpoint=dnssrv+_grpc._tcp.prometheus-operated.prometheus.svc.cluster.local:10901
+        - --endpoint=dnssrv+_grpc._tcp.thanos-ruler-operated.thanos.svc.cluster.local:10901
         - --query.auto-downsampling
         - |-
           --tracing.config="config":
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
-            "sampler_param": 100
+            # "sampler_param": 100
+            "sampler_param": 10
             "sampler_type": "ratelimiting"
             "service_name": "thanos-query"
           "type": "OTLP"
@@ -62,7 +65,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
-        image: quay.io/thanos/thanos:v0.31.0
+        image: quay.io/thanos/thanos:v0.40.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 4
@@ -84,7 +87,12 @@ spec:
             port: 9090
             scheme: HTTP
           periodSeconds: 5
-        resources: {}
+        resources:
+          limits:
+            memory: 1Gi
+          requests:
+            cpu: 300m
+            memory: 300Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
