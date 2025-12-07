@@ -27,3 +27,20 @@ spec:
     - port: 9001
       targetPort: 9001
       name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio # This MUST match the serviceName in the StatefulSet
+  labels:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: headless
+spec:
+  clusterIP: None # This makes the service "headless"
+  ports:
+    - port: 9000
+      name: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: minio # Selects the pods created by the StatefulSet
+    app.kubernetes.io/component: minio # Selects the pods created by the StatefulSet

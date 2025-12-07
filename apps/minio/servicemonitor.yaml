@@ -1,26 +1,48 @@
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: minio
+#   labels:
+#     app.kubernetes.io/name: minio
+#     app.kubernetes.io/instance: minio-api
+#     app.kubernetes.io/component: api
+# spec:
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: minio
+#       app.kubernetes.io/instance: minio-api
+#       app.kubernetes.io/component: api
+#   endpoints:
+#     - port: api
+#       path: /minio/v2/metrics/cluster
+#       scheme: http
+#       interval: 30s
+#       scrapeTimeout: 10s
+#       bearerTokenSecret:
+#         key: token
+#         name: minio-prometheus-token
+#   namespaceSelector:
+#     matchNames:
+#       - minio
+# ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: minio
   labels:
     app.kubernetes.io/name: minio
-    app.kubernetes.io/instance: minio-api
-    app.kubernetes.io/component: api
+    app.kubernetes.io/component: headless
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: minio
-      app.kubernetes.io/instance: minio-api
-      app.kubernetes.io/component: api
+      app.kubernetes.io/component: headless
   endpoints:
-    - port: api
+    - port: http
       path: /minio/v2/metrics/cluster
       scheme: http
       interval: 30s
       scrapeTimeout: 10s
-      bearerTokenSecret:
-        key: token
-        name: minio-prometheus-token
   namespaceSelector:
     matchNames:
       - minio

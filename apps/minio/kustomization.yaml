@@ -5,7 +5,9 @@ resources:
   - virtualservice.yaml
   - authorizationpolicy.yaml
   - servicemonitor.yaml
+  - statefulset.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  # - tenant.yaml
 generators:
   - sopsgenerator.yaml

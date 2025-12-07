@@ -1,0 +1,78 @@
+apiVersion: minio.min.io/v2
+kind: Tenant
+metadata:
+  name: minio-cluster
+  labels:
+    app: minio
+  ## Optionally pass annotations to be applied to the statefulset pods
+  annotations:
+    prometheus.io/path: /minio/v2/metrics/cluster
+    prometheus.io/port: "9000"
+    prometheus.io/scrape: "true"
+spec:
+  requestAutoCert: false
+  configuration:
+    name: storage-configuration
+  image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+  buckets:
+    - name: loki-data
+    - name: thanos-data
+    - name: tempo-data
+  # This is where we define the HA pool
+  pools:
+    ## Servers specifies the number of MinIO Tenant Pods / Servers in this pool.
+    ## For standalone mode, supply 1. For distributed mode, supply 4 or more.
+    ## Note that the operator does not support upgrading from standalone to distributed mode.
+    - servers: 4 # <-- This creates 4 pods for HA
+      ## custom name for the pool
+      name: pool-0
+      volumesPerServer: 4
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - control-plane-02
+                - control-plane-03
+                - worker-05
+                - worker-09
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      volumeClaimTemplate:
+        metadata:
+          name: data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+          # This is the most important part!
+          # Tell the operator to use your fast, non-replicated storage.
+          storageClassName: local-path
+      ## Configure Pod's security context
+      ## We recommend to skip the recursive permission change by using
+      ## fsGroupChangePolicy as OnRootMismatch because it can be pretty
+      ## expensive for larger volumes with lots of small files.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+      ## Configure container security context
+      containerSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
