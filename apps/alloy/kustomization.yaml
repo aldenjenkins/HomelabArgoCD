@@ -10,3 +10,4 @@ resources:
   - authorizationpolicy.yaml
   - virtualservice.yaml
   - servicemonitor.yaml
+  - probe.yaml
