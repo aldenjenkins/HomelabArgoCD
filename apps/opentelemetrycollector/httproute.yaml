@@ -1,0 +1,151 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: logs-gateway-collector-otlp-http
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - logs-gateway.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: logs-gateway-collector
+      port: 4318
+    matches:
+    - path:
+        type: PathPrefix
+        value: /v1/logs
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: logs-agent-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - logs-agent-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: logs-agent-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: logs-gateway-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - logs-gateway-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: logs-gateway-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: kubernetes-events-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - kubernetes-events-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: kubernetes-events-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: otlp-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - otlp-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: otlp-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: trace-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - trace-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: trace-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: core-prometheus-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - core-prometheus-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: core-prometheus-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: self-metrics-collector-zpages
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - selfmetrics-collector.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: selfmetrics-collector
+      port: 55679
+    matches:
+    - path:
+        type: PathPrefix
+        value: /

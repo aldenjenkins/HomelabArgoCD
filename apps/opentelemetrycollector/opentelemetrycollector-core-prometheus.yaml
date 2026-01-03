@@ -73,7 +73,8 @@ spec:
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
       prometheusremotewrite:
-        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/write
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
         add_metric_suffixes: false
         tls:
           insecure: true
@@ -86,7 +87,7 @@ spec:
         timeout: 10s
 
       otlphttp/prometheus:
-        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/otlp
+        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
         tls:
           insecure: true
         retry_on_failure:
@@ -447,10 +448,10 @@ spec:
               kubernetes_sd_configs:
                 - role: pod
               relabel_configs:
-                - action: drop
-                  regex: (kube-system|homelab-system)
-                  source_labels:
-                    - __meta_kubernetes_namespace
+                # - action: drop
+                #   regex: (kube-system|homelab-system)
+                #   source_labels:
+                #     - __meta_kubernetes_namespace
                 - action: drop
                   regex: (homelab-system|observability);sumologic-sumologic-otelcol-logs
                   source_labels:
@@ -574,10 +575,10 @@ spec:
               kubernetes_sd_configs:
                 - role: service
               relabel_configs:
-                - action: drop
-                  regex: (kube-system|homelab-system)
-                  source_labels:
-                    - __meta_kubernetes_namespace
+                # - action: drop
+                #   regex: (kube-system|homelab-system)
+                #   source_labels:
+                #     - __meta_kubernetes_namespace
                 - action: drop
                   regex: (.+)-redis-additional
                   source_labels:

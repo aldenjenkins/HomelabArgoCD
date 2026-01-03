@@ -76,6 +76,24 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#processors
     processors:
 
+      # 1. NEW: Allow logs tagged as external
+      filter/include_external:
+        logs:
+          include:
+            match_type: strict
+            resource_attributes:
+              - key: homelab.source
+                value: "external"
+
+      # 2. NEW: Block external logs from entering the K8s pipelines
+      filter/exclude_external:
+        logs:
+          exclude:
+            match_type: strict
+            resource_attributes:
+              - key: homelab.source
+                value: "external"
+
       # Use the in-built `batch` processor to batch up data before writing it for export.
       batch:
         timeout: 1s  # Reduce if too high
@@ -506,6 +524,7 @@ spec:
           - otlp
           processors: 
           - memory_limiter
+          - filter/exclude_external
           - filter/include_containers
           - filter/not_istio
           - groupbyattrs/containers
@@ -529,6 +548,7 @@ spec:
           - otlp
           processors: 
           - memory_limiter
+          - filter/exclude_external
           - filter/include_fluent_tag_host
           - filter/include_kubelet
           - filter/not_istio
@@ -567,6 +587,16 @@ spec:
           - batch
           exporters: 
           - otlphttp/loki
+
+        logs/otlp/external:
+          receivers: 
+          - otlp
+          processors:
+          - memory_limiter
+          - filter/include_external  # Only process NAS/Desktop logs here
+          # - resource/add_cluster     # Optional: if you want to enforce cluster name
+          - batch
+          exporters: [otlphttp/loki]
 
       telemetry:
         logs:

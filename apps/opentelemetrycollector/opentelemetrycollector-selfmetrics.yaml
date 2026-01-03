@@ -22,8 +22,21 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
+      prometheusremotewrite:
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+        add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
       otlphttp/prometheus:
-        endpoint: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/otlp
+        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
         tls:
           insecure: true
         retry_on_failure:
@@ -465,7 +478,8 @@ spec:
       pipelines:
         metrics:
           exporters:
-            - otlphttp/prometheus
+            # - otlphttp/prometheus
+            - prometheusremotewrite
           processors:
             - memory_limiter
             # - attributes/kube_state_metrics

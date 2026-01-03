@@ -17,5 +17,7 @@ resources:
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
+  - prometheusrule.yaml
+  # - virtualservice.yaml
+  # - authorizationpolicy.yaml

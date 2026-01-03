@@ -41,7 +41,8 @@ spec:
         # `traces.spanmetrics.latency` metric.
         add_metric_suffixes: false
         # Send to the locally running Mimir service.
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
         # TLS is not enabled for the instance.
         tls:
           insecure: true
