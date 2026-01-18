@@ -1,7 +1,7 @@
 namespace: observability
 resources:
   - namespace.yaml
-  - persistentvolume.yaml
+  # - persistentvolume.yaml
   - opentelemetrycollector-otlp.yaml
   - opentelemetrycollector-logs-gateway.yaml
   - opentelemetrycollector-logs-agent.yaml
@@ -10,14 +10,15 @@ resources:
   - opentelemetrycollector-core-prometheus.yaml
   - opentelemetrycollector-kubeletstats.yaml
   - opentelemetrycollector-selfmetrics.yaml
-  - instrumentation.yaml
+  # 2026-01-18
+  # disabling this for now as i don't think its used anywhere but lets see :)
+  # - instrumentation.yaml
   - serviceaccount.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
-  - servicemonitor.yaml
+  # The collector pods auto-add the scrape: "true" label so we don't need this
+  # - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - httproute.yaml
   - prometheusrule.yaml
-  # - virtualservice.yaml
-  # - authorizationpolicy.yaml

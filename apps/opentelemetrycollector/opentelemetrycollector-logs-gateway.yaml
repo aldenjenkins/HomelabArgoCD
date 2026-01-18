@@ -6,7 +6,7 @@ spec:
   # replicas: 2
   replicas: 2
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:0.139.0
+  image: otel/opentelemetry-collector-contrib:0.143.1
   imagePullPolicy: IfNotPresent
   podSecurityContext:
     fsGroup: 999
@@ -24,7 +24,7 @@ spec:
           requests:
             storage: 5Gi
         storageClassName: local-path
-        volumeMode: Filesystem
+        # volumeMode: Filesystem
   volumeMounts:
     - mountPath: /var/lib/storage/otc
       name: file-storage
@@ -422,7 +422,6 @@ spec:
               # - delete_key(attributes, "category") where attributes["category"] != nil
               #   and not IsMatch(attributes["category"], "(access|application)")
               
-      #{"level":"warn","ts":"2025-11-15T00:38:06.909Z","caller":"ottl@v0.139.0/parser.go:410","msg":"failed to execute statement","resource":{"service.instance.id":"5d996f2b-0da5-4668-8d0f-c3039335dd75","service.name":"otelcol-contrib","service.version":"0.139.0"},"otelcol.component.id":"transform/containers_parse_json","otelcol.component.kind":"processor","otelcol.pipeline.id":"logs/otlp/containers","otelcol.signal":"logs","error":"invalid character 'W' after top-level value","statement":"set(log.body, ParseJSON(log.body)) where IsMatch(log.body, \"^{\")"}
       transform/containers_parse_json:
         error_mode: ignore
         log_statements:

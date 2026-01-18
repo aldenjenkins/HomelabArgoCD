@@ -5,7 +5,7 @@ metadata:
 spec:
   serviceAccount: otel-collector
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:0.139.0
+  image: otel/opentelemetry-collector-contrib:0.143.1
   imagePullPolicy: IfNotPresent
   resources:
     limits:
@@ -202,8 +202,11 @@ spec:
         metric_statements:
           - context: datapoint
             statements:
-              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"])
-              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
+              # Added nil checks for Thanos Receive compatibility
+              # - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"])
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"]) where resource.attributes["k8s_pod_name"] != nil
+              # - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil
       k8sattributes:
         auth_type: serviceAccount
         extract:
@@ -240,22 +243,23 @@ spec:
           - context: datapoint
             statements:
               - delete_key(attributes, "service_name")
-              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
-              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"])
-              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
-              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
-              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"])
-              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"])
+              # Nil checks prevent empty labels (Thanos Receive rejects them)
+              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil
+              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil
+              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil
+              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
+              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil
+              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
               - set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
-              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"])
-              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"])
-              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
-              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
-              - set(attributes["service.version"], resource.attributes["service.version"])
+              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"]) where resource.attributes["k8s.job.name"] != nil
+              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil
+              - set(attributes["service.version"], resource.attributes["service.version"]) where resource.attributes["service.version"] != nil
               - set(attributes["homelab.tenant"], "prometheus-k8s")
       transform/normalize_service_name:
         metric_statements:

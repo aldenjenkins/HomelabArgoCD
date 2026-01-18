@@ -9,7 +9,8 @@ spec:
     targetCPUUtilization: 75
     targetMemoryUtilization: 90
   mode: deployment
-  image: otel/opentelemetry-collector-contrib:0.139.0
+  image: otel/opentelemetry-collector-contrib:0.143.1
+  imagePullPolicy: IfNotPresent
   # ports:
   #   - name: metrics
   #     port: 8888

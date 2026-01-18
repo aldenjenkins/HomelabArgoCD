@@ -118,6 +118,14 @@ rules:
       - endpointslices
     verbs: ["get", "list", "watch"]
   - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - get
+      - watch
+      - list
+  - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses

@@ -17,7 +17,8 @@ spec:
       cpu: "1"
       memory: 512Mi
   serviceAccount: otel-collector
-  image: otel/opentelemetry-collector-contrib:0.139.0
+  image: otel/opentelemetry-collector-contrib:0.143.1
+  imagePullPolicy: IfNotPresent
   config:
     # Define connectors which connect two pipelines, acting as both exporter and receiver.
     # see: https://opentelemetry.io/docs/collector/components/connector/
@@ -238,42 +239,45 @@ spec:
         metric_statements:
           - context: datapoint
             statements:
-              - set(attributes["instance"], resource.attributes["k8s.pod.name"]) where
-                resource.attributes["k8s.pod.name"] != nil
-              - set(attributes["instance"], resource.attributes["k8s.node.name"]) where
-                resource.attributes["k8s.pod.name"] != nil
-              - set(attributes["service.name"], resource.attributes["service.name"]) where
-                resource.attributes["service.name"] != nil
-              - set(attributes["container.image.name"], resource.attributes["container.image.name"])
-              - set(attributes["container.image.tag"], resource.attributes["container.image.tag"])
-              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
-              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
-              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"])
-              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"])
-              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"])
-              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
-              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"])
-              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
-              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
-              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"])
-              - set(attributes["namespaceName"], resource.attributes["k8s.namespace.name"])
-              - set(attributes["nodeName"], resource.attributes["k8s.node.name"])
-              - set(attributes["podName"], resource.attributes["k8s.pod.name"])
-              - set(attributes["clusterName"], resource.attributes["k8s.cluster.name"])
-              - set(attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil
-              - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil
-              - set(attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil
-              - set(attributes["homelab.env"], resource.attributes["homelab.env"]) where resource.attributes["homelab.env"] != nil
-              - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil
-              - set(attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil
+              # Nil/empty checks prevent empty labels (Thanos Receive rejects them)
+              - set(attributes["instance"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil and resource.attributes["k8s.pod.name"] != ""
+              - set(attributes["instance"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.pod.name"] == nil and resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
+              - set(attributes["service.name"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil and resource.attributes["service.name"] != ""
+              - set(attributes["container.image.name"], resource.attributes["container.image.name"]) where resource.attributes["container.image.name"] != nil and resource.attributes["container.image.name"] != ""
+              - set(attributes["container.image.tag"], resource.attributes["container.image.tag"]) where resource.attributes["container.image.tag"] != nil and resource.attributes["container.image.tag"] != ""
+              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
+              - set(attributes["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil and resource.attributes["k8s.daemonset.name"] != ""
+              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
+              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil and resource.attributes["k8s.cronjob.name"] != ""
+              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"]) where resource.attributes["k8s.job.name"] != nil and resource.attributes["k8s.job.name"] != ""
+              - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil and resource.attributes["k8s.namespace.name"] != ""
+              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
+              - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil and resource.attributes["k8s.pod.name"] != ""
+              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
+              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil and resource.attributes["k8s.container.name"] != ""
+              - set(attributes["namespaceName"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil and resource.attributes["k8s.namespace.name"] != ""
+              - set(attributes["nodeName"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
+              - set(attributes["podName"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil and resource.attributes["k8s.pod.name"] != ""
+              - set(attributes["clusterName"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
+              - set(attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil and resource.attributes["homelab.service"] != ""
+              - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil and resource.attributes["homelab.owner"] != ""
+              - set(attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil and resource.attributes["homelab.huid"] != ""
+              - set(attributes["homelab.env"], resource.attributes["homelab.env"]) where resource.attributes["homelab.env"] != nil and resource.attributes["homelab.env"] != ""
+              - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil and resource.attributes["homelab.environment"] != ""
+              - set(attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil and resource.attributes["homelab.version"] != ""
               - set(attributes["homelab.tenant"], "prometheus-k8s")
-
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint
             statements:
-              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"])
-              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+              - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil and resource.attributes["k8s.pod.name"] != ""
+              - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil and resource.attributes["k8s.namespace.name"] != ""
+      # Clean up empty connection_type from service graph metrics (Thanos Receive rejects empty labels)
+      transform/cleanup_empty_labels:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - delete_key(attributes, "connection_type") where attributes["connection_type"] == ""
 
     # Define the protocols to receive data for.
     # See https://opentelemetry.io/docs/collector/configuration/#receivers
@@ -311,6 +315,7 @@ spec:
           - k8sattributes
           # - resourcedetection/homelab
           - transform/label_metrics
+          - transform/cleanup_empty_labels
           exporters: 
           # - forward/keda
           - prometheusremotewrite
