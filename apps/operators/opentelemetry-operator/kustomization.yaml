@@ -1,14 +1,27 @@
 resources:
   - https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
   - servicemonitor.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
 patches:
   - target:
       kind: Deployment
       name: opentelemetry-operator-controller-manager
+    #
+    # Note: 2026-01-18
+    # Disabling the go instrumentation for now as i dont care to use it atm, just doesnt seem useful for anything currently.
+    #
+    # patch: |-
+    #   - op: add
+    #     path: /spec/template/spec/containers/0/args/-
+    #     value: "--enable-go-instrumentation"
+    #
+    # note: 2026-01-18
+    # This is to enable to the mtls required for allowing targetallocator to use secrets for ServiceMonitors and PodMonitors such as for my external minio metrics auth.
     patch: |-
       - op: add
         path: /spec/template/spec/containers/0/args/-
-        value: "--enable-go-instrumentation"
+        value: "--feature-gates=operator.targetallocator.mtls"
     # kind: Deployment
     # metadata:
     #   labels:

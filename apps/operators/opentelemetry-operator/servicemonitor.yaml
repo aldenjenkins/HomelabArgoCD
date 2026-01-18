@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/name: opentelemetry-operator
     app.kubernetes.io/part-of: opentelemetry-operator
     control-plane: controller-manager
-  name: opentelemetry-operator-metrics-monitor
+  name: opentelemetry-operator
   namespace: opentelemetry-operator-system
 spec:
   endpoints:
@@ -23,7 +23,10 @@ spec:
         ca: {}
         cert: {}
         insecureSkipVerify: true
-  namespaceSelector: {}
+  namespaceSelector:
+    matchNames:
+      - opentelemetry-operator-system
   selector:
     matchLabels:
       app.kubernetes.io/name: opentelemetry-operator
+      control-plane: controller-manager
