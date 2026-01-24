@@ -128,13 +128,13 @@ spec:
       probabilistic_sampler:
         sampling_percentage: 1
 
-      resourcedetection:
-        detectors: [env, system]
-        timeout: 5s
-        override: false
-        attributes:
-          - k8s.cluster.name
-          - k8s.node.name
+      # resourcedetection:
+      #   detectors: [env, system]
+      #   timeout: 5s
+      #   override: false
+      #   attributes:
+      #     - k8s.cluster.name
+      #     - k8s.node.name
 
       groupbyattrs:
         keys:

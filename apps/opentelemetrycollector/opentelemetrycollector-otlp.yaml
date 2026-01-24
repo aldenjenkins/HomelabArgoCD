@@ -265,7 +265,7 @@ spec:
               - set(attributes["homelab.env"], resource.attributes["homelab.env"]) where resource.attributes["homelab.env"] != nil and resource.attributes["homelab.env"] != ""
               - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil and resource.attributes["homelab.environment"] != ""
               - set(attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil and resource.attributes["homelab.version"] != ""
-              - set(attributes["homelab.tenant"], "prometheus-k8s")
+              # - set(attributes["homelab.tenant"], "prometheus-k8s")
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint

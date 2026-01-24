@@ -13,10 +13,11 @@ spec:
     requests:
       cpu: 500m
       memory: 1Gi
-  autoscaler:
-    maxReplicas: 2
-    minReplicas: 1
-    targetCPUUtilization: 90
+  replicas: 1
+  # autoscaler:
+  #   maxReplicas: 1
+  #   minReplicas: 1
+  #   targetCPUUtilization: 90
   config:
     # Define exporters to data stores.
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
@@ -260,7 +261,7 @@ spec:
               - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil
               - set(attributes["k8s.namespace.name"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil
               - set(attributes["service.version"], resource.attributes["service.version"]) where resource.attributes["service.version"] != nil
-              - set(attributes["homelab.tenant"], "prometheus-k8s")
+              # - set(attributes["homelab.tenant"], "prometheus-k8s")
       transform/normalize_service_name:
         metric_statements:
           - context: datapoint
@@ -359,6 +360,13 @@ spec:
               kubernetes_sd_configs:
                 - role: pod
 
+              # This if uncommented would only keep data related to the ksm namespace (or obserability if we deploy in obs namespace)
+              # metric_relabel_configs:
+              #   - action: keep
+              #     regex: kube-state-metrics
+              #     source_labels:
+              #       - namespace
+
               # ServiceMonitor selector:
               # app.kubernetes.io/component=exporter
               # app.kubernetes.io/name=kube-state-metrics
@@ -366,20 +374,23 @@ spec:
               relabel_configs:
                 # Keep only kube-state-metrics pods
                 - action: keep
-                  regex: exporter
+                  regex: kube-state-metrics;kube-state-metrics;kube-prometheus;exporter
                   source_labels:
-                    - __meta_kubernetes_pod_label_app_kubernetes_io_component
-                - action: keep
-                  regex: kube-state-metrics
-                  source_labels:
+                    - __meta_kubernetes_namespace
                     - __meta_kubernetes_pod_label_app_kubernetes_io_name
-                - action: keep
-                  regex: kube-prometheus
-                  source_labels:
                     - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
-                - action: keep
-                  regex: kube-state-metrics
-                  source_labels: [__meta_kubernetes_namespace]
+                    - __meta_kubernetes_pod_label_app_kubernetes_io_component
+                # - action: keep
+                #   regex: 
+                #   source_labels:
+                #     - __meta_kubernetes_pod_label_app_kubernetes_io_name
+                # - action: keep
+                #   regex: kube-prometheus
+                #   source_labels:
+                #     - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
+                # - action: keep
+                #   regex: kube-state-metrics
+                #   source_labels: [__meta_kubernetes_namespace]
 
                 # Only the https-main port
                 - action: keep
@@ -405,9 +416,9 @@ spec:
                 - action: replace
                   target_label: job
                   replacement: kube-state-metrics
-                - action: replace
-                  target_label: cluster
-                  replacement: homelab-live
+                # - action: replace
+                #   target_label: cluster
+                #   replacement: homelab-live
 
               bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
               scheme: https
@@ -415,7 +426,7 @@ spec:
                 insecure_skip_verify: true
               scrape_interval: 30s
               scrape_timeout: 30s
-              honor_labels: true
+              # honor_labels: true
 
               metric_relabel_configs:
                 # ServiceMonitor metricRelabelings: drop these two metrics
@@ -423,60 +434,60 @@ spec:
                   source_labels: [__name__]
                   regex: kube_endpoint_address_not_ready|kube_endpoint_address_available
 
-            # ========= kube-state-metrics self (https-self) =========
-            - job_name: kube-state-metrics-self
-              kubernetes_sd_configs:
-                - role: pod
-
-              relabel_configs:
-                # Same pod selection as above
-                - action: keep
-                  regex: exporter
-                  source_labels:
-                    - __meta_kubernetes_pod_label_app_kubernetes_io_component
-                - action: keep
-                  regex: kube-state-metrics
-                  source_labels:
-                    - __meta_kubernetes_pod_label_app_kubernetes_io_name
-                - action: keep
-                  regex: kube-prometheus
-                  source_labels:
-                    - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
-                - action: keep
-                  regex: kube-state-metrics
-                  source_labels: [__meta_kubernetes_namespace]
-
-                # Only the https-self port
-                - action: keep
-                  regex: https-self
-                  source_labels:
-                    - __meta_kubernetes_pod_container_port_name
-
-                - action: replace
-                  target_label: __scheme__
-                  replacement: https
-
-                - action: replace
-                  source_labels:
-                    - __meta_kubernetes_pod_ip
-                    - __meta_kubernetes_pod_container_port_number
-                  regex: (.*);(.*)
-                  replacement: "$1:$2"
-                  target_label: __address__
-
-                - action: replace
-                  target_label: job
-                  replacement: kube-state-metrics
-                - action: replace
-                  target_label: cluster
-                  replacement: homelab-live
-
-              bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-              scheme: https
-              tls_config:
-                insecure_skip_verify: true
-              scrape_interval: 30s
-              scrape_timeout: 30s
+            # # ========= kube-state-metrics self (https-self) =========
+            # - job_name: kube-state-metrics-self
+            #   kubernetes_sd_configs:
+            #     - role: pod
+            #
+            #   relabel_configs:
+            #     # Same pod selection as above
+            #     - action: keep
+            #       regex: exporter
+            #       source_labels:
+            #         - __meta_kubernetes_pod_label_app_kubernetes_io_component
+            #     - action: keep
+            #       regex: kube-state-metrics
+            #       source_labels:
+            #         - __meta_kubernetes_pod_label_app_kubernetes_io_name
+            #     - action: keep
+            #       regex: kube-prometheus
+            #       source_labels:
+            #         - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
+            #     - action: keep
+            #       regex: kube-state-metrics
+            #       source_labels: [__meta_kubernetes_namespace]
+            #
+            #     # Only the https-self port
+            #     - action: keep
+            #       regex: https-self
+            #       source_labels:
+            #         - __meta_kubernetes_pod_container_port_name
+            #
+            #     - action: replace
+            #       target_label: __scheme__
+            #       replacement: https
+            #
+            #     - action: replace
+            #       source_labels:
+            #         - __meta_kubernetes_pod_ip
+            #         - __meta_kubernetes_pod_container_port_number
+            #       regex: (.*);(.*)
+            #       replacement: "$1:$2"
+            #       target_label: __address__
+            #
+            #     - action: replace
+            #       target_label: job
+            #       replacement: kube-state-metrics
+            #     - action: replace
+            #       target_label: cluster
+            #       replacement: homelab-live
+            #
+            #   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            #   scheme: https
+            #   tls_config:
+            #     insecure_skip_verify: true
+            #   scrape_interval: 30s
+            #   scrape_timeout: 30s
 
     service:
       pipelines:
@@ -486,17 +497,17 @@ spec:
             - prometheusremotewrite
           processors:
             - memory_limiter
-            # - attributes/kube_state_metrics
+            - attributes/kube_state_metrics
             - metricstransform/add_standard_labels
-            # - resource/set_known_attributes
+            - resource/set_known_attributes
             - filter/drop_metrics
             - filter/kube_state_metrics
             - batch
-            # - groupbyattrs
-            # - transform/set_match_resource_attributes
-            # - k8sattributes
-            # - transform/label_metrics
-            # - transform/normalize_service_name
+            - groupbyattrs
+            - transform/set_match_resource_attributes
+            - k8sattributes
+            - transform/label_metrics
+            - transform/normalize_service_name
           receivers:
             - prometheus
       telemetry:

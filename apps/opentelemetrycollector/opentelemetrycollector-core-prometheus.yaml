@@ -3,28 +3,30 @@ kind: OpenTelemetryCollector
 metadata:
   name: core-prometheus
 spec:
-  autoscaler:
-    maxReplicas: 5
-    minReplicas: 2
-    targetCPUUtilization: 75
-    targetMemoryUtilization: 75
+  # autoscaler:
+  #   maxReplicas: 5
+  #   minReplicas: 2
+  #   targetCPUUtilization: 75
+  #   targetMemoryUtilization: 75
   mode: statefulset
+  replicas: 1
   affinity:
     # Rule 1: Only use control-plane-02 or control-plane-03
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          # - key: kubernetes.io/hostname
-          #   operator: In
-          #   values:
-          #   - control-plane-02
-          #   - control-plane-03
-          #   - worker-03
-          - key: kubernetes.io/os
+          - key: kubernetes.io/hostname
             operator: In
             values:
-            - linux
+            - control-plane-01
+            # - control-plane-02
+            # - control-plane-03
+            # - worker-03
+          # - key: kubernetes.io/os
+          #   operator: In
+          #   values:
+          #   - linux
     # Rule 2: Spread replicas across different nodes
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -172,7 +174,8 @@ spec:
       filter/drop_observability_ksm:
         metrics:
           datapoint:
-            - attributes["job"] == "kube-state-metrics" and attributes["k8s.namespace.name"] == "observability"
+            # - attributes["job"] == "kube-state-metrics" and attributes["k8s.namespace.name"] == "observability"
+            - attributes["job"] == "kube-state-metrics" and attributes["k8s.namespace.name"] == "kube-state-metrics"
       # filter/keda_metrics:
       #   metrics:
       #     include:
@@ -364,59 +367,59 @@ spec:
           - context: metric
             statements:
               - aggregate_on_attributes("sum", ["pod", "namespace", "container"]) where (metric.name == "container_network_receive_bytes_total" or metric.name == "container_network_transmit_bytes_total")
-      resourcedetection/homelab:
-        detectors: [env, system]
-        timeout: 5s
-        override: false
-        attributes:
-          - k8s.cluster.name
-          - k8s.node.name
+      # resourcedetection/homelab:
+      #   detectors: [env, system]
+      #   timeout: 5s
+      #   override: false
+      #   attributes:
+      #     - k8s.cluster.name
+      #     - k8s.node.name
       transform/label_metrics:
         metric_statements:
           - context: datapoint
             statements:
-              - delete_key(attributes, "otel_scope_name")
-              - delete_key(attributes, "otel_scope_version")
+              - delete_key(datapoint.attributes, "otel_scope_name")
+              - delete_key(datapoint.attributes, "otel_scope_version")
               # Nil/empty checks prevent empty labels (Thanos Receive rejects them)
               # - set(attributes["nodeName"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""  # Redundant with k8s.node.name
-              - set(attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
-              - set(attributes["k8s.node.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
-              - set(attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
-              - set(attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
-              - set(attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil and resource.attributes["k8s.cronjob.name"] != ""
-              - set(attributes["argo.rollout.name"], resource.attributes["argo.rollout.name"]) where resource.attributes["argo.rollout.name"] != nil and resource.attributes["argo.rollout.name"] != ""
-              - set(attributes["service.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
-              - set(attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
-              - set(attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil and resource.attributes["k8s.cronjob.name"] != ""
-              - set(attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil and resource.attributes["k8s.daemonset.name"] != ""
-              - set(attributes["service.name"], resource.attributes["argo.rollout.name"]) where resource.attributes["argo.rollout.name"] != nil and resource.attributes["argo.rollout.name"] != ""
-              - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"]) where resource.attributes["k8s.job.name"] != nil and resource.attributes["k8s.job.name"] != ""
-              - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil and resource.attributes["k8s.container.name"] != ""
-              - set(attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"]) where resource.attributes["k8s_pod_name"] != nil and resource.attributes["k8s_pod_name"] != ""
-              - set(attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil and resource.attributes["k8s_namespace_name"] != ""
-              - set(attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "homelab-system"
-              - set(attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "kube-system"
-              - set(attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil and resource.attributes["homelab.service"] != ""
-              - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil and resource.attributes["homelab.owner"] != ""
-              - set(attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil and resource.attributes["homelab.huid"] != ""
-              - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil and resource.attributes["homelab.environment"] != ""
-              - set(attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil and resource.attributes["homelab.version"] != ""
-              - set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil and resource.attributes["service.name"] != ""
-              - set(attributes["ready"], value_double) where metric.name == "kube_pod_container_status_ready"
+              - set(datapoint.attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
+              - set(datapoint.attributes["k8s.node.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
+              - set(datapoint.attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
+              - set(datapoint.attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
+              - set(datapoint.attributes["k8s.cronjob.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil and resource.attributes["k8s.cronjob.name"] != ""
+              - set(datapoint.attributes["argo.rollout.name"], resource.attributes["argo.rollout.name"]) where resource.attributes["argo.rollout.name"] != nil and resource.attributes["argo.rollout.name"] != ""
+              - set(datapoint.attributes["service.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
+              - set(datapoint.attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
+              - set(datapoint.attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil and resource.attributes["k8s.cronjob.name"] != ""
+              - set(datapoint.attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil and resource.attributes["k8s.daemonset.name"] != ""
+              - set(datapoint.attributes["service.name"], resource.attributes["argo.rollout.name"]) where resource.attributes["argo.rollout.name"] != nil and resource.attributes["argo.rollout.name"] != ""
+              - set(datapoint.attributes["k8s.job.name"], resource.attributes["k8s.job.name"]) where resource.attributes["k8s.job.name"] != nil and resource.attributes["k8s.job.name"] != ""
+              - set(datapoint.attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil and resource.attributes["k8s.container.name"] != ""
+              - set(datapoint.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"]) where resource.attributes["k8s_pod_name"] != nil and resource.attributes["k8s_pod_name"] != ""
+              - set(datapoint.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil and resource.attributes["k8s_namespace_name"] != ""
+              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "homelab-system"
+              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "kube-system"
+              - set(datapoint.attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil and resource.attributes["homelab.service"] != ""
+              - set(datapoint.attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil and resource.attributes["homelab.owner"] != ""
+              - set(datapoint.attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil and resource.attributes["homelab.huid"] != ""
+              - set(datapoint.attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil and resource.attributes["homelab.environment"] != ""
+              - set(datapoint.attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil and resource.attributes["homelab.version"] != ""
+              - set(datapoint.attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil and resource.attributes["service.name"] != ""
+              - set(datapoint.attributes["ready"], datapoint.value_double) where metric.name == "kube_pod_container_status_ready"
       transform/normalize_service_name:
         metric_statements:
           - context: datapoint
             statements:
-              - set(resource.attributes["service.name"], attributes["service.name"])
+              - set(resource.attributes["service.name"], datapoint.attributes["service.name"])
       # Clean up empty label values from target_info (Thanos Receive rejects empty labels)
       transform/cleanup_empty_labels:
         metric_statements:
           - context: datapoint
             statements:
-              - delete_key(attributes, "server_port") where attributes["server_port"] == ""
+              - delete_key(datapoint.attributes, "server_port") where datapoint.attributes["server_port"] == ""
           - context: resource
             statements:
-              - delete_key(attributes, "server.port") where attributes["server.port"] == ""
+              - delete_key(resource.attributes, "server.port") where resource.attributes["server.port"] == ""
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint
@@ -453,11 +456,11 @@ spec:
             scrape_interval: 60s
             scrape_timeout: 10s
           scrape_configs:
-            # - job_name: otel-collector
             - job_name: otel-collector
-              scrape_interval: 10s
-              static_configs:
-                - targets: ['0.0.0.0:8888']
+            # - job_name: otel-collector
+            #   scrape_interval: 10s
+            #   static_configs:
+            #     - targets: ['0.0.0.0:8888']
             - job_name: kubernetes-scrape-pods
               kubernetes_sd_configs:
                 - role: pod
@@ -666,27 +669,28 @@ spec:
                   source_labels:
                     - __meta_kubernetes_service_name
                   target_label: serviceName
-            - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-              job_name: kubernetes-cadvisor
-              kubernetes_sd_configs:
-                - role: node
-              relabel_configs:
-                # --- NEW: DROP THIS CADVISOR JOB ENTIRELY ---
-                - action: drop
-                  regex: .+(cadvisor) # Drops any target whose metrics_path indicates cAdvisor
-                  source_labels: [__metrics_path__]
-                # --------------------------------------------
-                - replacement: kubernetes.default.svc:443
-                  target_label: __address__
-                - regex: (.+)
-                  replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
-                  source_labels:
-                    - __meta_kubernetes_node_name
-                  target_label: __metrics_path__
-              scheme: https
-              tls_config:
-                ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                insecure_skip_verify: true
+            # 2026-01-18
+            # - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            #   job_name: kubernetes-cadvisor
+            #   kubernetes_sd_configs:
+            #     - role: node
+            #   relabel_configs:
+            #     # --- NEW: DROP THIS CADVISOR JOB ENTIRELY ---
+            #     - action: drop
+            #       regex: .+(cadvisor) # Drops any target whose metrics_path indicates cAdvisor
+            #       source_labels: [__metrics_path__]
+            #     # --------------------------------------------
+            #     - replacement: kubernetes.default.svc:443
+            #       target_label: __address__
+            #     - regex: (.+)
+            #       replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
+            #       source_labels:
+            #         - __meta_kubernetes_node_name
+            #       target_label: __metrics_path__
+            #   scheme: https
+            #   tls_config:
+            #     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            #     insecure_skip_verify: true
 
     service:
       pipelines:

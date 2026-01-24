@@ -160,12 +160,12 @@ spec:
           - action: upsert
             key: k8s.cluster.name
             value: homelab-live
-      resourcedetection/homelab:
-        detectors: [env, system]
-        timeout: 5s
-        override: false
-        attributes:
-          - k8s.node.name
+      # resourcedetection/homelab:
+      #   detectors: [env, system]
+      #   timeout: 5s
+      #   override: false
+      #   attributes:
+      #     - k8s.node.name
       transform/cleanup:
         metric_statements:
           - context: resource
@@ -207,8 +207,8 @@ spec:
               - set(attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil
               - set(attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil
               - set(attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil
-              - set(attributes["homelab.tenant"], "prometheus") where resource.attributes["k8s.namespace.name"] != nil and resource.attributes["k8s.namespace.name"] != "homelab-system" and resource.attributes["k8s.namespace.name"] != "kube-system"
-              - set(attributes["homelab.tenant"], "core-tech") where resource.attributes["k8s.namespace.name"] == "homelab-system" or resource.attributes["k8s.namespace.name"] == "kube-system"
+              # - set(attributes["homelab.tenant"], "prometheus") where resource.attributes["k8s.namespace.name"] != nil and resource.attributes["k8s.namespace.name"] != "homelab-system" and resource.attributes["k8s.namespace.name"] != "kube-system"
+              # - set(attributes["homelab.tenant"], "core-tech") where resource.attributes["k8s.namespace.name"] == "homelab-system" or resource.attributes["k8s.namespace.name"] == "kube-system"
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint
@@ -481,8 +481,8 @@ spec:
             # - debug
           processors:
             - memory_limiter
+            - metricstransform/add_standard_labels
             ############
-            # - metricstransform/add_standard_labels
             # - resource/set_known_attributes
             # - resourcedetection/homelab
             ########
