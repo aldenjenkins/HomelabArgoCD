@@ -64,15 +64,15 @@ spec:
         # - --downsample.concurrency=8
         - --downsample.concurrency=4
         # - --downsampling.disable
-        - --deduplication.replica-label=prometheus_replica
-        - --deduplication.replica-label=rule_replica
+        - --deduplication.replica-label=receive_replica
+        - --deduplication.replica-label=thanos_ruler_replica
         - |-
           --tracing.config="config":
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
             # "sampler_param": 100
-            "sampler_param": 10
+            "sampler_param": 5
             "sampler_type": "ratelimiting"
             "service_name": "thanos-compact"
           "type": "OTLP"

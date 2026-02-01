@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive
+    app.kubernetes.io/version: v0.40.1
+  name: thanos-receive
+spec:
+  endpoints:
+    - port: http
+      relabelings:
+        - action: replace
+          separator: /
+          sourceLabels:
+            - namespace
+            - pod
+          targetLabel: instance
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: receive
+      app.kubernetes.io/instance: thanos-receive
+      app.kubernetes.io/name: thanos-receive
+      headless: "false"

@@ -33,4 +33,4 @@ spec:
     staticConfig:
       static:
         - thanos-query-frontend-redis.thanos.svc.cluster.local.:6379
-        - thanos-memcached-index.thanos.svc.cluster.local.:11211
+        # - thanos-memcached-index.thanos.svc.cluster.local.:11211

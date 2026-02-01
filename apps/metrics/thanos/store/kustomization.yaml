@@ -1,6 +1,6 @@
 namespace: thanos
 resources:
-  - memcached
+  # memcached is now a sidecar in the store pod
   - service.yaml
   - statefulset.yaml
   - servicemonitor.yaml
@@ -11,6 +11,7 @@ configMapGenerator:
 - name: thanos-store-index-cache-config
   files:
   - files/thanos-index-cache-config.yaml
+  - files/thanos-caching-bucket-config.yaml
   options:
     # Makes the ConfigMap immutable for better stability and performance
     immutable: true

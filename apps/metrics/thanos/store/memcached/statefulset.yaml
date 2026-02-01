@@ -7,8 +7,7 @@ metadata:
     app.kubernetes.io/component: cache
 spec:
   serviceName: thanos-memcached-index
-  # replicas: 3 # Start with 3 replicas for redundancy and scaling cache capacity
-  replicas: 1
+  replicas: 2  # Co-located with store pods for low latency
   selector:
     matchLabels:
       app.kubernetes.io/name: thanos-memcached-index
@@ -18,17 +17,31 @@ spec:
         app.kubernetes.io/name: thanos-memcached-index
         app.kubernetes.io/component: cache
     spec:
-
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 11211
+        runAsGroup: 11211
+        fsGroup: 11211
+        seccompProfile:
+          type: RuntimeDefault
       affinity:
-        # Node Affinity ensures the pods land only on the designated control plane nodes
+        # Run on same nodes as thanos-store for minimal latency
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                  - control-plane-02
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - control-plane-01
+                      - control-plane-03
+        # One memcached per node
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: thanos-memcached-index
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: memcached
         image: memcached:1.6.24-alpine
@@ -48,3 +61,10 @@ spec:
           requests:
             cpu: 50m
             memory: 4096Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL

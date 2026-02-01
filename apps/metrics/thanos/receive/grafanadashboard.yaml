@@ -1,0 +1,15 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: thanos-receive
+  labels:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folderUID: thanos-uid
+  url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json

@@ -7,7 +7,15 @@ config:
   max_idle_connections: 100
   max_async_concurrency: 50  # Increased for startup burst
   max_async_buffer_size: 25000  # Increased buffer for startup
-  # Set max_item_size to 1MB (1048576 bytes) to match the recommended Memcached -I flag
   max_item_size: 1MiB
   max_get_multi_concurrency: 100  # Increased for parallel block loading
   max_get_multi_batch_size: 1000  # Larger batches for efficiency
+chunk_subrange_size: 16000
+max_chunks_get_range_requests: 3
+chunk_object_attrs_ttl: 24h
+chunk_subrange_ttl: 24h
+blocks_iter_ttl: 5m
+metafile_exists_ttl: 2h
+metafile_doesnt_exist_ttl: 15m
+metafile_content_ttl: 24h
+metafile_max_size: 1MiB

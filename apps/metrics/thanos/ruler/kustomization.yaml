@@ -2,10 +2,9 @@ namespace: thanos
 resources:
   - thanosruler.yaml
   - servicemonitor.yaml
-  # - authorizationpolicy.yaml
-  # - virtualservice.yaml
   - grafanadashboard.yaml
   - prometheusrule.yaml
+  - httproute.yaml
   # - telemetry.yaml
 
 generators:

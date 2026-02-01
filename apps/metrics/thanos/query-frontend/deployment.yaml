@@ -16,14 +16,12 @@ spec:
       app.kubernetes.io/name: thanos-query-frontend
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/enable-access-logging: "false"
       labels:
         app.kubernetes.io/component: query-cache
         app.kubernetes.io/instance: thanos-query-frontend
         app.kubernetes.io/name: thanos-query-frontend
         app.kubernetes.io/version: v0.30.2
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -47,27 +45,30 @@ spec:
         - --query-frontend.compress-responses
         - --http-address=0.0.0.0:9090
         - --query-frontend.downstream-url=http://thanos-query.thanos.svc.cluster.local.:9090
-        - --query-range.split-interval=12h
-        - --labels.split-interval=12h
+        - --query-range.split-interval=2h  # Match Receive block size for better cache hits
+        - --labels.split-interval=2h
         - --query-range.max-retries-per-request=10
         - --labels.max-retries-per-request=10
         - --query-frontend.log-queries-longer-than=10s
+        - --cache-compression-type=snappy
         - |-
-          --query-range.response-cache-config="config":
+          --query-range.response-cache-config="type": "REDIS"
+          "config":
             "addr": "thanos-query-frontend-redis.thanos.svc.cluster.local:6379"
             "max_get_multi_concurrency": 100
-          "type": "redis"
+            "cache_size": "500MB"
         - |-
-          --labels.response-cache-config="config":
+          --labels.response-cache-config="type": "REDIS"
+          "config":
             "addr": "thanos-query-frontend-redis.thanos.svc.cluster.local:6379"
             "max_get_multi_concurrency": 100
-          "type": "redis"
+            "cache_size": "500MB"
         - |-
           --tracing.config="config":
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
-            "sampler_param": 10
+            "sampler_param": 5
             "sampler_type": "ratelimiting"
             "service_name": "thanos-query-frontend"
           "type": "OTLP"
@@ -98,7 +99,7 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            memory: 400Mi
+            memory: 1280Mi
           requests:
             cpu: 30m
             memory: 123Mi

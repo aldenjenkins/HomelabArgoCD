@@ -12,7 +12,10 @@ spec:
   replicas: 2
   updateStrategy:
     type: RollingUpdate
-  podManagementPolicy: Parallel
+    rollingUpdate:
+      maxUnavailable: 1  # Update one pod at a time to prevent simultaneous network saturation
+  podManagementPolicy: OrderedReady  # Can't change - immutable field
+  # podManagementPolicy: Parallel  # Both pods restart together, but bandwidth-limited
   selector:
     matchLabels:
       app.kubernetes.io/component: object-store-gateway
@@ -21,6 +24,10 @@ spec:
   serviceName: thanos-store
   template:
     metadata:
+      # annotations:
+      #   # Cilium bandwidth limits - prevent Store from saturating network during sync
+      #   kubernetes.io/ingress-bandwidth: "500M"  # 500 Mbps ingress (from Minio)
+      #   kubernetes.io/egress-bandwidth: "200M"   # 200 Mbps egress (responses to Query)
       labels:
         app.kubernetes.io/component: object-store-gateway
         app.kubernetes.io/instance: thanos-store
@@ -28,23 +35,30 @@ spec:
         app.kubernetes.io/version: v0.31.0
     spec:
       affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - control-plane-01
+                      - control-plane-03
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
                 matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values:
-                  - thanos-store
-                - key: app.kubernetes.io/instance
-                  operator: In
-                  values:
-                  - thanos-store
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - thanos-store
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - thanos-store
               namespaces:
-              - thanos
+                - thanos
               topologyKey: kubernetes.io/hostname
-            weight: 100
       containers:
       - args:
         - store
@@ -55,13 +69,24 @@ spec:
         - --http-address=0.0.0.0:10902
         - --objstore.config=$(OBJSTORE_CONFIG)
         - --ignore-deletion-marks-delay=24h
+        # - --sync-block-duration=3m  # Sync with object storage every 3m to pick up Receive uploads quickly
         - --index-cache.config-file=/etc/thanos/cache/thanos-index-cache-config.yaml
+        # Chunks cache - caches actual metric data to reduce S3 downloads
+        - --store.caching-bucket.config-file=/etc/thanos/cache/thanos-caching-bucket-config.yaml
+        # Lazy loading reduces memory and startup time
+        - --store.enable-index-header-lazy-reader
+        # Increase block sync interval to reduce S3 LIST operations (default 3m)
+        - --sync-block-duration=15m
+        # Rate limit block sync to prevent network saturation on startup (default 20)
+        - --block-sync-concurrency=2  # Reduced further - slower but gentler
+        # Limit concurrent chunk fetches (default 0 = unlimited)
+        - --store.grpc.series-max-concurrency=10
         - |-
           --tracing.config="config":
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
-            "sampler_param": 10
+            "sampler_param": 5
             "sampler_type": "ratelimiting"
             "service_name": "thanos-store"
           "type": "OTLP"
@@ -100,9 +125,9 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            memory: 1Gi
+            memory: 2Gi
           requests:
-            cpu: 500m
+            cpu: 200m
             memory: 500Mi
         securityContext:
           allowPrivilegeEscalation: false
@@ -123,6 +148,37 @@ spec:
         - name: index-cache-config
           mountPath: /etc/thanos/cache
           readOnly: true
+      # Memcached sidecar - local cache with zero network latency
+      - name: memcached
+        image: memcached:1.6.24-alpine
+        args:
+          - "-m"
+          - "4096"  # 4GB cache memory
+          - "-c"
+          - "2048"  # Increased max connections for startup burst
+          - "-I"
+          - "1m"    # Max item size 1MB
+          - "-t"
+          - "4"     # Increased threads for concurrent requests
+        ports:
+        - name: memcached
+          containerPort: 11211
+        resources:
+          limits:
+            cpu: 500m
+            memory: 4500Mi
+          requests:
+            cpu: 100m  # Increased for burst handling
+            memory: 4096Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 11211
+          runAsGroup: 11211
+          capabilities:
+            drop:
+              - ALL
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -135,8 +191,6 @@ spec:
       serviceAccountName: thanos-store
       terminationGracePeriodSeconds: 120
       volumes:
-        - name: data
-          emptyDir: {}
         - name: index-cache-config
           configMap:
             # Name of the ConfigMap generated by Kustomize
@@ -145,16 +199,19 @@ spec:
               # Map the file content to the target file name in the mount path
               - key: thanos-index-cache-config.yaml
                 path: thanos-index-cache-config.yaml
-  # volumeClaimTemplates:
-  # - metadata:
-  #     labels:
-  #       app.kubernetes.io/component: object-store-gateway
-  #       app.kubernetes.io/instance: thanos-store
-  #       app.kubernetes.io/name: thanos-store
-  #     name: data
-  #   spec:
-  #     accessModes:
-  #     - ReadWriteOnce
-  #     resources:
-  #       requests:
-  #         storage: 10Gi
+              - key: thanos-caching-bucket-config.yaml
+                path: thanos-caching-bucket-config.yaml
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          app.kubernetes.io/component: object-store-gateway
+          app.kubernetes.io/instance: thanos-store
+          app.kubernetes.io/name: thanos-store
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 20Gi  # Cache for block data and index headers

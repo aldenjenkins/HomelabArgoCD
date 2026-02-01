@@ -1,0 +1,16 @@
+namespace: thanos
+resources:
+  - statefulset.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - poddisruptionbudget.yaml
+  - grafanadashboard.yaml
+  - httproute.yaml
+
+configMapGenerator:
+- name: thanos-receive-hashring
+  files:
+  - files/hashring.json
+  options:
+    immutable: true

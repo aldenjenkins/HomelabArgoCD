@@ -4,8 +4,6 @@ resources:
   - deployment.yaml
   - servicemonitor.yaml
   - serviceaccount.yaml
+  - httproute.yaml
   - service.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
   - grafanadashboard.yaml
-  - telemetry.yaml

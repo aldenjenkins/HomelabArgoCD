@@ -4,6 +4,7 @@ resources:
   - compactor
   - query
   - query-frontend
+  - receive
   - store
   - ruler
   - grafanafolder.yaml

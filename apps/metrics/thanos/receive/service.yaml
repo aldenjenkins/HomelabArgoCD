@@ -1,0 +1,61 @@
+# Headless service for hashring peer discovery
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive
+    app.kubernetes.io/version: v0.40.1
+    headless: "true"
+  name: thanos-receive-headless
+spec:
+  clusterIP: None
+  ports:
+    - name: grpc
+      port: 10901
+      targetPort: 10901
+      protocol: TCP
+    - name: http
+      port: 10902
+      targetPort: 10902
+      protocol: TCP
+    - name: remote-write
+      port: 19291
+      targetPort: 19291
+      protocol: TCP
+  selector:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive
+---
+# Regular service for remote write ingestion (load balanced)
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive
+    app.kubernetes.io/version: v0.40.1
+    headless: "false"
+  name: thanos-receive
+spec:
+  type: ClusterIP
+  ports:
+    - name: grpc
+      port: 10901
+      targetPort: 10901
+      protocol: TCP
+    - name: http
+      port: 10902
+      targetPort: 10902
+      protocol: TCP
+    - name: remote-write
+      port: 19291
+      targetPort: 19291
+      protocol: TCP
+  selector:
+    app.kubernetes.io/component: receive
+    app.kubernetes.io/instance: thanos-receive
+    app.kubernetes.io/name: thanos-receive

@@ -8,4 +8,4 @@ resources:
   - servicemonitor.yaml
   - grafanadashboard.yaml
   - prometheusrule.yaml
-  - telemetry.yaml
+  # - telemetry.yaml

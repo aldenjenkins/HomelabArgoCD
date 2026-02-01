@@ -1,0 +1,24 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: thanos-query-frontend-redis
+  namespace: thanos
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: thanos-query-frontend-redis
+    type: redis-datasource
+    url: redis://thanos-query-frontend-redis.thanos.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: latest

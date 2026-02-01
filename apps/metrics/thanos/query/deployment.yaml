@@ -44,19 +44,25 @@ spec:
         - --http-address=0.0.0.0:9090
         - --log.level=info
         - --log.format=logfmt
-        - --query.replica-label=prometheus_replica
-        - --query.replica-label=rule_replica
+        - --query.replica-label=receive_replica
+        - --query.replica-label=thanos_ruler_replica
         - --endpoint=dnssrv+_grpc._tcp.thanos-store.thanos.svc.cluster.local:10901
-        - --endpoint=dnssrv+_grpc._tcp.prometheus-operated.prometheus.svc.cluster.local:10901
+        - --endpoint=dnssrv+_grpc._tcp.thanos-receive-headless.thanos.svc.cluster.local:10901
         - --endpoint=dnssrv+_grpc._tcp.thanos-ruler-operated.thanos.svc.cluster.local:10901
+        # - --endpoint=dns+thanos-store.thanos.svc.cluster.local:10901
+        # - --endpoint=dns+thanos-receive-headless.thanos.svc.cluster.local:10901
+        # - --endpoint=dns+thanos-ruler-operated.thanos.svc.cluster.local:10901
+        # Legacy Prometheus sidecar endpoint - remove after migration
+        # - --endpoint=dnssrv+_grpc._tcp.prometheus-operated.prometheus.svc.cluster.local:10901
         - --query.auto-downsampling
+        - --grpc-compression=snappy
         - |-
           --tracing.config="config":
             "client_type": "grpc"
             "insecure": true
             "endpoint": "trace-collector.observability.svc.cluster.local:4317"
             # "sampler_param": 100
-            "sampler_param": 10
+            "sampler_param": 5
             "sampler_type": "ratelimiting"
             "service_name": "thanos-query"
           "type": "OTLP"
@@ -89,7 +95,7 @@ spec:
           periodSeconds: 5
         resources:
           limits:
-            memory: 1Gi
+            memory: 2Gi
           requests:
             cpu: 300m
             memory: 300Mi
