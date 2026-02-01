@@ -102,7 +102,7 @@ spec:
     processors:
       # Use the in-built `batch` processor to batch up data before writing it for export.
       batch:
-        timeout: 1s  # Reduce if too high
+        timeout: 10s  # Reduce if too high
         send_batch_size: 1024  # Ensure it's reasonable
         send_batch_max_size: 2048
 

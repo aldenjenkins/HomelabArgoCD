@@ -357,6 +357,113 @@ spec:
               - action: add_label
                 new_label: homelab_otel_source
                 new_value: core-prometheus-collector
+              - action: add_label
+                new_label: k8s_cluster_name
+                new_value: homelab-live
+      # Aggregate Istio metrics to reduce cardinality before sending to Thanos
+      # This replaces the PrometheusRule/Thanos Ruler aggregation approach
+      # See: https://istio.io/latest/docs/ops/best-practices/observability/
+      # Labels REMOVED by aggregation (high-cardinality): instance, k8s_pod_name, podName,
+      #   k8s_node_name, k8s_container_name, k8s_deployment_name, k8s_namespace_name, namespaceName,
+      #   job, service_name, destination_app, destination_version, destination_cluster,
+      #   destination_principal, source_cluster, source_principal
+      metricstransform/aggregate_istio:
+        transforms:
+          # istio_requests_total
+          - include: istio_requests_total
+            action: update
+            new_name: workload:istio_requests_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: &istio_common_labels
+                  - reporter
+                  - source_workload
+                  - source_workload_namespace
+                  - source_canonical_service
+                  - source_canonical_revision
+                  - destination_workload
+                  - destination_workload_namespace
+                  - destination_canonical_service
+                  - destination_canonical_revision
+                  - destination_service
+                  - destination_service_name
+                  - destination_service_namespace
+                  - request_protocol
+                  - response_code
+                  - response_flags
+                  - connection_security_policy
+                  - k8s_cluster_name
+                  - homelab_otel_source
+          # istio_request_duration_milliseconds (histogram - internally one metric, exported as _count/_sum/_bucket)
+          - include: istio_request_duration_milliseconds
+            action: update
+            new_name: workload:istio_request_duration_milliseconds
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_common_labels
+          # istio_request_bytes (histogram - internally one metric, exported as _count/_sum/_bucket)
+          - include: istio_request_bytes
+            action: update
+            new_name: workload:istio_request_bytes
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_common_labels
+          # istio_response_bytes (histogram - internally one metric, exported as _count/_sum/_bucket)
+          - include: istio_response_bytes
+            action: update
+            new_name: workload:istio_response_bytes
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_common_labels
+          # istio_tcp_* metrics
+          - include: istio_tcp_sent_bytes_total
+            action: update
+            new_name: workload:istio_tcp_sent_bytes_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: &istio_tcp_labels
+                  - reporter
+                  - source_workload
+                  - source_workload_namespace
+                  - source_canonical_service
+                  - source_canonical_revision
+                  - destination_workload
+                  - destination_workload_namespace
+                  - destination_canonical_service
+                  - destination_canonical_revision
+                  - destination_service
+                  - destination_service_name
+                  - destination_service_namespace
+                  - connection_security_policy
+                  - response_flags
+                  - homelab_otel_source
+                  - k8s_cluster_name
+          - include: istio_tcp_received_bytes_total
+            action: update
+            new_name: workload:istio_tcp_received_bytes_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_tcp_labels
+          - include: istio_tcp_connections_opened_total
+            action: update
+            new_name: workload:istio_tcp_connections_opened_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_tcp_labels
+          - include: istio_tcp_connections_closed_total
+            action: update
+            new_name: workload:istio_tcp_connections_closed_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_tcp_labels
       resource/set_known_attributes:
         attributes:
           - action: upsert
@@ -382,7 +489,7 @@ spec:
               - delete_key(datapoint.attributes, "otel_scope_version")
               # Nil/empty checks prevent empty labels (Thanos Receive rejects them)
               # - set(attributes["nodeName"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""  # Redundant with k8s.node.name
-              - set(datapoint.attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
+              # - set(datapoint.attributes["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil and resource.attributes["k8s.cluster.name"] != ""
               - set(datapoint.attributes["k8s.node.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil and resource.attributes["k8s.node.name"] != ""
               - set(datapoint.attributes["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil and resource.attributes["k8s.deployment.name"] != ""
               - set(datapoint.attributes["k8s.statefulset.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil and resource.attributes["k8s.statefulset.name"] != ""
@@ -462,6 +569,7 @@ spec:
             #   static_configs:
             #     - targets: ['0.0.0.0:8888']
             - job_name: kubernetes-scrape-pods
+              scrape_interval: 30s
               kubernetes_sd_configs:
                 - role: pod
               relabel_configs:
@@ -705,12 +813,13 @@ spec:
             - attributes/kube_state_metrics
             - attributes/cadvisor
             - metricstransform/add_standard_labels
-            - resource/set_known_attributes
+            # - resource/set_known_attributes
             - batch
             - groupbyattrs
             - transform/set_match_resource_attributes
             - k8sattributes
             - transform/label_metrics
+            - metricstransform/aggregate_istio  # Aggregate istio metrics before sending to Thanos
             - transform/normalize_service_name
             - transform/cleanup_empty_labels
             # - filter/drop_observability_ksm
