@@ -43,7 +43,7 @@ spec:
       initContainers:
         []
       containers:
-        - image: docker.io/memcached:1.6.23-alpine
+        - image: docker.io/memcached:1.6.40-alpine
           imagePullPolicy: IfNotPresent
           name: memcached
           args:
