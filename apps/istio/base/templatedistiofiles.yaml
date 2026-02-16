@@ -21415,7 +21415,7 @@ spec:
         envFrom:
         - configMapRef:
             name: istio-cni-config
-        image: docker.io/istio/install-cni:1.27.1-distroless
+        image: docker.io/istio/install-cni:1.29.0-distroless
         name: install-cni
         ports:
         - containerPort: 15014
