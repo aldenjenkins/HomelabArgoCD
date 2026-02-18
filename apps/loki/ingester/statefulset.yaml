@@ -37,7 +37,7 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          image: grafana/loki:3.5.5
+          image: grafana/loki:3.6.6
           imagePullPolicy: IfNotPresent
           args:
             - -target=ingester
