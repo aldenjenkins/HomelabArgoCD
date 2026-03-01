@@ -15,7 +15,7 @@ spec:
     imagePullPolicy: "IfNotPresent"
   redisExporter:
     enabled: true
-    image: "quay.io/opstree/redis-exporter:v1.76.0"
+    image: "quay.io/opstree/redis-exporter:v1.81.0"
     imagePullPolicy: "IfNotPresent"
   podSecurityContext:
     fsGroup: 1000
