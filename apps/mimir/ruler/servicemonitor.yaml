@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mimir-ruler
+  labels:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: ruler
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "3.0.2"
+spec:
+  namespaceSelector:
+    matchNames:
+    - mimir
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: mimir
+      app.kubernetes.io/component: ruler
+    matchExpressions:
+      - key: prometheus.io/service-monitor
+        operator: NotIn
+        values:
+          - "false"
+  endpoints:
+    - port: http-metrics
+      relabelings:
+        - action: replace
+          sourceLabels: [job]
+          replacement: "mimir/ruler"
+          targetLabel: job
+        - action: replace
+          replacement: "homelab-live"
+          targetLabel: cluster
+      scheme: http

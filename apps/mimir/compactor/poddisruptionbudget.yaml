@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: compactor
+    app.kubernetes.io/instance: mimir-compactor
+    app.kubernetes.io/name: mimir-compactor
+    app.kubernetes.io/part-of: mimir
+  name: mimir-compactor
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: compactor
+      app.kubernetes.io/instance: mimir-compactor
+      app.kubernetes.io/name: mimir-compactor

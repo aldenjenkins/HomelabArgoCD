@@ -1,0 +1,29 @@
+namespace: mimir
+resources:
+  - namespace.yaml
+  - gossip-ring-service.yaml
+  - memcached
+  - kafka
+  - distributor
+  - ingester
+  - querier
+  - query-frontend
+  - query-scheduler
+  - compactor
+  - store-gateway
+  - gateway
+  - ruler
+  - alertmanager
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+
+generators:
+  - sopsgenerator.yaml
+
+configMapGenerator:
+  - name: mimir-config
+    files:
+      - files/mimir.yaml
+      - files/runtime.yaml
+    options:
+      immutable: true

@@ -1,0 +1,14 @@
+namespace: mimir
+resources:
+  - service.yaml
+  - httproute.yaml
+  - deployment.yaml
+  - serviceaccount.yaml
+  - grafanadatasource.yaml
+
+configMapGenerator:
+  - name: mimir-gateway-nginx
+    files:
+      - files/nginx.conf
+    options:
+      immutable: false

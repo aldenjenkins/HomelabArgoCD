@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: query-frontend
+    app.kubernetes.io/instance: mimir-query-frontend
+    app.kubernetes.io/name: mimir-query-frontend
+    app.kubernetes.io/part-of: mimir
+    app.kubernetes.io/version: "3.0.2"
+  name: mimir-query-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: query-frontend
+      app.kubernetes.io/instance: mimir-query-frontend
+      app.kubernetes.io/name: mimir-query-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: query-frontend
+        app.kubernetes.io/instance: mimir-query-frontend
+        app.kubernetes.io/name: mimir-query-frontend
+        app.kubernetes.io/part-of: mimir
+        app.kubernetes.io/version: "3.0.2"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - mimir-query-frontend
+                namespaces:
+                  - mimir
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - name: query-frontend
+          image: grafana/mimir:3.0.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=query-frontend
+            - -config.file=/etc/mimir/mimir.yaml
+            - -config.expand-env=true
+          env:
+            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            #   value: http://trace-collector.observability.svc.cluster.local:4318
+            # - name: OTEL_TRACES_SAMPLER
+            #   value: always_on
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-secret-key
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9095
+              name: grpc
+              protocol: TCP
+            - containerPort: 7946
+              name: memberlist
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+              readOnly: true
+            - name: data
+              mountPath: /data
+        # # Memcached sidecar for results cache
+        # - name: memcached
+        #   image: memcached:1.6.24-alpine
+        #   args:
+        #     - "-m"
+        #     - "512"   # 512MB cache memory
+        #     - "-c"
+        #     - "1024"  # Max connections
+        #     - "-I"
+        #     - "5m"    # Max item size 5MB (for query results)
+        #     - "-t"
+        #     - "2"     # Threads
+        #   ports:
+        #     - name: memcached
+        #       containerPort: 11211
+        #   resources:
+        #     limits:
+        #       cpu: 250m
+        #       memory: 600Mi
+        #     requests:
+        #       cpu: 50m
+        #       memory: 512Mi
+        #   securityContext:
+        #     allowPrivilegeEscalation: false
+        #     readOnlyRootFilesystem: true
+        #     runAsNonRoot: true
+        #     runAsUser: 11211
+        #     runAsGroup: 11211
+        #     capabilities:
+        #       drop:
+        #         - ALL
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: mimir-query-frontend
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: config
+          configMap:
+            name: mimir-config
+        - name: data
+          emptyDir: {}

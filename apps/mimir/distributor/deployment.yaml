@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: distributor
+    app.kubernetes.io/instance: mimir-distributor
+    app.kubernetes.io/name: mimir-distributor
+    app.kubernetes.io/part-of: mimir
+    app.kubernetes.io/version: "3.0.2"
+  name: mimir-distributor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: distributor
+      app.kubernetes.io/instance: mimir-distributor
+      app.kubernetes.io/name: mimir-distributor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: distributor
+        app.kubernetes.io/instance: mimir-distributor
+        app.kubernetes.io/name: mimir-distributor
+        app.kubernetes.io/part-of: mimir
+        app.kubernetes.io/version: "3.0.2"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - mimir-distributor
+                namespaces:
+                  - mimir
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - name: distributor
+          image: grafana/mimir:3.0.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=distributor
+            - -config.file=/etc/mimir/mimir.yaml
+            - -config.expand-env=true
+            # # When write requests go through distributors via gRPC, we want gRPC clients to re-resolve the distributors DNS
+            # # endpoint before the distributor process is terminated, in order to avoid any failures during graceful shutdown.
+            # # To achieve it, we set a shutdown delay greater than the gRPC max connection age.
+            # - "-server.grpc.keepalive.max-connection-age=60s"
+            # - "-server.grpc.keepalive.max-connection-age-grace=5m"
+            # - "-server.grpc.keepalive.max-connection-idle=1m"
+            # - "-shutdown-delay=90s"
+          env:
+            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            #   value: http://trace-collector.observability.svc.cluster.local:4318
+            # - name: OTEL_TRACES_SAMPLER
+            #   value: always_on
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-secret-key
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9095
+              name: grpc
+              protocol: TCP
+            - containerPort: 7946
+              name: memberlist
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+              readOnly: true
+            - name: data
+              mountPath: /data
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: mimir-distributor
+      terminationGracePeriodSeconds: 100
+      volumes:
+        - name: config
+          configMap:
+            name: mimir-config
+        - name: data
+          emptyDir: {}

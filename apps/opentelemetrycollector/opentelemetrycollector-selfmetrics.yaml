@@ -23,9 +23,22 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
-      prometheusremotewrite:
+      prometheusremotewrite/thanos:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+        add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
+      prometheusremotewrite/mimir:
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
         add_metric_suffixes: false
         tls:
           insecure: true
@@ -77,8 +90,8 @@ spec:
             key: container
           - action: delete
             key: pod
-          - action: delete
-            key: namespace
+          # - action: delete
+          #   key: namespace
         include:
           match_type: regexp
           metric_names: ^kube_.+
@@ -97,6 +110,9 @@ spec:
               - action: add_label
                 new_label: homelab_otel_source
                 new_value: selfmetrics-collector
+              - action: add_label
+                new_label: cluster
+                new_value: homelab-live
       resource/set_known_attributes:
         attributes:
           - action: upsert
@@ -115,7 +131,7 @@ spec:
             - name == "kube_configmap_metadata_resource_version"
             - name == "kube_configmap_created"
             - name == "kube_deployment_status_replicas_updated"
-            - name == "kube_deployment_spec_replicas"
+            # - name == "kube_deployment_spec_replicas"  # Needed for Mimir recording rules
             - name == "kube_deployment_status_observed_generation"
             - name == "kube_deployment_metadata_generation"
             - name == "kube_deployment_status_replicas_ready"
@@ -161,7 +177,7 @@ spec:
             - name == "kube_pod_init_container_status_restarts_total"
             - name == "kube_pod_ips"
             - name == "kube_pod_labels"
-            - name == "kube_pod_owner"
+            # - name == "kube_pod_owner"
             - name == "kube_pod_restart_policy"
             - name == "kube_pod_start_time"
             - name == "kube_pod_status_scheduled"
@@ -178,7 +194,7 @@ spec:
             - name == "kube_poddisruptionbudget_status_expected_pods"
             - name == "kube_poddisruptionbudget_created"
             - name == "kube_poddisruptionbudget_status_desired_healthy"
-            - name == "kube_replicaset_owner"
+            # - name == "kube_replicaset_owner"
             - name == "kube_replicaset_metadata_generation"
             - name == "kube_replicaset_spec_replicas"
             - name == "kube_replicaset_status_replicas"
@@ -255,7 +271,7 @@ spec:
               - set(attributes["service.name"], resource.attributes["k8s.statefulset.name"]) where resource.attributes["k8s.statefulset.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.cronjob.name"]) where resource.attributes["k8s.cronjob.name"] != nil
               - set(attributes["service.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
-              - set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
+              # - set(attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
               - set(attributes["k8s.job.name"], resource.attributes["k8s.job.name"]) where resource.attributes["k8s.job.name"] != nil
               - set(attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil
               - set(attributes["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil
@@ -494,7 +510,8 @@ spec:
         metrics:
           exporters:
             # - otlphttp/prometheus
-            - prometheusremotewrite
+            # - prometheusremotewrite/thanos
+            - prometheusremotewrite/mimir
           processors:
             - memory_limiter
             - attributes/kube_state_metrics

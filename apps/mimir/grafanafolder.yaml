@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: mimir
+spec:
+  allowCrossNamespaceImport: true
+  uid: mimir-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

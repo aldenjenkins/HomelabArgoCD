@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mimir-memcached-headless
+  labels:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: memcached
+    app.kubernetes.io/version: "3.0.2"
+    prometheus.io/service-monitor: "false"
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: memcached
+      port: 11211
+      targetPort: memcached
+    - name: http-metrics
+      port: 9150
+      targetPort: http-metrics
+  selector:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: memcached
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mimir-memcached
+  labels:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: memcached
+    app.kubernetes.io/version: "3.0.2"
+spec:
+  type: ClusterIP
+  ports:
+    - name: memcached
+      port: 11211
+      targetPort: memcached
+    - name: http-metrics
+      port: 9150
+      targetPort: http-metrics
+  selector:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: memcached

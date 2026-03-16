@@ -1,0 +1,13 @@
+# Mimir runtime configuration
+# This file can be updated without restarting Mimir components
+# Changes are picked up every 10 seconds (configurable in runtime_config.period)
+
+# Per-tenant overrides (useful for testing different limits)
+overrides:
+  # anonymous tenant (when multitenancy is disabled)
+  anonymous:
+    ingestion_rate: 100000
+    ingestion_burst_size: 200000
+    max_global_series_per_user: 5000000
+    native_histograms_ingestion_enabled: true
+    max_native_histogram_buckets: 160

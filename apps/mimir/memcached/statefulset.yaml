@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mimir-memcached
+  labels:
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/component: memcached
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mimir
+      app.kubernetes.io/instance: mimir
+      app.kubernetes.io/component: memcached
+  serviceName: mimir-memcached-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mimir
+        app.kubernetes.io/instance: mimir
+        app.kubernetes.io/component: memcached
+    spec:
+      securityContext:
+        fsGroup: 11211
+        runAsGroup: 11211
+        runAsNonRoot: true
+        runAsUser: 11211
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: memcached
+          image: memcached:1.6.40-alpine
+          imagePullPolicy: IfNotPresent
+          args:
+            - memcached
+            - -m 2048
+            - -I 5m
+            - -c 4096
+            - -v
+          ports:
+            - containerPort: 11211
+              name: memcached
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2.5Gi
+            limits:
+              memory: 2.5Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          livenessProbe:
+            tcpSocket:
+              port: memcached
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: memcached
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        - name: exporter
+          image: quay.io/prometheus/memcached-exporter:v0.15.4
+          imagePullPolicy: IfNotPresent
+          args:
+            - --memcached.address=localhost:11211
+          ports:
+            - containerPort: 9150
+              name: http-metrics
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true

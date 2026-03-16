@@ -36,7 +36,7 @@ spec:
         verbosity: detailed
 
       # Exporter for sending Prometheus data to Mimir.
-      prometheusremotewrite:
+      prometheusremotewrite/thanos:
         # Don't add suffixes to the metrics. We've already renamed the `traces.spanmetrics.calls` metric to
         # `traces.spanmetrics.calls.total`, and we don't want to add the `_milliseconds` suffix to the
         # `traces.spanmetrics.latency` metric.
@@ -47,6 +47,20 @@ spec:
         # TLS is not enabled for the instance.
         tls:
           insecure: true
+
+      prometheusremotewrite/mimir:
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+        add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
 
       # prometheusremotewrite/keda:
       #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
@@ -318,7 +332,8 @@ spec:
           - transform/cleanup_empty_labels
           exporters: 
           # - forward/keda
-          - prometheusremotewrite
+          # - prometheusremotewrite/thanos
+          - prometheusremotewrite/mimir
         # metrics/keda:
         #   exporters:
         #     - prometheusremotewrite/keda

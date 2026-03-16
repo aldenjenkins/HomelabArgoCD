@@ -45,9 +45,22 @@ spec:
         sending_queue:
           num_consumers: 50
         timeout: 10s
-      prometheusremotewrite:
+      prometheusremotewrite/thanos:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+        add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
+      prometheusremotewrite/mimir:
+        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+        endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
         add_metric_suffixes: false
         tls:
           insecure: true
@@ -477,7 +490,8 @@ spec:
         metrics:
           exporters:
             # - otlphttp/prometheus
-            - prometheusremotewrite
+            # - prometheusremotewrite/thanos
+            - prometheusremotewrite/mimir
             # - debug
           processors:
             - memory_limiter

@@ -1,0 +1,11 @@
+namespace: mimir
+resources:
+  - servicemonitor.yaml
+  - service.yaml
+  - poddisruptionbudget.yaml
+  - statefulset.yaml
+  - serviceaccount.yaml
+  - grafanadatasource.yaml
+
+generators:
+  - sopsgenerator.yaml

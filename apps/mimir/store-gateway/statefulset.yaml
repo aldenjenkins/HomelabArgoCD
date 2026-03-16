@@ -1,0 +1,194 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir-store-gateway
+    app.kubernetes.io/name: mimir-store-gateway
+    app.kubernetes.io/part-of: mimir
+    app.kubernetes.io/version: "3.0.2"
+  name: mimir-store-gateway
+spec:
+  replicas: 3
+  podManagementPolicy: OrderedReady
+  serviceName: mimir-store-gateway-headless
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: store-gateway
+      app.kubernetes.io/instance: mimir-store-gateway
+      app.kubernetes.io/name: mimir-store-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: store-gateway
+        app.kubernetes.io/instance: mimir-store-gateway
+        app.kubernetes.io/name: mimir-store-gateway
+        app.kubernetes.io/part-of: mimir
+        app.kubernetes.io/version: "3.0.2"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - control-plane-01
+                      - control-plane-02
+                      - control-plane-03
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - mimir-store-gateway
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - mimir-store-gateway
+              namespaces:
+                - mimir
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: store-gateway
+          image: grafana/mimir:3.0.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=store-gateway
+            - -config.file=/etc/mimir/mimir.yaml
+            - -config.expand-env=true
+            # - -server.grpc-max-send-msg-size-bytes=209715200
+          env:
+            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            #   value: http://trace-collector.observability.svc.cluster.local:4318
+            # - name: OTEL_TRACES_SAMPLER
+            #   value: always_on
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-secret-key
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9095
+              name: grpc
+              protocol: TCP
+            - containerPort: 7946
+              name: memberlist
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 8
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+              readOnly: true
+            - name: data
+              mountPath: /data
+        # # Memcached sidecar for index/chunks caching (similar to Thanos Store)
+        # - name: memcached
+        #   image: memcached:1.6.24-alpine
+        #   args:
+        #     - "-m"
+        #     - "2048"  # 2GB cache memory
+        #     - "-c"
+        #     - "2048"  # Max connections
+        #     - "-I"
+        #     - "1m"    # Max item size 1MB
+        #     - "-t"
+        #     - "4"     # Threads
+        #   ports:
+        #     - name: memcached
+        #       containerPort: 11211
+        #   resources:
+        #     limits:
+        #       cpu: 500m
+        #       memory: 2500Mi
+        #     requests:
+        #       cpu: 100m
+        #       memory: 2048Mi
+        #   securityContext:
+        #     allowPrivilegeEscalation: false
+        #     readOnlyRootFilesystem: true
+        #     runAsNonRoot: true
+        #     runAsUser: 11211
+        #     runAsGroup: 11211
+        #     capabilities:
+        #       drop:
+        #         - ALL
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: mimir-store-gateway
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: config
+          configMap:
+            name: mimir-config
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          app.kubernetes.io/component: store-gateway
+          app.kubernetes.io/instance: mimir-store-gateway
+          app.kubernetes.io/name: mimir-store-gateway
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 20Gi

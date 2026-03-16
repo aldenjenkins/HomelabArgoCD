@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: compactor
+    app.kubernetes.io/instance: mimir-compactor
+    app.kubernetes.io/name: mimir-compactor
+    app.kubernetes.io/part-of: mimir
+    app.kubernetes.io/version: "3.0.2"
+  name: mimir-compactor
+spec:
+  replicas: 1
+  serviceName: mimir-compactor
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: compactor
+      app.kubernetes.io/instance: mimir-compactor
+      app.kubernetes.io/name: mimir-compactor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: compactor
+        app.kubernetes.io/instance: mimir-compactor
+        app.kubernetes.io/name: mimir-compactor
+        app.kubernetes.io/part-of: mimir
+        app.kubernetes.io/version: "3.0.2"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - mimir-compactor
+                namespaces:
+                  - mimir
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - name: compactor
+          image: grafana/mimir:3.0.2
+          imagePullPolicy: IfNotPresent
+          args:
+            - -target=compactor
+            - -config.file=/etc/mimir/mimir.yaml
+            - -config.expand-env=true
+          env:
+            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            #   value: http://trace-collector.observability.svc.cluster.local:4318
+            # - name: OTEL_TRACES_SAMPLER
+            #   value: always_on
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-objectstorage
+                  key: s3-secret-key
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9095
+              name: grpc
+              protocol: TCP
+            - containerPort: 7946
+              name: memberlist
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 4
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mimir
+              readOnly: true
+            - name: data
+              mountPath: /data
+      nodeSelector:
+        kubernetes.io/os: linux
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: mimir-compactor
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: config
+          configMap:
+            name: mimir-config
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          app.kubernetes.io/component: compactor
+          app.kubernetes.io/instance: mimir-compactor
+          app.kubernetes.io/name: mimir-compactor
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 20Gi

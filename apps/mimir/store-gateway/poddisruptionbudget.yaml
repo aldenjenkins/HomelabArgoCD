@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir-store-gateway
+    app.kubernetes.io/name: mimir-store-gateway
+    app.kubernetes.io/part-of: mimir
+  name: mimir-store-gateway
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: store-gateway
+      app.kubernetes.io/instance: mimir-store-gateway
+      app.kubernetes.io/name: mimir-store-gateway
