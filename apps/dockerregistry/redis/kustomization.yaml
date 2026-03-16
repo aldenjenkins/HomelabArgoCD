@@ -1,0 +1,4 @@
+namespace: docker-registry
+resources:
+  - redis.yaml
+  - grafanadatasource.yaml

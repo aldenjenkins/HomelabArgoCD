@@ -1,11 +1,21 @@
 namespace: docker-registry
 resources:
   - namespace.yaml
+  - redis
   - deployment.yaml
+  # - deployment-s3-storage.yaml
   - service.yaml
-  - virtualservice.yaml
+  - httproute.yaml
   - persistentvolumeclaim.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - servicemonitor.yaml
   - probe.yaml
+configMapGenerator:
+  - name: docker-registry-config
+    files:
+      - files/config.yml
+    options:
+      immutable: true
+generators:
+  - sopsgenerator.yaml

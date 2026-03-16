@@ -1,19 +1,85 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: docker-registry
+#   labels:
+#     app: registry
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: registry
+#   template:
+#     metadata:
+#       labels:
+#         app: registry
+#     spec:
+#       nodeSelector:
+#         kubernetes.io/hostname: worker-04
+#       securityContext:
+#         runAsUser: 45454
+#         runAsGroup: 45454
+#         fsGroup: 45454
+#         runAsNonRoot: true
+#         seccompProfile:
+#           type: RuntimeDefault
+#       containers:
+#         - name: registry
+#           image: registry:3.0.0
+#           imagePullPolicy: IfNotPresent
+#           securityContext:
+#             privileged: false
+#             allowPrivilegeEscalation: false
+#             readOnlyRootFilesystem: true
+#             runAsNonRoot: true
+#             runAsUser: 45454
+#             runAsGroup: 45454
+#             seccompProfile:
+#               type: RuntimeDefault
+#             capabilities:
+#               drop:
+#                 - ALL
+#           env:
+#             - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+#               value: "http://trace-collector.observability.svc.cluster.local:4318/v1/traces"
+#             - name: REGISTRY_LOG_LEVEL
+#               value: info
+#           ports:
+#             - containerPort: 5000
+#               name: tcp
+#             - containerPort: 5001
+#               name: metrics
+#           volumeMounts:
+#             - name: registry-data
+#               mountPath: /var/lib/registry
+#       volumes:
+#         - name: registry-data
+#           persistentVolumeClaim:
+#             claimName: registry-data
+# ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: docker-registry
+  name: docker-registry-s3
   labels:
-    app: registry
+    app: registry-s3
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: registry
+      app: registry-s3
   template:
     metadata:
       labels:
-        app: registry
+        app: registry-s3
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: registry-s3
       securityContext:
         runAsUser: 45454
         runAsGroup: 45454
@@ -23,8 +89,12 @@ spec:
           type: RuntimeDefault
       containers:
         - name: registry
-          image: registry:3
-          imagePullPolicy: Always
+          image: registry:3.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/registry
+            - serve
+            - /etc/docker/registry/config.yml
           securityContext:
             privileged: false
             allowPrivilegeEscalation: false
@@ -37,18 +107,24 @@ spec:
             capabilities:
               drop:
                 - ALL
+          envFrom:
+            - secretRef:
+                name: registry-env-secret
           env:
             - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
               value: "http://trace-collector.observability.svc.cluster.local:4318/v1/traces"
+            - name: REGISTRY_LOG_LEVEL
+              value: info
           ports:
             - containerPort: 5000
               name: tcp
             - containerPort: 5001
               name: metrics
           volumeMounts:
-            - name: registry-data
-              mountPath: /var/lib/registry
+            - name: registry-config
+              mountPath: /etc/docker/registry
       volumes:
-        - name: registry-data
-          persistentVolumeClaim:
-            claimName: registry-data
+        - name: registry-config
+          configMap:
+            name: docker-registry-config
+

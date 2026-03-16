@@ -1,13 +1,27 @@
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: docker-registry
+#   labels:
+#     app: registry
+# spec:
+#   selector:
+#     matchLabels:
+#       app: registry
+#   endpoints:
+#     - port: metrics
+#       interval: 30s
+# ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: docker-registry
+  name: docker-registry-s3
   labels:
-    app: registry
+    app: registry-s3
 spec:
   selector:
     matchLabels:
-      app: registry
+      app: registry-s3
   endpoints:
     - port: metrics
       interval: 30s
