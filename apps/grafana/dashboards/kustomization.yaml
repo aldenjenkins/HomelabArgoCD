@@ -1,3 +1,4 @@
+namespace: grafana
 resources:
   - grafana-dashboard-apiserver.yaml
   - grafana-dashboard-cluster-total.yaml

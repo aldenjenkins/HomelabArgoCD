@@ -3,16 +3,25 @@ resources:
   - namespace.yaml
   - alertmanager.yaml
   - alertmanagerconfig.yaml
-  - networkpolicy.yaml
+  # Removing this because cilium actually uses it and we want networking from thanos too. Probably delete to be concise in the future.
+  # - networkpolicy.yaml
   - poddisruptionbudget.yaml
   - prometheusrule.yaml
   - service.yaml
   - serviceaccount.yaml
   - servicemonitor.yaml
-  - authorizationpolicy.yaml
-  - virtualservice.yaml
-  - grafanadatasource.yaml
+  # - authorizationpolicy.yaml
+  # - virtualservice.yaml
+  - httproute.yaml
+  # - grafanadatasource.yaml
   - grafanadashboard.yaml
   - probe.yaml
+configMapGenerator:
+  - name: slackwebhook-templates
+    files:
+      - slackwebhook.tmpl=files/slackwebhook.tmpl
+    options:
+      disableNameSuffixHash: true
+
 generators:
   - sopsgenerator.yaml

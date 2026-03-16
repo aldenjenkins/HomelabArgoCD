@@ -3,14 +3,13 @@ resources:
   - namespace.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
-  - deployment.yaml
+  # - deployment.yaml
   - role.yaml
   - rolebinding.yaml
   - service.yaml
   - serviceaccount.yaml
-  - servicemonitor.yaml
-  - authorizationpolicy.yaml
-  - virtualservice.yaml
-  - probe.yaml
+  # - servicemonitor.yaml
+  - httproute.yaml
+  # - probe.yaml
 generators:
   - sopsgenerator.yaml

@@ -5,7 +5,8 @@ metadata:
     dashboards: grafana
   name: grafana
 spec:
-  version: 12.3.0-19020365962 # renovate: docker=docker.io/grafana/grafana
+  # version: 12.3.0-19020365962 
+  version: 12.4.0-22081664032 # renovate: docker=docker.io/grafana/grafana
   service:
     metadata:
       labels:
@@ -14,9 +15,9 @@ spec:
     spec:
       replicas: 3
       template:
-        metadata:
-          labels:
-            sidecar.istio.io/inject: "true"
+        # metadata:
+        #   labels:
+        #     sidecar.istio.io/inject: "true"
         spec:
           securityContext:
             fsGroup: &gid 472
@@ -84,6 +85,9 @@ spec:
               #   - mountPath: /etc/grafana/provisioning/plugins
               #     name: app-provisioning
               # securityContext: *container_security_context
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp
               securityContext: &container_security_context
                 readOnlyRootFilesystem: true
                 runAsNonRoot: true
@@ -101,6 +105,9 @@ spec:
             - configMap:
                 name: app-provisioning
               name: app-provisioning
+            # /tmp for plugin installation while maintaining readonly filesystem
+            - name: tmp
+              emptyDir: {}
             # The operator looks for this name keyword and volumeMounts to the "grafana" container automatically at /var/lib/grafana.
             # - name: grafana-data
             #   persistentVolumeClaim:
@@ -130,7 +137,7 @@ spec:
       headers: "Name:Remote-Name Groups:Remote-Groups Email:Remote-Email"
     analytics:
       reporting_enabled: "false"
-      # enabled: "false"
+      enabled: "false"
       feedback_links_enabled: "false"
     live:
       ha_engine: "redis"

@@ -1,0 +1,20 @@
+{{/* Slack notification templates for Alertmanager */}}
+
+{{/* Generate Grafana Explore URL from alert's GeneratorURL */}}
+{{ define "grafanaExploreURL" -}}
+  {{- $grafanaURLStart := "https://grafana.home.alden.ai/explore?schemaVersion=1&panes=%7B%22mx6%22:%7B%22datasource%22:%22prometheus%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22expr%22:%22" -}}
+  {{- $grafanaURLTail := "%22,%22range%22:true,%22instant%22:true,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22prometheus%22%7D,%22editorMode%22:%22code%22,%22legendFormat%22:%22__auto%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D%7D&orgId=1" -}}
+  {{- if (index .Alerts 0).GeneratorURL -}}
+    {{- $raw := (index .Alerts 0).GeneratorURL -}}
+    {{- $strip1 := reReplaceAll ".*g0.expr=" "" $raw -}}
+    {{- $strip2 := reReplaceAll "&.*" "" $strip1 -}}
+    {{- $expr1 := reReplaceAll "%5C" "%5C%5C" $strip2 -}}
+    {{- $expr2 := reReplaceAll "%22" "%5C%22" $expr1 -}}
+    {{- printf "%s%s%s" $grafanaURLStart $expr2 $grafanaURLTail }}
+  {{- else -}}
+    #
+  {{- end -}}
+{{- end }}
+
+{{/* Default title link pointing to Grafana Explore */}}
+{{ define "slack.default.titlelink" }}{{ template "grafanaExploreURL" . }}{{ end }}

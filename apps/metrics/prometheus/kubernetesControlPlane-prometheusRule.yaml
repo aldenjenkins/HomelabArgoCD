@@ -8,6 +8,7 @@ metadata:
     prometheus: k8s
     role: alert-rules
   name: kubernetes-monitoring-rules
+  namespace: prometheus
 spec:
   groups:
     - name: kubernetes-apps
@@ -1308,17 +1309,23 @@ spec:
     - name: k8s.rules.container_cpu_usage_seconds_total
       rules:
         - expr: |
-            sum by (cluster, namespace, pod, container) (
-              rate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
-            ) * on (cluster, namespace, pod) group_left(node) topk by (cluster, namespace, pod) (
-              1, max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})
+            label_replace(
+              sum by (cluster, namespace, pod, container) (
+                rate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
+              ),
+              "k8s_pod_name", "$1", "pod", "(.+)"
+            ) * on (cluster, namespace, k8s_pod_name) group_left(node) topk by (cluster, namespace, k8s_pod_name) (
+              1, max by(cluster, namespace, k8s_pod_name, node) (kube_pod_info{node!=""})
             )
           record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m
         - expr: |
-            sum by (cluster, namespace, pod, container) (
-              irate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
-            ) * on (cluster, namespace, pod) group_left(node) topk by (cluster, namespace, pod) (
-              1, max by(cluster, namespace, pod, node) (kube_pod_info{node!=""})
+            label_replace(
+              sum by (cluster, namespace, pod, container) (
+                irate(container_cpu_usage_seconds_total{job="kubelet", metrics_path="/metrics/cadvisor", image!=""}[5m])
+              ),
+              "k8s_pod_name", "$1", "pod", "(.+)"
+            ) * on (cluster, namespace, k8s_pod_name) group_left(node) topk by (cluster, namespace, k8s_pod_name) (
+              1, max by(cluster, namespace, k8s_pod_name, node) (kube_pod_info{node!=""})
             )
           record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate
     - name: k8s.rules.container_memory_working_set_bytes

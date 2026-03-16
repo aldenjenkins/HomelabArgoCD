@@ -12,4 +12,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - http://kiali.kiali.svc.cluster.local.:20001/kiali/healthz
+        - http://kiali.kiali.svc.cluster.local.:20001/healthz

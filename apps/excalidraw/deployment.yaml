@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: excalidraw
-        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - name: excalidraw

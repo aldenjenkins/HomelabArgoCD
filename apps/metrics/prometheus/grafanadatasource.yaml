@@ -2,6 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: prometheus-datasource
+  namespace: prometheus
 spec:
   allowCrossNamespaceImport: true
   datasource:
@@ -16,7 +17,9 @@ spec:
       timeInterval: 15s
       tlsSkipVerify: true
       manageAlerts: true
-      prometheusType: Prometheus
+      # prometheusType: Prometheus
+      prometheusType: Thanos
+      cacheLevel: 'High'
       exemplarTraceIdDestinations:
         # Field with internal link pointing to data source in Grafana.
         # datasourceUid value can be anything, but it should be unique across all defined data source uids.

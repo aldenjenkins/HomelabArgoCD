@@ -4,7 +4,8 @@ resources:
   - apiserver
   - coredns
   - controllermanager
-  - kubelet
-  - proxy
+  # Disabling this service monitor since this *should?* be working via in in-spec kubeletstats otel collector daemonset. 
+  # - kubelet
+  - kube-proxy
   - rolebinding.yaml
   - role.yaml

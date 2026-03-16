@@ -4,8 +4,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - grafanadashboard.yaml
 generators:
   - sopsgenerator.yaml
