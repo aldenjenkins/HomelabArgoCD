@@ -19,7 +19,7 @@ compactor:
     # compacted_block_retention: 1h
     # block_retention: 12h  # How long to keep blocks. Default is 14 days, this demo system is short-lived.
     block_retention: 168h  # How long to keep blocks. Default is 14 days, this demo system is short-lived. 168h = 7 days
-    compacted_block_retention: 10m   # How long to keep compacted blocks stored elsewhere.
+    compacted_block_retention: 1h   # Must be longer than blocklist_poll (30m) to avoid stale references
     # compaction_cycle: 30s
     compaction_cycle: 10m
     compaction_window: 1h  # Blocks in this time window will be compacted together.
@@ -58,7 +58,7 @@ memberlist:
   bind_addr: []
   bind_port: 7956
   cluster_label: 'tempo.default'
-  gossip_interval: 1s
+  gossip_interval: 5s
   gossip_nodes: 2
   gossip_to_dead_nodes_time: 30s
   join_members:
@@ -76,59 +76,71 @@ memberlist:
   rejoin_interval: 0s
   retransmit_factor: 2
   stream_timeout: 10s
+# metrics_generator:
+#   metrics_ingestion_time_range_slack: 30s
+#   processor:
+#     local_blocks:
+#       flush_to_storage: true
+#     service_graphs:
+#       dimensions:
+#         - homelab.environment
+#         - homelab.huid
+#         - homelab.owner
+#         - homelab.service
+#       histogram_buckets:
+#         - 0.1
+#         - 0.2
+#         - 0.4
+#         - 0.8
+#         - 1.6
+#         - 3.2
+#         - 6.4
+#         - 12.8
+#       max_items: 50000
+#       wait: 10s
+#       workers: 10
+#     span_metrics:
+#       dimensions: []
+#       histogram_buckets:
+#         - 0.002
+#         - 0.004
+#         - 0.008
+#         - 0.016
+#         - 0.032
+#         - 0.064
+#         - 0.128
+#         - 0.256
+#         - 0.512
+#         - 1.02
+#         - 2.05
+#         - 4.1
+#   registry:
+#     collection_interval: 15s
+#     external_labels: {}
+#     stale_duration: 15m
+#   ring:
+#     kvstore:
+#       store: memberlist
+#   storage:
+#     path: /var/tempo/wal
+#     remote_write:
+#       # - url: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+#       - url: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+#         # TODO: maybe enable this? or maybe this should be done via otel collector?
+#         # send_exemplars: true
+#     remote_write_add_org_id_header: true
+#     remote_write_flush_deadline: 1m
+#   traces_storage:
+#     path: /var/tempo/traces
 metrics_generator:
-  metrics_ingestion_time_range_slack: 30s
   processor:
     local_blocks:
       flush_to_storage: true
-    service_graphs:
-      dimensions:
-        - homelab.environment
-        - homelab.huid
-        - homelab.owner
-        - homelab.service
-      histogram_buckets:
-        - 0.1
-        - 0.2
-        - 0.4
-        - 0.8
-        - 1.6
-        - 3.2
-        - 6.4
-        - 12.8
-      max_items: 50000
-      wait: 10s
-      workers: 10
-    span_metrics:
-      dimensions: []
-      histogram_buckets:
-        - 0.002
-        - 0.004
-        - 0.008
-        - 0.016
-        - 0.032
-        - 0.064
-        - 0.128
-        - 0.256
-        - 0.512
-        - 1.02
-        - 2.05
-        - 4.1
-  registry:
-    collection_interval: 15s
-    external_labels: {}
-    stale_duration: 15m
   ring:
     kvstore:
       store: memberlist
   storage:
     path: /var/tempo/wal
-    remote_write:
-      - url: http://prometheus-operated.prometheus.svc.cluster.local:9090/api/v1/write
-        # TODO: maybe enable this? or maybe this should be done via otel collector?
-        # send_exemplars: true
-    remote_write_add_org_id_header: true
-    remote_write_flush_deadline: 1m
   traces_storage:
     path: /var/tempo/traces
 multitenancy_enabled: false
@@ -138,12 +150,14 @@ overrides:
       max_traces_per_user: 0
       rate_limit_bytes: 75000000
     metrics_generator:
-      processor:
-        service_graphs:
-          enable_client_server_prefix: true
-      processors:
-        - service-graphs
-        - local-blocks
+      processors: [local-blocks]
+    # metrics_generator:
+    #   processor:
+    #     service_graphs:
+    #       enable_client_server_prefix: true
+    #   processors:
+    #     - service-graphs
+    #     - local-blocks
   per_tenant_override_config: /runtime-config/overrides.yaml
 querier:
   frontend_worker:

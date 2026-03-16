@@ -1,10 +1,7 @@
 namespace: tempo
 resources:
   - namespace.yaml
-  # - redis
-  # - service.yaml
   - serviceaccount.yaml
-  # - deployment.yaml
   - gateway
   - gossipring
   - memcached
@@ -14,12 +11,8 @@ resources:
   - compactor
   - querier
   - query-frontend
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
   - grafanadatasource.yaml
   - probe.yaml
-generators:
-  - sopsgenerator.yaml
 configMapGenerator:
 - files:
   - files/gateway/nginx.conf
