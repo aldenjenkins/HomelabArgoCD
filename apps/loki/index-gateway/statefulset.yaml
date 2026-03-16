@@ -42,12 +42,9 @@ spec:
             - -target=index-gateway
             - -config.file=/mnt/loki.yaml
             - -config.expand-env=true
-          envFrom:
-            - secretRef:
-                name: minio-loki-storage-creds
           env:
             - name: JAEGER_ENDPOINT
-              value: http://trace-collector.observability.svc.cluster.local.:4317
+              value: http://trace-collector.observability.svc.cluster.local.:4318
             - name: JAEGER_SAMPLER_TYPE
               value: const
             - name: JAEGER_SAMPLER_PARAM
@@ -61,7 +58,7 @@ spec:
                 resourceFieldRef:
                   resource: limits.cpu
           ports:
-            - name: http
+            - name: http-metrics
               containerPort: 3100
               protocol: TCP
             - name: grpc
@@ -73,7 +70,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /ready
-              port: http
+              port: http-metrics
             initialDelaySeconds: 5
             periodSeconds: 1
             successThreshold: 3

@@ -17,14 +17,14 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/proxyCPU: 30m
-        sidecar.istio.io/proxyCPULimit: 1000m
-        sidecar.istio.io/proxyMemory: 64Mi
-        sidecar.istio.io/proxyMemoryLimit: 128Mi
+      # annotations:
+      #   sidecar.istio.io/proxyCPU: 30m
+      #   sidecar.istio.io/proxyCPULimit: 1000m
+      #   sidecar.istio.io/proxyMemory: 64Mi
+      #   sidecar.istio.io/proxyMemoryLimit: 128Mi
       labels:
         app.kubernetes.io/name: mcrouter
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
         variant: loki
     spec:
       automountServiceAccountToken: false

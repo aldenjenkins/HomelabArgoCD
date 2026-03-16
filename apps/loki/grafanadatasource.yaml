@@ -2,6 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: loki-datasource
+  namespace: loki
 spec:
   allowCrossNamespaceImport: true
   datasource:
@@ -12,7 +13,7 @@ spec:
     # url: http://loki.loki.svc.cluster.local:3100
     # url: http://loki-proxy.loki.svc.cluster.local:8080
     # url: http://loki-gateway.loki.svc.cluster.local.:80
-    url: http://loki-query-frontend.loki.svc.cluster.local.:3100
+    url: http://loki-gateway.loki.svc.cluster.local.:80
     jsonData:
       timeout: 60
       maxLines: 1000
