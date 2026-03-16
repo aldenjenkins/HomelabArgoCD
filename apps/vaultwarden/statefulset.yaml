@@ -18,7 +18,6 @@ spec:
       labels:
         app.kubernetes.io/name: vaultwarden
         app.kubernetes.io/component: vaultwarden
-        sidecar.istio.io/inject: "true"
     spec:
       restartPolicy: Always
       initContainers:
@@ -109,6 +108,8 @@ spec:
             requests:
               memory: 100Mi
               cpu: 2m
+            limits:
+              memory: 500Mi
 
           readinessProbe:
             httpGet:

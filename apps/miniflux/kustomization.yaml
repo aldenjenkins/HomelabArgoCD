@@ -4,8 +4,7 @@ resources:
   - postgres
   - deployment.yaml
   - service.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - probe.yaml
 
 generatorOptions:

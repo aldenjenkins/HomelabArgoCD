@@ -392,3 +392,99 @@ spec:
               rate(node_network_transmit_drop_total{job="node-exporter", device!="lo"}[5m])
             )
           record: instance:node_network_transmit_drop_excluding_lo:rate5m
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: network-link-monitoring
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: node-exporter
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 1.8.2
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+  - name: network_link_health
+    interval: 30s
+    rules:
+    # Alert for 1 Gbps interfaces (eno1, eth0)
+    - alert: NetworkLinkSpeedDegraded1G
+      expr: |
+        node_network_speed_bytes{device=~"eno1|eth0"} < 125000000
+      for: 2m
+      labels:
+        severity: warning
+        component: network
+        link_issue: speed_degraded
+      annotations:
+        summary: "1G network link degraded on {{ $labels.instance }}"
+        description: |
+          LINK SPEED ISSUE - CABLE PROBLEM
+          
+          Node: {{ $labels.instance }}
+          Interface: {{ $labels.device }}
+          Current: {{ $value | humanize }}B/s (expected 125MB/s for 1G)
+          
+          Switch port LED likely ORANGE (not GREEN).
+          FIX: Unplug and replug the Ethernet cable.
+          
+    # Alert for 2.5 Gbps interface (enp87s0)
+    - alert: NetworkLinkSpeedDegraded2_5G
+      expr: |
+        node_network_speed_bytes{device="enp87s0"} < 312500000
+      for: 2m
+      labels:
+        severity: warning
+        component: network
+        link_issue: speed_degraded
+      annotations:
+        summary: "2.5G network link degraded on {{ $labels.instance }}"
+        description: |
+          LINK SPEED ISSUE - CABLE PROBLEM
+          
+          Node: {{ $labels.instance }}
+          Interface: {{ $labels.device }} (2.5G capable)
+          Current: {{ $value | humanize }}B/s (expected 312.5MB/s for 2.5G)
+          
+          Possible causes:
+          - Cable issue (reseat cable)
+          - Switch port not 2.5G capable
+          - Auto-negotiation failure
+          
+    # Common alerts for all interfaces
+    - alert: NetworkInterfaceDown
+      expr: |
+        node_network_up{device=~"eno1|eth0|enp87s0"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: network
+      annotations:
+        summary: "🔴 Network interface DOWN on {{ $labels.instance }}"
+        description: "Interface {{ $labels.device }} is DOWN - immediate attention required!"
+        
+    - alert: NetworkTransmissionErrors
+      expr: |
+        increase(node_network_transmit_errs_total{device=~"eno1|eth0|enp87s0"}[5m]) > 10
+        or
+        increase(node_network_receive_errs_total{device=~"eno1|eth0|enp87s0"}[5m]) > 10
+      for: 2m
+      labels:
+        severity: warning
+        component: network
+      annotations:
+        summary: "Network errors on {{ $labels.instance }}"
+        description: "{{ $labels.device }}: {{ $value }} transmission errors detected"
+        
+    - alert: NetworkLinkFlapping
+      expr: |
+        rate(node_network_carrier_changes_total{device=~"eno1|eth0|enp87s0"}[10m]) > 0.001
+      for: 5m
+      labels:
+        severity: warning
+        component: network
+      annotations:
+        summary: "Network link unstable on {{ $labels.instance }}"
+        description: "{{ $labels.device }} link flapping - check cable/switch port"

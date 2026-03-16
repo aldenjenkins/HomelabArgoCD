@@ -3,7 +3,7 @@ resources:
   - namespace.yaml
   - service.yaml
   - statefulset.yaml
-  - virtualservice.yaml
+  - httproute.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
   - grafanafolder.yaml

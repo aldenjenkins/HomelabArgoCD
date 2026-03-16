@@ -4,8 +4,7 @@ resources:
   - persistentvolumeclaim.yaml
   - deployment.yaml
   - service.yaml
-  - authorizationpolicy.yaml
-  - virtualservice.yaml
+  - httproute.yaml
   - probe.yaml
 generators:
   - sopsgenerator.yaml
