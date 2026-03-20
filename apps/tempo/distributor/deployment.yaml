@@ -40,6 +40,8 @@ spec:
       serviceAccountName: tempo
       securityContext:
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       enableServiceLinks: false
       containers:
         - args:
@@ -94,6 +96,8 @@ spec:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           volumeMounts:
             - mountPath: /conf
               name: config
