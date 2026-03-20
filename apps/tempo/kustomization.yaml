@@ -13,6 +13,8 @@ resources:
   - query-frontend
   - grafanadatasource.yaml
   - probe.yaml
+  - prometheusrule.yaml
+  - dashboards
 configMapGenerator:
 - files:
   - files/gateway/nginx.conf
