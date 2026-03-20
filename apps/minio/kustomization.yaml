@@ -2,12 +2,12 @@ namespace: minio
 resources:
   - namespace.yaml
   - service.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - servicemonitor.yaml
   - statefulset.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  - prometheusrule.yaml
   # - tenant.yaml
 generators:
   - sopsgenerator.yaml

@@ -1,0 +1,37 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-web-httproute
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - minio.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: minio-web
+      port: 9001
+    # matches:
+    # - path:
+    #     type: PathPrefix
+    #     value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-api-httproute
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - minio-api.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: minio-api
+      port: 9000
+    # matches:
+    # - path:
+    #     type: PathPrefix
+    #     value: /
