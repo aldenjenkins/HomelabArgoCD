@@ -37,10 +37,6 @@ spec:
         app.homelab/huid: huid-ovz6vtlh
         app.homelab/owner: homelab.techservices.data.observability
         app.homelab/service: Tempo
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "3200"
-        prometheus.io/scrape: "true"
     spec:
       serviceAccountName: tempo
       securityContext:

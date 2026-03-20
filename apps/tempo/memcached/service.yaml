@@ -37,6 +37,7 @@ metadata:
     app.kubernetes.io/component: memcached
     app.kubernetes.io/version: "2.9.0"
     app.kubernetes.io/managed-by: Helm
+    prometheus.io/service-monitor: "false"
 spec:
   type: ClusterIP
   clusterIP: None

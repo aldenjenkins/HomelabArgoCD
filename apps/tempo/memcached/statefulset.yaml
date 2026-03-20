@@ -19,10 +19,6 @@ spec:
   serviceName: memcached
   template:
     metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "3200"
-        prometheus.io/scrape: "true"
       labels:
         helm.sh/chart: tempo-distributed-1.52.9
         app.kubernetes.io/name: tempo
