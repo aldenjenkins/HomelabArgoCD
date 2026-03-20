@@ -12,8 +12,7 @@ resources:
   # - podmonitor.yaml
   - prometheusrule.yaml
   - grafanadatasource.yaml
-  - grafanafolder.yaml
-  - grafanadashboard.yaml
+  - dashboards
   # - metrics-grafanadashboard.yaml
   - probe.yaml
   - compactor
