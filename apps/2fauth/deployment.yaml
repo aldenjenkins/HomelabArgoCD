@@ -1,0 +1,279 @@
+# Source: freshrss/templates/deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 2fauth
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: 2fauth
+  template:
+    metadata:
+      labels:
+        app: 2fauth
+    spec:
+      securityContext:
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 568
+      containers:
+        - name: 2fauth
+          image: 2fauth/2fauth:6.1.1
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+            privileged: false
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              add: []
+              drop:
+                - ALL
+          env:
+            # You can change the name of the app
+            - name: APP_NAME
+              value: 2FAuth
+            # You can leave this on "local". If you change it to production most console commands will ask for extra confirmation.
+            # Never set it to "testing".
+            - name: APP_ENV
+              value: production
+            # The timezone for your application, which is used to record dates and times to database. This global setting can be
+            # overridden by users via in-app settings for a personalised dates and times display.
+            # If this setting is changed while the application is already running, existing records in the database won't be updated
+            - name: APP_TIMEZONE
+              value: UTC
+            # Set to true if you want to see debug information in error screens.
+            - name: APP_DEBUG
+              value: "false"
+            # The encryption key for  our database and sessions. Keep this very secure.
+            # If you generate a new one all existing data must be considered LOST.
+            # Change it to a string of exactly 32 chars or use command `php artisan key:generate` to generate it
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: app-key
+                  name: 2fauth-secret
+            # This variable must match your installation's external address.
+            # Webauthn won't work otherwise.
+            - name: APP_URL
+              value: https://2fauth.home.alden.ai
+            # If you want to serve js assets from a CDN (like https://cdn.example.com),
+            # uncomment the following line and set this var with the CDN url.
+            # Otherwise, let this line commented.
+            - name: ASSET_URL
+              value: https://2fauth.home.alden.ai
+            #
+            # Turn this to true if you want your app to react like a demo.
+            # The Demo mode reset the app content every hours and set a generic demo user.
+            - name: IS_DEMO_APP
+              value: "false"
+            - name: DB_CONNECTION
+              value: "pgsql"
+            - name: "DB_DATABASE"
+              valueFrom:
+                secretKeyRef:
+                  key: "dbname"
+                  name: "twofauth-postgres-18-app"
+            - name: "DB_HOST"
+              valueFrom:
+                secretKeyRef:
+                  key: "host"
+                  name: "twofauth-postgres-18-app"
+            - name: "DB_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "password"
+                  name: "twofauth-postgres-18-app"
+            - name: "DB_PORT"
+              value: "5432"
+            - name: "DB_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  key: "username"
+                  name: "twofauth-postgres-18-app"
+            # The log channel defines where your log entries go to.
+            # 'daily' is the default logging mode giving you 7 daily rotated log files in /storage/logs/.
+            # Also available are 'errorlog', 'syslog', 'stderr', 'papertrail', 'slack' and a 'stack' channel
+            # to combine multiple channels into a single one.
+            - name: LOG_CHANNEL
+              value: errorlog
+            # Log level. You can set this from least severe to most severe:
+            # debug, info, notice, warning, error, critical, alert, emergency
+            # If you set it to debug your logs will grow large, and fast. If you set it to emergency probably
+            # nothing will get logged, ever.
+            - name: LOG_LEVEL
+              value: notice
+            # Database config (can only be sqlite)
+            # If you're looking for performance improvements, you could install memcached.
+            - name: CACHE_DRIVER
+              value: redis
+            - name: SESSION_DRIVER
+              value: redis
+            - name: SESSION_STORE
+              value: redis
+            # Mail settings
+            # Refer your email provider documentation to configure your mail settings
+            # Set a value for every available setting to avoid issue
+            # - name: MAIL_MAILER
+            #   value: log
+            # - name: MAIL_HOST
+            #   value: smtp.mailtrap.io
+            # - name: MAIL_PORT
+            #   value: 2525
+            # - name: MAIL_USERNAME
+            #   value: null
+            # - name: MAIL_PASSWORD
+            #   value: null
+            # - name: MAIL_ENCRYPTION
+            #   value: null
+            # - name: MAIL_FROM_NAME
+            #   value: null
+            # - name: MAIL_FROM_ADDRESS
+            #   value: null
+            # SSL peer verification.
+            # Set this to false to disable the SSL certificate validation.
+            # WARNING
+            # Disabling peer verification can result in a major security flaw.
+            # Change it only if you know what you're doing.
+            # - name: MAIL_VERIFY_SSL_PEER
+            #   value: true
+            # API settings
+            # The maximum number of API calls in a minute from the same IP.
+            # Once reached, all requests from this IP will be rejected until the minute has elapsed.
+            # Set to null to disable the API throttling.
+            - name: THROTTLE_API
+              value: "360"
+            # Authentication settings
+            # The number of times per minute a user can fail to log in before being locked out.
+            # Once reached, all login attempts will be rejected until the minute has elapsed.
+            # This setting applies to both email/password and webauthn login attemps.
+            - name: LOGIN_THROTTLE
+              value: "5"
+            # The default authentication guard
+            # Supported:
+            #   'web-guard' : The Laravel built-in auth system (default if nulled)
+            #   'reverse-proxy-guard' : When 2FAuth is deployed behind a reverse-proxy that handle authentication
+            # WARNING
+            # When using 'reverse-proxy-guard' 2FAuth only look for the dedicated headers and skip all other built-in
+            # authentication checks. That means your proxy is fully responsible of the authentication process, 2FAuth will
+            # trust him as long as headers are presents.
+            - name: AUTHENTICATION_GUARD
+              value: reverse-proxy-guard
+              # value: reverse-proxy-guard
+            # Authentication log retention time, in days.
+            # Log entries older than that are automatically deleted.
+            - name: AUTHENTICATION_LOG_RETENTION
+              value: "365"
+            # Name of the HTTP headers sent by the reverse proxy that identifies the authenticated user at proxy level.
+            # Check your proxy documentation to find out how these headers are named (i.e 'REMOTE_USER', 'REMOTE_EMAIL', etc...)
+            # (only relevant when AUTHENTICATION_GUARD is set to 'reverse-proxy-guard')
+            - name: AUTH_PROXY_HEADER_FOR_USER
+              value: HTTP_REMOTE_USER
+            - name: AUTH_PROXY_HEADER_FOR_EMAIL
+              value: ""
+            # Custom logout URL to open when using an auth proxy.
+            - name: PROXY_LOGOUT_URL
+              value: https://auth.home.alden.ai/logout
+            # WebAuthn settings
+            # Relying Party name, aka the name of the application. If blank, defaults to APP_NAME. Do not set to null.
+            # - name: WEBAUTHN_NAME
+            # value: 2fauth
+            # Relying Party ID, should equal the site domain (i.e 2fauth.example.com).
+            # If null, the device will fill it internally (recommended)
+            # See https://webauthn-doc.spomky-labs.com/prerequisites/the-relying-party#how-to-determine-the-relying-party-id
+            # - name: WEBAUTHN_ID
+            # value: 2fauth.home.alden.ai
+            # Use this setting to control how user verification behave during the
+            # WebAuthn authentication flow.
+            #
+            # Most authenticators and smartphones will ask the user to actively verify
+            # themselves for log in. For example, through a touch plus pin code,
+            # password entry, or biometric recognition (e.g., presenting a fingerprint).
+            # The intent is to distinguish one user from any other.
+            #
+            # Supported:
+            #   'required': Will ALWAYS ask for user verification
+            #   'preferred' (default) : Will ask for user verification IF POSSIBLE
+            #   'discouraged' : Will NOT ask for user verification (for example, to minimize disruption to the user interaction flow)
+            - name: WEBAUTHN_USER_VERIFICATION
+              value: preferred
+            #### SSO settings (for Socialite) ####
+            # Uncomment and complete lines for the OAuth providers you want to enable.
+            # - OPENID_AUTHORIZE_URL=
+            # - OPENID_TOKEN_URL=
+            # - OPENID_USERINFO_URL=
+            # - OPENID_CLIENT_ID=
+            # - OPENID_CLIENT_SECRET=
+            # - GITHUB_CLIENT_ID=
+            # - GITHUB_CLIENT_SECRET=
+            # Use this setting to declare trusted proxied.
+            # Supported:
+            #   '*': to trust any proxy
+            #   A comma separated IP list: The list of proxies IP to trust
+            - name: TRUSTED_PROXIES
+              value: "*"
+            # Proxy for outgoing requests like new releases detection or logo fetching.
+            # You can provide a proxy URL that contains a scheme, username, and password.
+            # For example, "http://username:password@192.168.16.1:10".
+            - name: PROXY_FOR_OUTGOING_REQUESTS
+              value: ""
+            # Leave the following configuration vars as is.
+            # Unless you like to tinker and know what you're doing.
+            - name: BROADCAST_DRIVER
+              value: log
+            - name: QUEUE_DRIVER
+              value: sync
+            - name: SESSION_LIFETIME
+              value: "120"
+            - name: REDIS_HOST
+              value: twofauth-redis.2fauth.svc.cluster.local
+            - name: REDIS_PASSWORD
+              value: ""
+            - name: REDIS_PORT
+              value: "6379"
+            - name: SESSION_SECURE_COOKIE
+              value: "true"
+          ports:
+            - containerPort: 8000
+              name: 2fauth-http
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /up
+              scheme: HTTP
+            initialDelaySeconds: 12
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: /up
+              scheme: HTTP
+            initialDelaySeconds: 10
+            failureThreshold: 4
+            successThreshold: 2
+            timeoutSeconds: 5
+            periodSeconds: 12
+          startupProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            failureThreshold: 60
+            successThreshold: 1
+            timeoutSeconds: 3
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /2fauth
+              name: config
+              readOnly: false
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: 2fauth-config
