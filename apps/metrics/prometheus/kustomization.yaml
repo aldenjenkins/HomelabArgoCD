@@ -5,26 +5,28 @@ resources:
   - kubernetesControlPlane-prometheusRule.yaml
   - prometheus-clusterRole.yaml
   - prometheus-clusterRoleBinding.yaml
-  - prometheus-networkPolicy.yaml
+  # Removing this because cilium actually uses it and we want network from otel and thanos and elsewhere. Probably delete to be concise in the future.
+  # - prometheus-networkPolicy.yaml
   - prometheus-podDisruptionBudget.yaml
-  - prometheus.yaml
+  # - prometheus.yaml
   - prometheusrule.yaml
   - prometheus-roleBindingConfig.yaml
   - prometheus-roleBindingSpecificNamespaces.yaml
   - prometheus-roleConfig.yaml
   - prometheus-roleSpecificNamespaces.yaml
-  - prometheus-service.yaml
+  # - prometheus-service.yaml
   - prometheus-serviceAccount.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
-  - grafanadatasource.yaml
+  # - httproute.yaml
+  # - virtualservice.yaml
+  # - authorizationpolicy.yaml
+  # - grafanadatasource.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
-  - thanos-sidecar-service.yaml
-  - servicemonitor.yaml
-  - telemetry.yaml
-  - destinationrule.yaml
-  - probe.yaml
+  # - thanos-sidecar-service.yaml
+  # - servicemonitor.yaml
+  # - telemetry.yaml
+  # - destinationrule.yaml
+  # - probe.yaml
 
 generators:
   - sopsgenerator.yaml

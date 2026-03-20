@@ -1,0 +1,34 @@
+---
+apiVersion: v1alpha1
+kind: EthernetConfig
+name: enp87s0 # Name of the link (interface).
+# 2026-03-18 using new LinkAlias generated from mac harware selector from talhelper genconfig (since interface name isnt guaranteed)
+# name: ethSel0 # Name of the link (interface).
+# Configuration for Ethernet features.
+features:
+    hw-tc-offload: false
+    rx-checksum: true
+    rx-gro: true
+    rx-hashing: true
+    tx-checksum-ip-generic: true
+    tx-checksum-sctp: false
+    tx-generic-segmentation: false
+    tx-gre-csum-segmentation: false
+    tx-gre-segmentation: false
+    tx-gso-partial: false
+    tx-ipxip4-segmentation: false
+    tx-ipxip6-segmentation: false
+    tx-scatter-gather: true
+    tx-tcp-ecn-segmentation: false
+    tx-tcp-segmentation: false
+    tx-tcp6-segmentation: false
+    tx-udp_tnl-csum-segmentation: false
+    tx-udp_tnl-segmentation: false
+# Configuration for Ethernet link rings.
+rings:
+    rx: 4096 # Number of RX rings.
+    tx: 4096 # Number of TX rings.
+# Configuration for Ethernet link channels.
+channels:
+    other: 1 # Number of other channels.
+    combined: 4 # Number of combined channels.

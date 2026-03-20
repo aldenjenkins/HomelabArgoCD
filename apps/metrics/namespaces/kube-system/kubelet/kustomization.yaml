@@ -1,2 +1,4 @@
-resources:
-  - servicemonitor.yaml
+namespace: kube-system
+resources: []
+  # Disabling this since the otel kubelet collector daemonset does this.
+  # - servicemonitor.yaml

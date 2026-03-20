@@ -31,13 +31,13 @@ spec:
         version: "v1.87.0"
         app.kubernetes.io/version: "v1.87.0"
         app.kubernetes.io/part-of: "kiali"
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
       annotations:
         checksum/config: 12d7579aa3de1df2ebb8812a826d78d94a8fd2e4a20b51a64dab57151bc28902
         # prometheus.io/scrape: "true"
         # prometheus.io/port: "9090"
         kiali.io/dashboards: go,kiali
-        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+        # proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
     spec:
       serviceAccountName: kiali
       containers:
@@ -63,14 +63,14 @@ spec:
               containerPort: 9090
           readinessProbe:
             httpGet:
-              path: /kiali/healthz
+              path: /healthz
               port: api-port
               scheme: HTTP
             initialDelaySeconds: 5
-            periodSeconds: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /kiali/healthz
+              path: /healthz
               port: api-port
               scheme: HTTP
             initialDelaySeconds: 5

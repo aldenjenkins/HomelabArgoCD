@@ -5,9 +5,14 @@ resources:
   - clusterrole.yaml
   - serviceaccount.yaml
   - clusterrolebinding.yaml
-  - service.yaml
-  - daemonset.yaml
-  - authorizationpolicy.yaml
-  - virtualservice.yaml
-  - servicemonitor.yaml
-  - probe.yaml
+
+  # 2026-01-16
+  #
+  # Disabling pyroscope and alloy profiles for now as its probably adding quite a bit of network latency.
+  # to re-enable, simply uncomment these below.
+
+  # - service.yaml
+  # - daemonset.yaml
+  # - httproute.yaml
+  # - servicemonitor.yaml
+  # - probe.yaml

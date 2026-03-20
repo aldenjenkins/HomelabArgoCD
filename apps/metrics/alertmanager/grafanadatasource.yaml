@@ -12,7 +12,7 @@ spec:
     url: http://alertmanager-main.alertmanager.svc.cluster.local:9093
     isDefault: false
     jsonData:
-      handleGrafanaManagedAlerts: true
+      handleGrafanaManagedAlerts: false
       implementation: prometheus
   instanceSelector:
     matchLabels:

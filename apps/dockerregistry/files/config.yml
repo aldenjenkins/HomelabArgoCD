@@ -1,0 +1,45 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+  level: info
+  formatter: json
+storage:
+  s3:
+    encrypt: false # default is false
+    chunksize: 5242880 # default is 5242880
+    rootdirectory: / # default is /
+  cache:
+    blobdescriptor: redis
+  delete:
+    enabled: true
+  redirect:
+    disable: true
+http:
+  addr: :5000
+  headers:
+    X-Content-Type-Options: [nosniff]
+  debug:
+    addr: :5001
+    prometheus:
+      enabled: true
+      path: /metrics
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
+  tcp:
+    - addr: docker-registry-redis.docker-registry.svc.cluster.local.:6379
+      timeout: 3s
+      interval: 10s
+      threshold: 3
+redis:
+  addrs: [docker-registry-redis.docker-registry.svc.cluster.local.:6379]
+  db: 0
+  dialtimeout: 100ms
+  readtimeout: 100ms
+  writetimeout: 100ms
+  maxidleconns: 16
+  poolsize: 64
+  connmaxidletime: 300s

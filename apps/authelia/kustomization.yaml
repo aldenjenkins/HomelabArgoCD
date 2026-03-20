@@ -5,7 +5,7 @@ resources:
   - redis
   - deployment.yaml
   - service.yaml
-  - virtualservice.yaml
+  - httproute.yaml
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml

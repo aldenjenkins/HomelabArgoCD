@@ -1,3 +1,4 @@
+namespace: vaultwarden
 resources:
   - objectstore.yaml
   - cnpg-cluster.yaml

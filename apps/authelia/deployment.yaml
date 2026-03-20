@@ -29,7 +29,7 @@ spec:
         component: authelia
         app.kubernetes.io/name: authelia
         app.kubernetes.io/instance: authelia
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
         app.kubernetes.io/version: 4.38.17
     spec:
       hostNetwork: false
@@ -53,8 +53,9 @@ spec:
           imagePullPolicy: IfNotPresent
           command: ["authelia"]
           resources:
-            limits: {}
-            requests: {}
+            requests:
+              cpu: 5m
+              memory: 150Mi
           env:
             - name: AUTHELIA_SERVER_DISABLE_HEALTHCHECK
               value: "true"

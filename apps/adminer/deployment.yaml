@@ -11,7 +11,6 @@ spec:
     metadata:
       labels:
         app: adminer
-        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - name: adminer

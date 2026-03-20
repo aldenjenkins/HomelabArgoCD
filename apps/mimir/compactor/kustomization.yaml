@@ -1,0 +1,7 @@
+namespace: mimir
+resources:
+  - statefulset.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - poddisruptionbudget.yaml

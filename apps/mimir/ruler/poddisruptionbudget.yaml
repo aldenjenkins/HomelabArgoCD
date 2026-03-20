@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: ruler
+    app.kubernetes.io/instance: mimir-ruler
+    app.kubernetes.io/name: mimir-ruler
+    app.kubernetes.io/part-of: mimir
+  name: mimir-ruler
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ruler
+      app.kubernetes.io/instance: mimir-ruler
+      app.kubernetes.io/name: mimir-ruler

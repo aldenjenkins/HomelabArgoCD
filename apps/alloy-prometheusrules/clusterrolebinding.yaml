@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: alloy-prometheusrules
+subjects:
+- kind: ServiceAccount
+  name: alloy-prometheusrules
+  namespace: alloy-prometheusrules
+roleRef:
+  kind: ClusterRole
+  name: alloy-prometheusrules
+  apiGroup: rbac.authorization.k8s.io

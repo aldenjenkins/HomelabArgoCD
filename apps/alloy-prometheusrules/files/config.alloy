@@ -1,0 +1,3 @@
+mimir.rules.kubernetes "default" {
+  address = "http://mimir-ruler.mimir.svc.cluster.local:8080"
+}

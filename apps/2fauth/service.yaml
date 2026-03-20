@@ -1,0 +1,11 @@
+# Source: freshrss/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-2fauth
+spec:
+  selector:
+    app: 2fauth
+  ports:
+    - name: 2fauth-http
+      port: 8000

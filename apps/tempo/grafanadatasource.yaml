@@ -2,6 +2,7 @@ apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: tempo-datasource
+  namespace: tempo
 spec:
   allowCrossNamespaceImport: true
   datasource:
@@ -10,10 +11,12 @@ spec:
     type: tempo
     access: proxy
     # url: http://tempo.tempo.svc:3100
-    url: http://tempo-gateway.tempo.svc:80
+    url: http://tempo-gateway.tempo.svc.cluster.local:80
     # url: http://tempo-query-frontend.tempo.svc:9095
     isDefault: false
     jsonData:
+      lokiSearch:
+        datasourceUid: loki
       tracesToLogsV2:
         # Field with an internal link pointing to a logs data source in Grafana.
         # datasourceUid value must match the uid value of the logs data source.
@@ -44,16 +47,72 @@ spec:
         datasourceUid: 'prometheus'
         spanStartTimeShift: '-1h'
         spanEndTimeShift: '1h'
-        tags: [{key: 'service.name', value: 'service_name'}, {key: 'job'}]
+        # tags: [{key: 'service.name', value: 'service_name'}, {key: 'job'}]
+        tags: 
+          - key: 'service.name'
+            value: 'service_name'
+          - key: 'status.code'
+            value: 'status_code'
         queries:
-          - name: 'Sample query'
-            query: 'sum(rate(traces_spanmetrics_latency_bucket{$__tags}[5m]))'
-      tracesToProfiles:
-        datasourceUid: 'pyroscope'
-        tags: ['job', 'instance', 'pod', 'namespace']
-        profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
-        customQuery: true
-        query: 'method="${__span.tags.method}"'
+          # Latency Analysis
+          - name: 'Span Rate'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, span_name=$__span.name}[5m]))'
+            
+          - name: 'Error Rate'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, span_name=$__span.name, status_code="STATUS_CODE_ERROR"}[5m]))'
+            
+          - name: 'P95 Latency'
+            query: 'histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket{$__tags, span_name=$__span.name}[5m])) by (le))'
+            
+          - name: 'P99 Latency'
+            query: 'histogram_quantile(0.99, sum(rate(traces_spanmetrics_latency_bucket{$__tags, span_name=$__span.name}[5m])) by (le))'
+            
+          - name: 'Average Duration'
+            query: 'sum(rate(traces_spanmetrics_latency_sum{$__tags, span_name=$__span.name}[5m])) / sum(rate(traces_spanmetrics_latency_count{$__tags, span_name=$__span.name}[5m]))'
+            
+          # Error Analysis
+          - name: 'Error Rate %'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, status_code="STATUS_CODE_ERROR"}[5m])) / sum(rate(traces_spanmetrics_calls_total{$__tags}[5m])) * 100'
+            
+          - name: 'Errors (count)'
+            query: 'sum(increase(traces_spanmetrics_calls_total{$__tags, status_code="STATUS_CODE_ERROR"}[5m]))'
+            
+          # Service Health (RED metrics)
+          - name: 'Request Rate (req/sec)'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags}[5m]))'
+            
+          - name: 'Error Rate (req/sec)'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, status_code="STATUS_CODE_ERROR"}[5m]))'
+            
+          - name: 'Duration P50'
+            query: 'histogram_quantile(0.50, sum(rate(traces_spanmetrics_latency_bucket{$__tags}[5m])) by (le))'
+            
+          # Throughput
+          - name: 'Total Calls (5m)'
+            query: 'sum(increase(traces_spanmetrics_calls_total{$__tags}[5m]))'
+            
+          - name: 'Calls per Service'
+            query: 'sum by (service_name) (rate(traces_spanmetrics_calls_total{$__tags}[5m]))'
+            
+          # Resource Utilization (if you have these metrics)
+          - name: 'CPU Usage'
+            query: 'sum(rate(container_cpu_usage_seconds_total{pod=~".*$service_name.*"}[5m]))'
+            
+          - name: 'Memory Usage'
+            query: 'sum(container_memory_working_set_bytes{pod=~".*$service_name.*"})'
+            
+          # Database/External Calls (if span names indicate this)
+          - name: 'DB Query Rate'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, span_name=~".*sql.*|.*query.*|.*db.*"}[5m]))'
+            
+          - name: 'External API Rate'
+            query: 'sum(rate(traces_spanmetrics_calls_total{$__tags, span_name=~".*http.*|.*grpc.*"}[5m]))'
+      # tracesToProfiles:
+      #   datasourceUid: 'pyroscope'
+      #   tags: ['job', 'instance', 'pod', 'namespace']
+      #   profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
+      #   customQuery: true
+      #   query: 'method="${__span.tags.method}"'
       serviceMap:
         datasourceUid: 'prometheus'
   instanceSelector:

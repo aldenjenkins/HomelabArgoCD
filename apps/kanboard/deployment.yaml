@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: kanboard
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: kanboard
@@ -12,8 +12,9 @@ spec:
     metadata:
       labels:
         app: kanboard
-        sidecar.istio.io/inject: "true"
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-05
       volumes:
         - name: appdata
           persistentVolumeClaim:
@@ -45,11 +46,11 @@ spec:
               value: 'HTTP_REMOTE_USER'
             - name: ENABLE_XFRAME
               value: 'false'
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: kanboard
-                  key: db-connection-str
+            # - name: DATABASE_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: kanboard
+            #       key: db-connection-str
           ports:
             - containerPort: 80
               name: kanboard-http

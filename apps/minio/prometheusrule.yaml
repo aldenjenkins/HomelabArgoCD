@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: minio
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/part-of: minio
+    prometheus: k8s
+    role: alert-rules
+  name: minio-rules
+spec:
+  groups:
+    - name: Minio
+      rules:
+
+        - alert: MinioClusterDiskOffline
+          expr: 'minio_cluster_drive_offline_total > 0'
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Minio cluster disk offline (instance {{ $labels.instance }})
+            description: "Minio cluster disk is offline\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+        - alert: MinioNodeDiskOffline
+          expr: 'minio_cluster_nodes_offline_total > 0'
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: Minio node disk offline (instance {{ $labels.instance }})
+            description: "Minio cluster node disk is offline\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+        - alert: MinioDiskSpaceUsage
+          expr: 'minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes * 100 < 50'
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Minio disk space usage (instance {{ $labels.instance }})
+            description: "Minio available free space is low (< 50%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

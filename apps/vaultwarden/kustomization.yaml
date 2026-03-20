@@ -4,6 +4,6 @@ resources:
   - postgres
   - statefulset.yaml
   - service.yaml
-  - virtualservice.yaml
+  - httproute.yaml
 generators:
   - sopsgenerator.yaml

@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  labels:
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/instance: mimir-gateway
+    app.kubernetes.io/name: mimir-gateway
+    app.kubernetes.io/part-of: mimir
+  name: mimir-gateway
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - mimir.home.alden.ai
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: mimir-gateway
+          port: 80

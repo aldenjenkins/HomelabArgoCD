@@ -5,7 +5,8 @@ resources:
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - serviceaccount.yaml
-  - virtualservice.yaml
+  # - httproute.yaml
+  # - virtualservice.yaml
   - service.yaml
   - servicemonitor.yaml
   # - podmonitor.yaml
@@ -25,8 +26,6 @@ resources:
   - query-frontend
   - query-scheduler
   - ruler
-generators:
-  - sopsgenerator.yaml
 
 configMapGenerator:
 - files:

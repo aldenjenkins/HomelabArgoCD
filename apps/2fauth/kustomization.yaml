@@ -1,0 +1,12 @@
+namespace: 2fauth
+resources:
+  - namespace.yaml
+  - postgres
+  - redis
+  - persistentvolumeclaim.yaml
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+  - probe.yaml
+generators:
+  - sopsgenerator.yaml

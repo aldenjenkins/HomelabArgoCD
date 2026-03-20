@@ -6,12 +6,13 @@ resources:
   - clusterrolebinding.yaml
   - deployment.yaml
   - service.yaml
-  - networkpolicy.yaml
+  # Removing this because cilium actually uses it and we want network from otel and thanos and elsewhere. Probably delete to be concise in the future.
+  # - networkpolicy.yaml
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - prometheusrule.yaml
-  - telemetry.yaml
+  # - telemetry.yaml
 generators:
   - sopsgenerator.yaml
 configMapGenerator:

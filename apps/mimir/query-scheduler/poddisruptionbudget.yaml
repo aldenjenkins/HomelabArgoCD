@@ -1,0 +1,16 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: query-scheduler
+    app.kubernetes.io/instance: mimir-query-scheduler
+    app.kubernetes.io/name: mimir-query-scheduler
+    app.kubernetes.io/part-of: mimir
+  name: mimir-query-scheduler
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: query-scheduler
+      app.kubernetes.io/instance: mimir-query-scheduler
+      app.kubernetes.io/name: mimir-query-scheduler

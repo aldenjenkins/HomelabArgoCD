@@ -1,5 +1,6 @@
 namespace: grafana
 resources:
+  - namespace.yaml
   - configmap.yaml
   - postgres
   - redis
@@ -7,8 +8,7 @@ resources:
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - dashboards
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - servicemonitor.yaml
   - probe.yaml
   # TODO: This prometheus rule is currently failing to evaluatle. the runbook url is 404 too, so maybe it needs updating.

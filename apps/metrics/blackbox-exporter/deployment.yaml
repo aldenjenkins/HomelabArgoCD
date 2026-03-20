@@ -23,7 +23,7 @@ spec:
         app.kubernetes.io/name: blackbox-exporter
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 0.25.0
-        sidecar.istio.io/inject: "true"
+        # sidecar.istio.io/inject: "true"
         # Ignored from envoy-stats-monitor because the blackbox exporter metrics already get these same metrics
         istio-prometheus-ignore: "true"
     spec:
@@ -33,7 +33,8 @@ spec:
             - --config.file=/etc/blackbox_exporter/config.yml
             - --web.listen-address=:19115
           # image: quay.io/prometheus/blackbox-exporter:v0.25.0
-          image: quay.io/prometheus/blackbox-exporter:latest
+          image: quay.io/prometheus/blackbox-exporter:v0.28.0
+          imagePullPolicy: IfNotPresent
           name: blackbox-exporter
           ports:
             - containerPort: 19115

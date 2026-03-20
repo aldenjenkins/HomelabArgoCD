@@ -216,6 +216,7 @@ memberlist:
   # TODO: maybe this will fail? should know immediately
   cluster_label_verification_disabled: false
   abort_if_cluster_join_fails: false
+  gossip_interval: 5s
   join_members:
     - loki-gossip-ring.loki.svc.cluster.local.
 
@@ -267,11 +268,12 @@ ruler:
       s3forcepathstyle: true
     type: s3
   # rule_path: /var/loki
-  alertmanager_url: http://alertmanager-operated.alertmanager.svc.cluster.local.:9093/alertmanager
+  alertmanager_url: http://alertmanager-main.alertmanager.svc.cluster.local.:9093
   remote_write:
     enabled: true
     client:
-      url: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      # url: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      url: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
   evaluation:
     mode: remote
     query_frontend:

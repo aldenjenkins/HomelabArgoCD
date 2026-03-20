@@ -296,7 +296,7 @@ spec:
             - memory_limiter
             - groupbyattrs
             - k8sattributes
-            - probabilistic_sampler
+            # - probabilistic_sampler
             - batch
           exporters:
             - otlphttp/tempo

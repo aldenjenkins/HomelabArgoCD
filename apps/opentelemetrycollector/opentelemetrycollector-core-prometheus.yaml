@@ -74,10 +74,26 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
-      prometheusremotewrite:
-        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      # Thanos Receive - existing metrics backend
+      prometheusremotewrite/thanos:
         endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
         add_metric_suffixes: false
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+        remote_write_queue:
+          enabled: true
+          num_consumers: 50
+          queue_size: 1000
+        timeout: 10s
+
+      # Mimir Distributor - testing new metrics backend
+      prometheusremotewrite/mimir:
+        endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+        add_metric_suffixes: false
+        resource_to_telemetry_conversion:
+          exclude_service_attributes: false
         tls:
           insecure: true
         retry_on_failure:
@@ -299,6 +315,8 @@ spec:
             - IsMatch(name, "^container_memory_.+$") and not (name == "container_memory_usage_bytes" or name == "container_memory_working_set_bytes" or name == "container_memory_cache")
             - IsMatch(name, "^container_spec_.+$")
             - IsMatch(name, "^machine_.+$")
+            # Drop high-cardinality Longhorn histograms (url label causes cardinality explosion)
+            - IsMatch(name, "^longhorn_rest_client_.+")
             - IsMatch(name, "^node_.+$") and not (name == "node_memory_MemTotal_bytes" or name == "node_memory_MemFree_bytes" or name == "node_memory_MemAvailable_bytes")
       groupbyattrs:
         keys:
@@ -511,7 +529,7 @@ spec:
               - set(datapoint.attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil and resource.attributes["homelab.huid"] != ""
               - set(datapoint.attributes["homelab.environment"], resource.attributes["homelab.environment"]) where resource.attributes["homelab.environment"] != nil and resource.attributes["homelab.environment"] != ""
               - set(datapoint.attributes["homelab.version"], resource.attributes["homelab.version"]) where resource.attributes["homelab.version"] != nil and resource.attributes["homelab.version"] != ""
-              - set(datapoint.attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil and resource.attributes["service.name"] != ""
+              - set(datapoint.attributes["job"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil and resource.attributes["service.name"] != "" and (datapoint.attributes["job"] == nil or datapoint.attributes["job"] == "")
               - set(datapoint.attributes["ready"], datapoint.value_double) where metric.name == "kube_pod_container_status_ready"
       transform/normalize_service_name:
         metric_statements:
@@ -527,6 +545,8 @@ spec:
           - context: resource
             statements:
               - delete_key(resource.attributes, "server.port") where resource.attributes["server.port"] == ""
+              # Convert mimir-component to mimir/component for prometheusremotewrite job label
+              - replace_pattern(resource.attributes["service.name"], "^mimir-(.+)$$", "mimir/$$1")
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint
@@ -826,7 +846,8 @@ spec:
           exporters:
             # - forward/keda
             # - otlphttp/prometheus
-            - prometheusremotewrite
+            # - prometheusremotewrite/thanos
+            - prometheusremotewrite/mimir
         # metrics/keda:
         #   exporters:
         #     - prometheusremotewrite/keda

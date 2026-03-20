@@ -5,7 +5,8 @@ resources:
   # - deployment.yaml
   - poddisruptionbudget.yaml
   # - horizontalpodautoscaler.yaml
-  - networkpolicy.yaml
+  # Removing this because cilium actually uses it and we want network from otel and thanos and elsewhere. Probably delete to be concise in the future.
+  # - networkpolicy.yaml
 
 # configMapGenerator:
 # - files:

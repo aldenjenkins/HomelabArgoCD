@@ -1,0 +1,22 @@
+# Headless service for memberlist gossip ring discovery
+# All Mimir components join this ring for peer discovery
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: gossip-ring
+    app.kubernetes.io/instance: mimir-gossip-ring
+    app.kubernetes.io/name: mimir-gossip-ring
+    app.kubernetes.io/part-of: mimir
+  name: mimir-gossip-ring
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: gossip-ring
+      port: 7946
+      appProtocol: tcp
+      targetPort: 7946
+      protocol: TCP
+  selector:
+    app.kubernetes.io/part-of: mimir

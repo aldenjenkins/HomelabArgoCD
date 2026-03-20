@@ -1,0 +1,5 @@
+namespace: 2fauth
+resources:
+  - redis.yaml
+  - servicemonitor.yaml
+  # - grafanadatasource.yaml

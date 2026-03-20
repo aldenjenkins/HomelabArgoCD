@@ -1,0 +1,13 @@
+namespace: alloy-prometheusrules
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+configMapGenerator:
+  - name: alloy-config
+    files:
+      - files/config.alloy
+    options:
+      immutable: true

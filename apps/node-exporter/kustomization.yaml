@@ -4,9 +4,11 @@ resources:
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - daemonset.yaml
-  - networkpolicy.yaml
+  # Removing this because cilium actually uses it and we want network from otel and thanos and elsewhere. Probably delete to be concise in the future.
+  # - networkpolicy.yaml
   - prometheusrule.yaml
   - service.yaml
   - serviceaccount.yaml
-  - servicemonitor.yaml
+  # Removing this because the kubeletstats collector daemonset is setup to scrape it, otherwise both that and the core-prometheus-collector deployment will scrape it.
+  # - servicemonitor.yaml
   - grafanadashboard.yaml

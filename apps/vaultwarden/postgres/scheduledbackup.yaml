@@ -3,6 +3,10 @@ kind: ScheduledBackup
 metadata:
   name: vaultwarden-postgres-18
 spec:
-  schedule: "0 10 0 * * *"
+  schedule: "0 9 0 * * *"
   cluster:
     name: vaultwarden-postgres-18
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

@@ -24,7 +24,6 @@ spec:
       labels:
         app.kubernetes.io/name: opencost
         app.kubernetes.io/instance: opencost
-        sidecar.istio.io/inject: "true"
     spec:
       serviceAccountName: opencost
       securityContext:

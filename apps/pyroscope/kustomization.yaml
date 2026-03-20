@@ -1,15 +1,18 @@
 namespace: pyroscope
 resources:
   - namespace.yaml
-  - service.yaml
-  - deployment.yaml
-  - servicemonitor.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
-  # - python-fast-slow.yaml
-  - grafanadatasource.yaml
-  - telemetry.yaml
-  - probe.yaml
+  #
+  # 2026-01-16
+  #
+  # Disabling pyroscope for now as its probably adding quite a bit of network latency.
+  # to re-enable, simply uncomment these below.
+  #
+  # - service.yaml
+  # - deployment.yaml
+  # - servicemonitor.yaml
+  # - httproute.yaml
+  # - grafanadatasource.yaml
+  # - probe.yaml
 
 configMapGenerator:
 - files:

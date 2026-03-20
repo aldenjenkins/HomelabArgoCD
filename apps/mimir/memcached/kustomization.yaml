@@ -1,0 +1,7 @@
+namespace: mimir
+resources:
+  - service.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml
+  - grafanadashboard.yaml
+  - statefulset.yaml

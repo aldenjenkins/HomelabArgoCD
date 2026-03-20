@@ -1,0 +1,63 @@
+apiVersion: descheduler/v1alpha2
+kind: DeschedulerPolicy
+metricsProviders:
+- source: KubernetesMetrics
+profiles:
+- name: Default
+  pluginConfig:
+  - name: DefaultEvictor
+    args:
+      # Protect pods with PVCs and node-pinned workloads from eviction
+      podProtections:
+        extraEnabled:
+          - PodsWithPVC  # Don't evict pods with PVCs (StatefulSet workloads)
+      nodeFit: true  # Only evict if pod can actually schedule elsewhere
+      minReplicas: 2  # Don't evict unless there are at least 2 replicas
+  - args:
+      metricsUtilization:
+        source: KubernetesMetrics
+      targetThresholds:
+        cpu: 60
+        memory: 60
+      thresholds:
+        cpu: 30
+        memory: 30
+      # Exclude namespaces with node-pinned workloads from eviction
+      evictableNamespaces:
+        exclude:
+          - thanos
+          - minio
+          - prometheus
+          - loki
+          - tempo
+    name: LowNodeUtilization
+  - args:
+      excludeOwnerKinds:
+      - Job
+      includingInitContainers: true
+      minPodLifetimeSeconds: 1800
+      reasons:
+      - ContainerStatusUnknown
+      - NodeAffinity
+      - NodeShutdown
+      - Terminated
+      - UnexpectedAdmissionError
+    name: RemoveFailedPods
+  - name: RemovePodsViolatingInterPodAntiAffinity
+  - args:
+      nodeAffinityType:
+      - requiredDuringSchedulingIgnoredDuringExecution
+    name: RemovePodsViolatingNodeAffinity
+  - name: RemovePodsViolatingNodeTaints
+  - name: RemovePodsViolatingTopologySpreadConstraint
+  plugins:
+    balance:
+      enabled:
+      - LowNodeUtilization
+      - RemovePodsViolatingTopologySpreadConstraint
+    deschedule:
+      enabled:
+      - RemoveFailedPods
+      - RemovePodsViolatingInterPodAntiAffinity
+      - RemovePodsViolatingNodeAffinity
+      - RemovePodsViolatingNodeTaints

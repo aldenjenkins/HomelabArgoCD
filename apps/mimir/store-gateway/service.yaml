@@ -1,0 +1,64 @@
+# Headless service for StatefulSet peer discovery
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/part-of: mimir
+    headless: "true"
+    prometheus.io/service-monitor: "false"
+  name: mimir-store-gateway-headless
+  namespace: mimir
+spec:
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 9095
+      targetPort: 9095
+      protocol: TCP
+    - name: memberlist
+      port: 7946
+      targetPort: 7946
+      protocol: TCP
+  selector:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir-store-gateway
+    app.kubernetes.io/name: mimir-store-gateway
+---
+# Regular service for load-balanced access
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/part-of: mimir
+    headless: "false"
+  name: mimir-store-gateway
+  namespace: mimir
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 9095
+      targetPort: 9095
+      protocol: TCP
+    - name: memberlist
+      port: 7946
+      targetPort: 7946
+      protocol: TCP
+  selector:
+    app.kubernetes.io/component: store-gateway
+    app.kubernetes.io/instance: mimir-store-gateway
+    app.kubernetes.io/name: mimir-store-gateway

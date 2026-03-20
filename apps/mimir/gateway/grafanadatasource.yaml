@@ -1,0 +1,34 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: mimir
+  labels:
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/instance: mimir
+    app.kubernetes.io/name: mimir
+    app.kubernetes.io/part-of: mimir
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  datasource:
+    name: Mimir
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://mimir-gateway.mimir.svc.cluster.local:80/prometheus
+    isDefault: true
+    editable: true
+    jsonData:
+      manageAlerts: true
+      # alertmanagerUid: mimirAlertmanager
+      httpMethod: POST
+      prometheusType: Mimir
+      cacheLevel: 'High'
+      timeInterval: "15s"
+      exemplarTraceIdDestinations:
+        # Field with internal link pointing to data source in Grafana.
+        # datasourceUid value can be anything, but it should be unique across all defined data source uids.
+        - datasourceUid: tempo
+          name: traceID

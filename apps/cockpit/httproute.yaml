@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: cockpit-httproute
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - cockpit.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: cockpit
+      port: 9090
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
