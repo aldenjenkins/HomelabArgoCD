@@ -66,10 +66,10 @@ spec:
             - -config.expand-env=true
             # - -server.grpc-max-send-msg-size-bytes=209715200
           env:
-            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            #   value: http://trace-collector.observability.svc.cluster.local:4318
-            # - name: OTEL_TRACES_SAMPLER
-            #   value: always_on
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
             - name: POD_NAME
               valueFrom:
                 fieldRef:

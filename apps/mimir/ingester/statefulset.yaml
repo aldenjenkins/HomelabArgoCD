@@ -65,10 +65,10 @@ spec:
             # Ingester-specific overrides
             - -ingester.ring.instance-availability-zone=$(POD_NAME)
           env:
-            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            #   value: http://trace-collector.observability.svc.cluster.local:4318
-            # - name: OTEL_TRACES_SAMPLER
-            #   value: always_on
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
             - name: POD_NAME
               valueFrom:
                 fieldRef:

@@ -54,10 +54,10 @@ spec:
             # - "-server.grpc.keepalive.max-connection-idle=1m"
             # - "-shutdown-delay=90s"
           env:
-            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            #   value: http://trace-collector.observability.svc.cluster.local:4318
-            # - name: OTEL_TRACES_SAMPLER
-            #   value: always_on
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
             - name: S3_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

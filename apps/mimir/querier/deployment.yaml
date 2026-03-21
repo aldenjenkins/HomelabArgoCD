@@ -57,10 +57,10 @@ spec:
                 secretKeyRef:
                   name: mimir-objectstorage
                   key: s3-secret-key
-            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            #   value: http://trace-collector.observability.svc.cluster.local:4318
-            # - name: OTEL_TRACES_SAMPLER
-            #   value: always_on
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
           ports:
             - containerPort: 8080
               name: http
