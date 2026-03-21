@@ -3,3 +3,4 @@ resources:
   - deployment.yaml
   - horizontalpodautoscaler.yaml
   - service.yaml
+  - servicemonitor.yaml

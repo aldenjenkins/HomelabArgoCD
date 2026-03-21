@@ -1,5 +1,6 @@
 namespace: loki
 resources:
   - service.yaml
+  - servicemonitor.yaml
   - deployment.yaml
   - horizontalpodautoscaler.yaml
