@@ -40,7 +40,7 @@ spec:
               weight: 100
       containers:
         - name: query-frontend
-          image: grafana/mimir:3.0.2
+          image: grafana/mimir:3.0.4
           imagePullPolicy: IfNotPresent
           args:
             - -target=query-frontend
