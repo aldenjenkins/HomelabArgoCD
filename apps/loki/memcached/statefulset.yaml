@@ -39,6 +39,8 @@ spec:
         runAsGroup: 11211
         runAsNonRoot: true
         runAsUser: 11211
+        seccompProfile:
+          type: RuntimeDefault
       # initContainers:
       #   []
       # nodeSelector:
@@ -85,6 +87,8 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           readinessProbe:
             failureThreshold: 6
             initialDelaySeconds: 5
@@ -117,6 +121,8 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           readinessProbe:
             failureThreshold: 3
             httpGet:
