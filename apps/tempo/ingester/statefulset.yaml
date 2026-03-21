@@ -55,7 +55,6 @@ spec:
         - args:
             - -target=ingester
             - -config.file=/conf/tempo.yaml
-            - -mem-ballast-size-mbs=1024
           image: docker.io/grafana/tempo:2.9.0
           imagePullPolicy: IfNotPresent
           name: ingester
@@ -66,31 +65,27 @@ spec:
               containerPort: 7956
             - name: http-metrics
               containerPort: 3200
-          env:
-            - name: GOMEMLIMIT
-              valueFrom:
-                resourceFieldRef:
-                  divisor: "0"
-                  resource: requests.memory
           livenessProbe:
             httpGet:
               path: /ready
               port: http-metrics
-            initialDelaySeconds: 60
+            initialDelaySeconds: 5
             timeoutSeconds: 5
+            failureThreshold: 10
           readinessProbe:
             httpGet:
               path: /ready
               port: http-metrics
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
             timeoutSeconds: 1
+            failureThreshold: 3
           resources:
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: 2000m
+              memory: 4Gi
             requests:
-              cpu: 200m
-              memory: 200Mi
+              cpu: 2000m
+              memory: 4Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -154,15 +149,17 @@ spec:
             items:
               - key: "overrides.yaml"
                 path: "overrides.yaml"
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: local-path
-        resources:
-          requests:
-            storage: "20Gi"
+        - name: data
+          emptyDir: {}
+  # volumeClaimTemplates:
+  #   - apiVersion: v1
+  #     kind: PersistentVolumeClaim
+  #     metadata:
+  #       name: data
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       storageClassName: local-path
+  #       resources:
+  #         requests:
+  #           storage: "20Gi"
