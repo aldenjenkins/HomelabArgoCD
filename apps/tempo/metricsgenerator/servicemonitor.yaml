@@ -1,0 +1,39 @@
+# Source: tempo-distributed/templates/metrics-generator/servicemonitor-metrics-generator.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tempo-metrics-generator
+  namespace: "tempo"
+  labels:
+    helm.sh/chart: tempo-distributed-2.6.4
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: metrics-generator
+    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/version: "2.10.3"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  namespaceSelector:
+    matchNames:
+    - tempo
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: metrics-generator
+    matchExpressions:
+      - key: prometheus.io/service-monitor
+        operator: NotIn
+        values:
+          - "false"
+  endpoints:
+    - port: http-metrics
+      relabelings:
+        - action: replace
+          sourceLabels: [job]
+          replacement: "tempo/metrics-generator"
+          targetLabel: job
+        - action: replace
+          replacement: "homelab-live"
+          targetLabel: cluster
+      scheme: http

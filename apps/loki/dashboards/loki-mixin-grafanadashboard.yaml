@@ -1,0 +1,168 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-bloom-build
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-bloom-build.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-bloom-gateway
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-bloom-gateway.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-chunks
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-chunks.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-deletion
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-deletion.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-logs
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-logs.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-mixin-recording-rules
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-mixin-recording-rules.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-operational
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-operational.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-reads-resources
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-reads-resources.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-reads
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-reads.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-retention
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-retention.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-thanos-object-storage
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-thanos-object-storage.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-writes-resources
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-writes-resources.json"
+  folderUID: loki-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: loki-writes
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-writes.json"
+  folderUID: loki-uid

@@ -38,14 +38,12 @@ spec:
         app.homelab/huid: huid-ovz6vtle
         app.homelab/owner: homelab.techservices.data.observability
         app.homelab/service: Tempo
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "3200"
-        prometheus.io/scrape: "true"
     spec:
       serviceAccountName: tempo
       securityContext:
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       enableServiceLinks: false
       
       initContainers:
@@ -98,6 +96,9 @@ spec:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+
           volumeMounts:
             - mountPath: /conf
               name: config

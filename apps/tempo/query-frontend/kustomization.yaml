@@ -1,5 +1,6 @@
 namespace: tempo
 resources:
   - service.yaml
+  - servicemonitor.yaml
   - poddisruptionbudget.yaml
   - deployment.yaml

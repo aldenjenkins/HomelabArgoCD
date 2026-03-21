@@ -1,0 +1,5 @@
+namespace: loki
+resources:
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+  - loki-mixin-grafanadashboard.yaml

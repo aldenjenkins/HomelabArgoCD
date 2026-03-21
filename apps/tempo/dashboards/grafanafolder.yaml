@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: tempo
+spec:
+  allowCrossNamespaceImport: true
+  uid: tempo-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

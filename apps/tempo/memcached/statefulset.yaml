@@ -10,7 +10,9 @@ metadata:
     app.kubernetes.io/version: "2.9.0"
     app.kubernetes.io/managed-by: Helm
 spec:
-  replicas: 3
+  # 2026-03-20 matching the 1 replica from latest tempo-distributed helm charts templated manifests
+  # replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: tempo
@@ -19,10 +21,6 @@ spec:
   serviceName: memcached
   template:
     metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "3200"
-        prometheus.io/scrape: "true"
       labels:
         helm.sh/chart: tempo-distributed-1.52.9
         app.kubernetes.io/name: tempo
@@ -38,12 +36,14 @@ spec:
       serviceAccountName: tempo
       securityContext:
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       enableServiceLinks: false
       
       initContainers:
         []
       containers:
-        - image: docker.io/memcached:1.6.23-alpine
+        - image: docker.io/memcached:1.6.41-alpine
           imagePullPolicy: IfNotPresent
           name: memcached
           args:
@@ -86,5 +86,36 @@ spec:
             runAsGroup: 1000
             runAsNonRoot: true
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tempo
+              app.kubernetes.io/instance: tempo
+              app.kubernetes.io/component: memcached
+        
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: memcached
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: memcached
+                topologyKey: topology.kubernetes.io/zone
+        
   updateStrategy:
     type: RollingUpdate

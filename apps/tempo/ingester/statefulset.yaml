@@ -41,14 +41,12 @@ spec:
         app.homelab/huid: huid-ovz6vtlh
         app.homelab/owner: homelab.techservices.data.observability
         app.homelab/service: Tempo
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: "3200"
-        prometheus.io/scrape: "true"
     spec:
       serviceAccountName: tempo
       securityContext:
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       enableServiceLinks: false
       
       initContainers:
@@ -57,7 +55,6 @@ spec:
         - args:
             - -target=ingester
             - -config.file=/conf/tempo.yaml
-            - -mem-ballast-size-mbs=1024
           image: docker.io/grafana/tempo:2.9.0
           imagePullPolicy: IfNotPresent
           name: ingester
@@ -68,31 +65,27 @@ spec:
               containerPort: 7956
             - name: http-metrics
               containerPort: 3200
-          env:
-            - name: GOMEMLIMIT
-              valueFrom:
-                resourceFieldRef:
-                  divisor: "0"
-                  resource: requests.memory
           livenessProbe:
             httpGet:
               path: /ready
               port: http-metrics
-            initialDelaySeconds: 60
+            initialDelaySeconds: 5
             timeoutSeconds: 5
+            failureThreshold: 10
           readinessProbe:
             httpGet:
               path: /ready
               port: http-metrics
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
             timeoutSeconds: 1
+            failureThreshold: 3
           resources:
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: 2000m
+              memory: 4Gi
             requests:
-              cpu: 200m
-              memory: 200Mi
+              cpu: 2000m
+              memory: 4Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -101,6 +94,8 @@ spec:
             readOnlyRootFilesystem: true
             runAsGroup: 1000
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
             runAsUser: 1000
           volumeMounts:
             - mountPath: /conf
@@ -110,6 +105,36 @@ spec:
             - mountPath: /var/tempo
               name: data
       terminationGracePeriodSeconds: 300
+        
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tempo
+              app.kubernetes.io/instance: tempo
+              app.kubernetes.io/component: ingester
+        
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: ingester
+                topologyKey: kubernetes.io/hostname
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: tempo
+                    app.kubernetes.io/instance: tempo
+                    app.kubernetes.io/component: ingester
+                topologyKey: topology.kubernetes.io/zone
         
       volumes:
         - name: config
@@ -124,15 +149,17 @@ spec:
             items:
               - key: "overrides.yaml"
                 path: "overrides.yaml"
-  volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        name: data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: local-path
-        resources:
-          requests:
-            storage: "20Gi"
+        - name: data
+          emptyDir: {}
+  # volumeClaimTemplates:
+  #   - apiVersion: v1
+  #     kind: PersistentVolumeClaim
+  #     metadata:
+  #       name: data
+  #     spec:
+  #       accessModes:
+  #         - ReadWriteOnce
+  #       storageClassName: local-path
+  #       resources:
+  #         requests:
+  #           storage: "20Gi"

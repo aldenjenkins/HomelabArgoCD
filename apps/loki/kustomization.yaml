@@ -8,12 +8,12 @@ resources:
   # - httproute.yaml
   # - virtualservice.yaml
   - service.yaml
-  - servicemonitor.yaml
+  # 2026-03-20 switching to per-service servicemonitors like we have for mimir and tempo for proper mixin dashboard rendering
+  # - servicemonitor.yaml
   # - podmonitor.yaml
   - prometheusrule.yaml
   - grafanadatasource.yaml
-  - grafanafolder.yaml
-  - grafanadashboard.yaml
+  - dashboards
   # - metrics-grafanadashboard.yaml
   - probe.yaml
   - compactor
