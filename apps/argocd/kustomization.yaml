@@ -1,7 +1,7 @@
 namespace: argocd
 resources:
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - namespace.yaml
+  - httproute.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - servicemonitor.yaml
