@@ -547,6 +547,8 @@ spec:
               - delete_key(resource.attributes, "server.port") where resource.attributes["server.port"] == ""
               # Convert mimir-component to mimir/component for prometheusremotewrite job label
               - replace_pattern(resource.attributes["service.name"], "^mimir-(.+)$$", "mimir/$$1")
+              - replace_pattern(resource.attributes["service.name"], "^tempo-(.+)$$", "tempo/$$1")
+              - replace_pattern(resource.attributes["service.name"], "^loki-(.+)$$", "loki/$$1")
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint

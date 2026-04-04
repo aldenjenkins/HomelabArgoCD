@@ -1,8 +1,7 @@
 namespace: longhorn-system
 resources:
   - https://raw.githubusercontent.com/longhorn/longhorn/v1.10.0/deploy/longhorn.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - storageclass.yaml
   # - backuptarget.yaml
   - recurringjob.yaml

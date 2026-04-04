@@ -16,7 +16,3 @@ spec:
     - port: metrics
       interval: 60s
       scrapeTimeout: 30s
-      relabelings:
-        - action: replace
-          replacement: homelab-live
-          targetLabel: cluster

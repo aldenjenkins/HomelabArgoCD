@@ -215,6 +215,7 @@ spec:
         keys:
           - k8s_pod_name
           - k8s_namespace_name
+          - k8s_container_name
       transform/set_match_resource_attributes:
         metric_statements:
           - context: datapoint
@@ -224,6 +225,7 @@ spec:
               - set(resource.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"]) where resource.attributes["k8s_pod_name"] != nil
               # - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
               - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil
+              - set(resource.attributes["k8s.container.name"], resource.attributes["k8s_container_name"]) where resource.attributes["k8s_container_name"] != nil
       k8sattributes:
         auth_type: serviceAccount
         extract:

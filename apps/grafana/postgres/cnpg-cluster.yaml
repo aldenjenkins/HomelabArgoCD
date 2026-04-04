@@ -2,23 +2,15 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: grafana-postgres-18
+  namespace: grafana
 spec:
   instances: 2
-  imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3
 
   bootstrap:
     initdb:
       database: grafana
       owner: grafana
-      import:
-        type: microservice
-        databases:
-          - grafana
-        source:
-          externalCluster: nas
-        #postImportApplicationSQL:
-        #- |
-        #  INSERT YOUR SQL QUERIES HERE
   storage:
     size: 10Gi
     storageClass: local-path
@@ -39,14 +31,6 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
+        serverName: grafana-postgres-18-3
+        
 
-  externalClusters:
-    - name: nas
-      connectionParameters:
-        # Use the correct IP or host name for the source database
-        host: 192.168.123.170
-        user: postgres
-        dbname: postgres
-      password:
-        name: nas-psql-postgres-password
-        key: password

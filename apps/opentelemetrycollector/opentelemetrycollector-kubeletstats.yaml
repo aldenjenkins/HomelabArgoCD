@@ -157,6 +157,11 @@ spec:
               - action: add_label
                 new_label: homelab_otel_source
                 new_value: kubeletstats-collector
+      transform/add_node_label:
+        metric_statements:
+          - context: datapoint
+            statements:
+              - set(attributes["node"], "${env:K8S_NODE_NAME}")
       metricstransform/rename_cpu_metrics:
         transforms:
           - action: update
@@ -496,6 +501,7 @@ spec:
           processors:
             - memory_limiter
             - metricstransform/add_standard_labels
+            - transform/add_node_label
             ############
             # - resource/set_known_attributes
             # - resourcedetection/homelab
