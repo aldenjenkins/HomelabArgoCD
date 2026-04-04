@@ -4,7 +4,7 @@ metadata:
   name: twofauth-postgres-18
 spec:
   instances: 2
-  imageName: ghcr.io/cloudnative-pg/postgresql:18.0
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3
 
   storage:
     size: 20Gi
