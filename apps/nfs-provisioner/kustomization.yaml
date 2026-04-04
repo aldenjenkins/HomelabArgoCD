@@ -5,6 +5,8 @@ resources:
   - storageclass.yaml
 generators:
   - sopsgenerator.yaml
+patches:
+  - path: patch_deployment_nodeselector.yaml
 replacements:
   - source:
       kind: Secret
