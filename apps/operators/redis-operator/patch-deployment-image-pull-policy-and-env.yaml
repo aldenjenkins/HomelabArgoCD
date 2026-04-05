@@ -9,3 +9,7 @@ spec:
       containers:
       - name: manager
         imagePullPolicy: IfNotPresent
+        args:
+        - --leader-elect
+        - --zap-log-level=info
+        - --enable-webhooks=false

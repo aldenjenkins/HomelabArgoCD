@@ -1,7 +1,9 @@
 namespace: prometheus-operator-system
 resources:
   - namespace.yaml
-  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.82.2/bundle.yaml
+  # - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.89.0/bundle.yaml
+  # renovate: datasource=github-releases depName=prometheus-operator/prometheus-operator
+  - https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.89.0/bundle.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
 labels:

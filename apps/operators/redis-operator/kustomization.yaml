@@ -1,7 +1,8 @@
 resources:
-  - github.com/OT-CONTAINER-KIT/redis-operator/config/default?ref=HEAD
+  # renovate: datasource=github-releases depName=OT-CONTAINER-KIT/redis-operator
+  - github.com/OT-CONTAINER-KIT/redis-operator/config/default?ref=v0.23.0
   - grafanafolder.yaml
   - grafanadashboard.yaml
 
 patches:
-  - path: patch-deployment-image-pull-policy.yaml
+  - path: patch-deployment-image-pull-policy-and-env.yaml

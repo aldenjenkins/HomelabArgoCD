@@ -8,3 +8,6 @@ resources:
   - grafanadashboard.yaml
   - podmonitor.yaml
   - prometheusrule.yaml
+patches:
+  - path: patch_deployment_env.yaml
+  - path: patch_certificate_renewbefore.yaml

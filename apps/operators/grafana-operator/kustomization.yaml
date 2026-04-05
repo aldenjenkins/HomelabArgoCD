@@ -1,4 +1,29 @@
+namespace: grafana-operator-system
 resources:
-  - https://github.com/grafana/grafana-operator/releases/latest/download/kustomize-cluster_scoped.yaml
+  # renovate: datasource=github-releases depName=grafana/grafana-operator
+  - https://github.com/grafana/grafana-operator/releases/download/v5.22.2/kustomize-cluster_scoped.yaml
   - servicemonitor.yaml
   - grafanadashboard.yaml
+patches:
+  # Replace default namespace grafana to be grafana-operator-system
+  - patch: |-
+      - op: replace
+        path: /metadata/name
+        value: grafana-operator-system
+    target:
+      kind: Namespace
+      name: grafana
+  # Use json log encoding in the operator's logs for better loki insights
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: grafana-operator-controller-manager
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/args/-
+        value: --zap-encoder=json
+      - op: add
+        path: /spec/template/spec/securityContext/seccompProfile
+        value:
+          type: RuntimeDefault
