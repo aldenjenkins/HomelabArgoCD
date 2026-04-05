@@ -21,7 +21,7 @@ spec:
             claimName: kanboard-data
       containers:
         - name: kanboard
-          image: kanboard/kanboard:v1.2.47
+          image: kanboard/kanboard:v1.2.52
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: appdata
