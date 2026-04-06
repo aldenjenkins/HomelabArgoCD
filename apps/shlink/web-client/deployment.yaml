@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shlink-web-client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shlink-web-client
+  template:
+    metadata:
+      labels:
+        app: shlink-web-client
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: shlink-web-client
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: write-servers-json
+          image: busybox:1.37
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: SHLINK_SERVER_URL
+              value: https://s.home.alden.ai
+            - name: SHLINK_SERVER_NAME
+              value: homelab shlink
+            - name: SHLINK_SERVER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shlink-backend-secret
+                  key: api-key
+          command:
+            - sh
+            - -c
+            - |
+              printf '[{"url":"%s","name":"%s","apiKey":"%s"}]' \
+                "$SHLINK_SERVER_URL" \
+                "$SHLINK_SERVER_NAME" \
+                "$SHLINK_SERVER_API_KEY" \
+                > /html/servers.json
+          volumeMounts:
+            - name: servers-json
+              mountPath: /html
+      containers:
+        - name: shlink-web-client
+          image: ghcr.io/shlinkio/shlink-web-client:4.7.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: servers-json
+              mountPath: /usr/share/nginx/html/servers.json
+              subPath: servers.json
+          resources:
+            requests:
+              memory: 10Mi
+            limits:
+              memory: 100Mi
+      volumes:
+        - name: servers-json
+          emptyDir: {}

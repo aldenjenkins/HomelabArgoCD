@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shlink
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shlink
+  template:
+    metadata:
+      labels:
+        app: shlink
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: shlink
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: shlink
+          image: ghcr.io/shlinkio/shlink:5.0.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: INITIAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shlink-backend-secret
+                  key: api-key
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: shlink-postgres-18-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shlink-postgres-18-app
+                  key: password
+            - name: GEOLITE_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: shlink-backend-secret
+                  key: geoip-license-key
+          envFrom:
+            - configMapRef:
+                name: shlink-cm
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /rest/health
+              port: http
+            periodSeconds: 10
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /rest/health
+              port: http
+            periodSeconds: 20
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 150Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/shlink/data
+              name: shlink-data
+      volumes:
+        - name: shlink-data
+          emptyDir: {}

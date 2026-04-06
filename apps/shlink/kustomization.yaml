@@ -1,0 +1,18 @@
+namespace: shlink
+resources:
+  - namespace.yaml
+  - httproute.yaml
+  - postgres
+  - redis
+  - backend
+  - web-client
+
+configMapGenerator:
+  - name: shlink-cm
+    envs:
+      - files/backend.env
+    options:
+      immutable: true
+
+generators:
+  - sopsgenerator.yaml
