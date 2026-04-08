@@ -17,7 +17,7 @@ spec:
         - name: pyroscope
           args:
             - -config.file=/etc/pyroscope/pyroscope.yaml
-          image: grafana/pyroscope:1.16.0
+          image: grafana/pyroscope:1.20.3
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
