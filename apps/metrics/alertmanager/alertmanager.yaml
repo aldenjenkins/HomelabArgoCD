@@ -52,4 +52,4 @@ spec:
     runAsNonRoot: true
     runAsUser: 1000
   serviceAccountName: alertmanager-main
-  version: v0.29.0 # renovate: docker=quay.io/prometheus/alertmanager
+  version: v0.32.0 # renovate: docker=quay.io/prometheus/alertmanager
