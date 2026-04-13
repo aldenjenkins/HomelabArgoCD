@@ -21775,7 +21775,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: docker.io/istio/proxyv2:1.27.1-distroless
+        image: docker.io/istio/proxyv2:1.29.2-distroless
         name: istio-proxy
         ports:
         - containerPort: 15021
