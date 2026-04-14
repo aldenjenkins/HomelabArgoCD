@@ -1,0 +1,11 @@
+namespace: shiori
+resources:
+  - namespace.yaml
+  - postgres
+  - persistentvolumeclaim.yaml
+  - service.yaml
+  - deployment.yaml
+  - httproute.yaml
+  - probe.yaml
+generators:
+  - sopsgenerator.yaml

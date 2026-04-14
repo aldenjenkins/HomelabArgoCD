@@ -10,3 +10,4 @@ homelab-live-control-plane-01.yaml
 homelab-live-control-plane-02.yaml
 homelab-live-control-plane-03.yaml
 talosconfig
+homelab-live-worker-11.yaml

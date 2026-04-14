@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: default-gateway-options
+  namespace: istio-system
+data:
+  service: |
+    metadata:
+      annotations:
+        io.cilium/lb-ipam-ips: "10.10.10.10"  # Cilium LB-IPAM annotation
+    spec:
+      externalTrafficPolicy: Local
+      allocateLoadBalancerNodePorts: false
+  horizontalPodAutoscaler: |
+    spec:
+      minReplicas: 2
+      maxReplicas: 3
+  deployment: |
+    spec:
+      template:
+        spec:
+          containers:
+          - name: istio-proxy
+            securityContext:
+              seccompProfile:
+                type: "RuntimeDefault"
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: DoesNotExist
+          # Spread across different worker nodes for HA
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  gateway.networking.k8s.io/gateway-name: default-https-gateway

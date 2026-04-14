@@ -20,7 +20,6 @@ spec:
       #   instrumentation.opentelemetry.io/inject-go: "true"
       #   instrumentation.opentelemetry.io/otel-go-auto-target-exe: "/app/gitea/gitea"
       labels:
-        sidecar.istio.io/inject: "true"
         app.kubernetes.io/name: forgejo
     spec:
       securityContext:
@@ -70,7 +69,7 @@ spec:
             #     readOnlyRootFilesystem: true
       containers:
         - name: forgejo
-          image: codeberg.org/forgejo/forgejo:13-rootless
+          image: codeberg.org/forgejo/forgejo:14.0.4-rootless
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:

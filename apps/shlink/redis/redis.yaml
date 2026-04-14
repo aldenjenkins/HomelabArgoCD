@@ -12,10 +12,39 @@ spec:
   kubernetesConfig:
     image: "quay.io/opstree/redis:v8.2.1"
     imagePullPolicy: "IfNotPresent"
+  # storage:
+  #   volumeClaimTemplate:
+  #     spec:
+  #       storageClassName: "local-path"
+  #       accessModes: ["ReadWriteOnce"]
+  #       resources:
+  #         requests:
+  #           storage: 5Gi
+  #   volumeMount:
+  #     mountPath:
+  #       - mountPath: /etc/redis
+  #         name: config
   redisExporter:
     enabled: true
     image: "quay.io/opstree/redis-exporter:v1.76.0"
     imagePullPolicy: "IfNotPresent"
+    securityContext:                      # applied to ALL containers incl. exporter
+      allowPrivilegeEscalation: false     # CRITICAL
+      readOnlyRootFilesystem: true        # HIGH
+      runAsNonRoot: true                  # HIGH (belt-and-suspenders at container level)
+      runAsUser: 1000
+      capabilities:                       # CRITICAL
+        drop: ["ALL"]
   podSecurityContext:
     fsGroup: 1000
     runAsUser: 1000
+    runAsNonRoot: true                  # HIGH: runAsNonRoot
+    seccompProfile:                     # MEDIUM: seccompProfile
+      type: RuntimeDefault
+  securityContext:                      # applied to ALL containers incl. exporter
+    allowPrivilegeEscalation: false     # CRITICAL
+    runAsNonRoot: true                  # HIGH (belt-and-suspenders at container level)
+    runAsUser: 1000
+    runAsGroup: 1000
+    capabilities:                       # CRITICAL
+      drop: ["ALL"]

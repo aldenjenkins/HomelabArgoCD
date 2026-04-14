@@ -1,0 +1,18 @@
+namespace: longhorn-system
+resources:
+  # renovate: datasource=github-releases depName=longhorn/longhorn
+  - https://github.com/longhorn/longhorn/releases/download/v1.11.1/longhorn.yaml
+  - dashboards
+  - httproute.yaml
+  - storageclass.yaml
+  # - backuptarget.yaml
+  - recurringjob.yaml
+  - servicemonitor.yaml
+  - prometheusrule.yaml
+
+generators:
+  - sopsgenerator.yaml
+
+patches:
+  - path: patches/patch_namespace.yaml
+  - path: patches/patch_configmap.yaml

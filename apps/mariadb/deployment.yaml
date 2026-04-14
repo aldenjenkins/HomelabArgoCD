@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: mysql-exporter
-          image: prom/mysqld-exporter:latest
+          image: prom/mysqld-exporter:v0.18.0
+          imagePullPolicy: IfNotPresent
           args:
             - --collect.auto_increment.columns
             - --collect.binlog_size

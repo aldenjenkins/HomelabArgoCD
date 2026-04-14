@@ -3,3 +3,5 @@ resources:
   - namespace.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
+  # disabling haproxy on nas as unnecessary for now
+  # - prometheusrule.yaml

@@ -1,0 +1,17 @@
+namespace: istio-system
+resources:
+  - base
+  - envoyfilter.yaml
+  - gateway.yaml
+  - configmap.yaml
+  # - waypoint.yaml
+  - istio-ingress.yaml
+  - telemetry.yaml
+  # The new istio meshconfig applied the scrape annotations to each pod so we don't need this or servicemonitor.
+  # - podmonitor.yaml
+  # - servicemonitor.yaml
+  # 2026-04-14 disabling this (although its been disabled until now, just disabling here so new argocd deploy doesnt pull it.)
+  # - prometheusrule.yaml
+  - dashboards
+generators:
+  - sopsgenerator.yaml

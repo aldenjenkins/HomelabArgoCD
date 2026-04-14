@@ -39,8 +39,6 @@ controlPlane:
       extraKernelArgs:
         - talos.platform=metal
         - cpufreq.default_governor=performance
-        - intel_idle.max_cstate=0
-        - pcie_aspm=off
       systemExtensions:
         officialExtensions:
           - siderolabs/intel-ucode
@@ -56,7 +54,6 @@ worker:
         # BUT remember that newer nucs added as workers must have this removed.
         # - i915.enable_guc=2
         - cpufreq.default_governor=performance
-        - intel_idle.max_cstate=0
       systemExtensions:
         officialExtensions:
           # - siderolabs/i915
@@ -313,6 +310,53 @@ nodes:
             match: system_disk
           grow: true
           minSize: 150GiB
+  - hostname: worker-11
+    ipAddress: 192.168.123.111
+    installDisk: /dev/nvme1n1
+    controlPlane: false
+    # This is a node which runs jellyfin, so it needs to have i915 extension while other control planes don't.
+    schematic:
+      customization:
+        extraKernelArgs:
+          - talos.platform=metal
+          - cpufreq.default_governor=performance
+          # 2026-04-06 trying guc=3 even though guc=2 didnt work on control-plane-01.
+          - i915.enable_guc=3
+        systemExtensions:
+          officialExtensions:
+            - siderolabs/i915
+            - siderolabs/intel-ucode
+            - siderolabs/iscsi-tools
+            - siderolabs/util-linux-tools
+    nodeLabels:
+      intel.feature.node.kubernetes.io/gpu: "true"
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "88:ae:dd:74:ac:aa"
+        addresses:
+          - 192.168.123.111/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.123.1
+        dhcp: false
+    nameservers:
+      - 192.168.123.171
+    userVolumes:
+      - name: longhorn
+        provisioning:
+          diskSelector:
+            match: '!system_disk'
+          minSize: 1000GiB
+          maxSize: 1000GiB
+      - name: local-path-provisioner
+        provisioning:
+          diskSelector:
+            match: '!system_disk'
+          minSize: 2500GiB
+          maxSize: 2500GiB
+    patches:
+      - "@./patches/nodes/worker-11/ethernetconfig.yaml"
+      - "@./patches/nodes/worker-11/sysctls.yaml"
   - hostname: control-plane-01
     ipAddress: 192.168.123.141
     installDisk: /dev/nvme1n1
@@ -323,11 +367,9 @@ nodes:
         extraKernelArgs:
           - talos.platform=metal
           - cpufreq.default_governor=performance
-          - intel_idle.max_cstate=0
-          - pcie_aspm=off
         systemExtensions:
           officialExtensions:
-            - siderolabs/i915
+            # - siderolabs/i915
             - siderolabs/intel-ucode
             - siderolabs/iscsi-tools
             - siderolabs/util-linux-tools

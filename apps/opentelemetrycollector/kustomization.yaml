@@ -22,3 +22,4 @@ resources:
   - grafanadashboard.yaml
   - httproute.yaml
   - prometheusrule.yaml
+  - probe.yaml

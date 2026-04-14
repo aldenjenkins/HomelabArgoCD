@@ -1,0 +1,7 @@
+namespace: bento-pdf
+resources:
+  - namespace.yaml
+  - service.yaml
+  - deployment.yaml
+  - httproute.yaml
+  - ciliumnetworkpolicy.yaml

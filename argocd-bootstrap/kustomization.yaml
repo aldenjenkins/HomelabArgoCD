@@ -1,6 +1,7 @@
 resources:
   - argocd
   - applicationset.yaml
+  - appproject.yaml
 generators:
   - sopsgenerator.yaml
 patchesStrategicMerge:
@@ -9,7 +10,7 @@ patchesStrategicMerge:
   - patches/custom-cm.yaml
   - patches/custom-notifications-cm.yaml
   - patches/custom-repo-server-deployment.yaml
-  - patches/custom-server-deployment.yaml
+  # - patches/custom-server-deployment.yaml
 replacements:
   - source:
       kind: Secret

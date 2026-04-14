@@ -12,12 +12,24 @@ spec:
     metadata:
       labels:
         app: jellyfin
-        sidecar.istio.io/inject: "true"
     spec:
       nodeSelector:
-        kubernetes.io/hostname: control-plane-01
+        kubernetes.io/hostname: worker-11
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        # Needed for hardware transcoding
+        supplementalGroups: [ 44, 104 ]
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: jellyfin
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           env:
             - name: NODE_NAME
               valueFrom:
@@ -34,10 +46,15 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
-          image: docker.io/jellyfin/jellyfin:latest
-          imagePullPolicy: Always
+          image: ghcr.io/jellyfin/jellyfin:10.11.7
+          imagePullPolicy: IfNotPresent
           resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
             limits:
+              cpu: 6000m
+              memory: 6Gi
               gpu.intel.com/i915: 1
           ports:
             - containerPort: 8096
@@ -50,11 +67,12 @@ spec:
               name: jellyfin-config
             - name: jellyfin-cache
               mountPath: /cache
+            - name: tmp
+              mountPath: /tmp
       restartPolicy: Always
-      # volumes:
-      #   - name: jellyfin-cache
-      #     emptyDir:
-      #       sizeLimit: "10Gi"
+      volumes:
+        - name: tmp
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: jellyfin-cache

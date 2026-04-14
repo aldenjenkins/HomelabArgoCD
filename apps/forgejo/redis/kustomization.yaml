@@ -1,4 +1,5 @@
+namespace: forgejo
 resources:
   - redis.yaml
-  - servicemonitor.yaml
+  # - servicemonitor.yaml
   - grafanadatasource.yaml

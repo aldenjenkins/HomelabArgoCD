@@ -3,15 +3,15 @@ resources:
   - namespace.yaml
   - postgres
   - redis
+  # - runner
   - deployment.yaml
   - service.yaml
-  - gateway.yaml
-  - virtualservice.yaml
+  - httproute.yaml
+  - tcproute.yaml
   - persistentvolumeclaim.yaml
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - probe.yaml
-  # - instrumentation.yaml
 generators:
   - sopsgenerator.yaml

@@ -1,0 +1,78 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: authelia-ext-authz
+  namespace: istio-system
+spec:
+  # Target the gateway
+  targetRefs:
+    - kind: Gateway
+      group: gateway.networking.k8s.io
+      name: default-https-gateway
+  action: CUSTOM
+  provider:
+    name: authelia
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - kanboard.home.alden.ai
+              - grafana.home.alden.ai
+              - jellyfin.home.alden.ai
+              - miniflux.home.alden.ai
+              - shlink.home.alden.ai
+              - thanos.home.alden.ai
+              - ruler.home.alden.ai
+              - librespeed.home.alden.ai
+              - alertmanager.home.alden.ai
+              - pyroscope.home.alden.ai
+              - dashy.home.alden.ai
+              - kiali.home.alden.ai
+              - longhorn.home.alden.ai
+              - opencost.home.alden.ai
+              - alloy.home.alden.ai
+              - plane.home.alden.ai
+              - cockpit.home.alden.ai
+              - adminer.home.alden.ai
+              - 2fauth.home.alden.ai
+              - hubble.home.alden.ai
+              - adguard.home.alden.ai
+              - header-display.home.alden.ai
+              - shiori.home.alden.ai
+        - operation:
+            hosts:
+              - s.home.alden.ai
+            notMethods:
+              - OPTIONS
+              - GET
+        - operation:
+            hosts:
+              - prometheus.home.alden.ai
+            notPaths:
+              - /api/v1/write
+              # This was for deleting old series after i reduced max metrics life in my Prometheus resource's spec. I had many old ones. I also wanted to test this out to see what its like. worked very nice.
+              # - /api/v1/admin/tsdb/delete_series
+        - operation:
+            hosts:
+              - mimir.home.alden.ai
+            notPaths:
+              - /api/v1/push
+        - operation:
+            hosts:
+              - thanos-receive.home.alden.ai
+            notPaths:
+              - /api/v1/receive
+        - operation:
+            paths:
+              - /*
+            hosts:
+              - forgejo.home.alden.ai
+            notPaths:
+              - /alden/nvim.git*
+        - operation:
+            hosts:
+              - argocd.home.alden.ai
+            notPaths:
+              - "/auth/token"
+              - "/api/v1/session"
+              - "/session.SessionService/Create"  # Exclude gRPC session creation from authentication

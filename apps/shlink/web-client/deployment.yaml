@@ -31,6 +31,7 @@ spec:
           image: busybox:1.37
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -56,12 +57,14 @@ spec:
           volumeMounts:
             - name: servers-json
               mountPath: /html
+              readOnly: false
       containers:
         - name: shlink-web-client
           image: ghcr.io/shlinkio/shlink-web-client:4.7.0
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -71,7 +74,14 @@ spec:
           volumeMounts:
             - name: servers-json
               mountPath: /usr/share/nginx/html/servers.json
-              subPath: servers.json
+              subPath: servers.json          # ← this is the fix: mount the FILE not the dir
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp                # ← removed the wrong subPath here
+            - name: nginx-cache
+              mountPath: /var/cache/nginx    # nginx needs to write here
+            - name: nginx-run
+              mountPath: /var/run           # nginx needs to write pid file here
           resources:
             requests:
               memory: 10Mi
@@ -79,4 +89,10 @@ spec:
               memory: 100Mi
       volumes:
         - name: servers-json
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
           emptyDir: {}

@@ -1,0 +1,4 @@
+namespace: longhorn-system
+resources:
+  - grafanafolder.yaml
+  - grafanadashboard.yaml

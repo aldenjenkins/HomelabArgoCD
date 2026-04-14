@@ -127,6 +127,9 @@ spec:
       #   timeout: 1s
     extensions:
       pprof: {}
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
 
     # Define processors to process received data.
     # See https://opentelemetry.io/docs/collector/configuration/#processors
@@ -859,6 +862,7 @@ spec:
         #   receivers:
         #     - forward/keda
       extensions:
+        - health_check
         - pprof
       telemetry:
         logs:

@@ -5,7 +5,7 @@ metadata:
 spec:
   serviceAccount: otel-collector
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:0.143.1
+  image: otel/opentelemetry-collector-contrib:0.150.1
   imagePullPolicy: IfNotPresent
   resources:
     limits:
@@ -60,6 +60,9 @@ spec:
         timeout: 30s
     extensions:
       pprof: {}
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
     # Define processors to process received data.
     # See https://opentelemetry.io/docs/collector/configuration/#processors
     processors:
@@ -529,6 +532,9 @@ spec:
             - transform/normalize_service_name
           receivers:
             - prometheus
+      extensions:
+        - health_check
+        - pprof
       telemetry:
         logs:
           encoding: json

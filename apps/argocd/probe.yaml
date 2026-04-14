@@ -14,3 +14,19 @@ spec:
     staticConfig:
       static:
         - http://argocd-server.argocd.svc.cluster.local./healthz
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+    name: argocd-tcp-static-urls-30s
+spec:
+    jobName: argocd-tcp-service-monitoring-30s
+    interval: 30s
+    scrapeTimeout: 30s
+    module: tcp_connect
+    prober:
+        url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+    targets:
+        staticConfig:
+            static:
+                - argocd-redis.argocd.svc.cluster.local.:6379

@@ -27,24 +27,24 @@ spec:
       containers:
         - args:
             - --web.listen-address=127.0.0.1:9100
+            - --path.procfs=/host/proc
             - --path.sysfs=/host/sys
             - --path.rootfs=/host/root
             - --path.udev.data=/host/root/run/udev/data
             - --no-collector.wifi
-            - --no-collector.hwmon
             - --no-collector.btrfs
-            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/containerd/.+|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
-            - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
-            - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
-          image: quay.io/prometheus/node-exporter:v1.9.1
+            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run|var/lib/kubelet/.+|var/lib/containerd/.+|system)($|/)
+            - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|tmpfs)$
+            - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15}|cilium.*|lxc.*|dummy.*|lo|tun.*)$
+            - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15}|cilium.*|lxc.*|dummy.*|lo|tun.*)$
+          image: quay.io/prometheus/node-exporter:v1.11.1
           name: node-exporter
           resources:
             limits:
-              cpu: 250m
               memory: 180Mi
             requests:
               cpu: 102m
-              memory: 180Mi
+              memory: 10Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -54,12 +54,16 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           volumeMounts:
-            - mountPath: /host/root
-              name: root
+            - name: proc
+              mountPath: /host/proc
               readOnly: true
             - name: sys
               mountPath: /host/sys
               readOnly: true
+            - mountPath: /host/root
+              name: root
+              readOnly: true
+              mountPropagation: HostToContainer
         - args:
             - --secure-listen-address=[$(IP)]:9100
             - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
@@ -106,6 +110,9 @@ spec:
       tolerations:
         - operator: Exists
       volumes:
+        - hostPath:
+            path: /proc
+          name: proc
         - hostPath:
             path: /sys
           name: sys

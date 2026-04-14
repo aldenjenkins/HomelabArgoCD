@@ -8,7 +8,6 @@ metadata:
         path: ksops
 files:
   - './secret.yaml'
-  - './authorizationpolicy.yaml'
 # secretFrom:
 #   - metadata:
 #       name: forgejo-app-ini

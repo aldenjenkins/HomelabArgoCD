@@ -10,7 +10,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 100%
-  image: otel/opentelemetry-collector-contrib:0.143.1
+  image: otel/opentelemetry-collector-contrib:0.150.1
   imagePullPolicy: IfNotPresent
   resources:
     limits:
@@ -73,6 +73,9 @@ spec:
         timeout: 10s
     extensions:
       pprof: {}
+      health_check:
+        endpoint: 0.0.0.0:13133
+        path: /
     # Define processors to process received data.
     # See https://opentelemetry.io/docs/collector/configuration/#processors
     processors:
@@ -489,8 +492,9 @@ spec:
               scrape_interval: 15s
 
     service:
-      # extensions:
-      #   - pprof
+      extensions:
+        - health_check
+        - pprof
       pipelines:
         metrics:
           exporters:

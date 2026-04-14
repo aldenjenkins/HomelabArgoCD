@@ -12,4 +12,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - http://jellyfin.jellyfin.svc.cluster.local.:8096/
+        - http://jellyfin.jellyfin.svc.cluster.local.:8096/health/

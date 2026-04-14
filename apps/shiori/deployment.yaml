@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shiori
+  labels:
+    app: shiori
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shiori
+  template:
+    metadata:
+      labels:
+        app: shiori
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: shiori
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: app
+          persistentVolumeClaim:
+            claimName: shiori-data
+      containers:
+        - name: shiori
+          image: ghcr.io/go-shiori/shiori:v1.8.0
+          imagePullPolicy: IfNotPresent
+          command: ["/usr/bin/shiori", "server"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - mountPath: /srv/shiori
+              name: app
+          envFrom:
+            - secretRef:
+                name: shiori-env-secret
+          env:
+            - name: SHIORI_SSO_PROXY_AUTH_ENABLED
+              value: "true"
+            - name: SHIORI_DIR
+              value: /srv/shiori
+            - name: SHIORI_SSO_PROXY_AUTH_TRUSTER
+              value: "10.244.0.0/16"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: shiori-postgres-18-app
+                  key: password
+            - name: SHIORI_DATABASE_URL
+              value: "postgres://shiori:$(DB_PASS)@shiori-postgres-18-rw.shiori.svc.cluster.local:5432/shiori"

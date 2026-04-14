@@ -4,8 +4,7 @@ resources:
   - deployment.yaml
   - statefulset.yaml
   - service.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  - httproute.yaml
   - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml

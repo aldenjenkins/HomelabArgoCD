@@ -9,7 +9,7 @@ spec:
     targetCPUUtilization: 75
     targetMemoryUtilization: 90
   mode: deployment
-  image: otel/opentelemetry-collector-contrib:0.143.1
+  image: otel/opentelemetry-collector-contrib:0.150.1
   imagePullPolicy: IfNotPresent
   # ports:
   #   - name: metrics
@@ -270,7 +270,7 @@ spec:
     extensions:
       health_check:
         endpoint: 0.0.0.0:13133
-        path: /healthz
+        path: /
 
     # Define the full service graph for the OpenTelemetry collector.
     service:

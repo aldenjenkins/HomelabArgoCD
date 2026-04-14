@@ -1,0 +1,4 @@
+namespace: istio-system
+resources:
+  - namespace.yaml
+  - templatedistiofiles.yaml

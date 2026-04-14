@@ -6,5 +6,6 @@ resources:
   - servicemonitor.yaml
   - httproute.yaml
   - grafanadashboard.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

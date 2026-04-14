@@ -1,0 +1,10 @@
+namespace: istio-system
+resources:
+  - grafanafolder.yaml
+  - workload-grafanadashboard.yaml
+  - mesh-grafanadashboard.yaml
+  - service-grafanadashboard.yaml
+  - performance-grafanadashboard.yaml
+  - controlplane-grafanadashboard.yaml
+  - wasmextension-grafanadashboard.yaml
+  - ztunnel-grafanadashboard.yaml

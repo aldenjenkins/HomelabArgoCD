@@ -1,0 +1,11 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "default-deny-egress"
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: bentopdf
+      app.kubernetes.io/name: bentopdf
+  egress:
+    - {} # This empty list puts the pod into "Default Deny" mode

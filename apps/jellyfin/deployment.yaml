@@ -14,7 +14,16 @@ spec:
     spec:
       containers:
         - name: jellyfin-exporter
-          image: rebelcore/jellyfin-exporter:v1.3.9
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          image: rebelcore/jellyfin-exporter:v1.5.0
           imagePullPolicy: IfNotPresent
           args:
             - "--jellyfin.address=http://jellyfin.jellyfin:8096"

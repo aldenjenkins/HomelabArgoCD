@@ -1,0 +1,44 @@
+namespace: external-secrets-operator-system
+resources:
+  - namespace.yaml
+  # - github.com/external-secrets/external-secrets/config/crds/bases?ref=HEAD
+  # renovate: datasource=github-releases depName=external-secrets/external-secrets
+  - https://github.com/external-secrets/external-secrets/releases/download/v2.3.0/external-secrets.yaml
+  - webhook-pki.yaml
+  - servicemonitor.yaml
+  - metrics-service.yaml
+patches:
+- path: patches/cert-controller-delete-deploy.yaml
+- path: patches/cert-controller-delete-secret.yaml
+- path: patches/cert-controller-delete-serviceaccount.yaml
+- path: patches/cert-controller-delete-clusterrole.yaml
+- path: patches/cert-controller-delete-clusterrolebinding.yaml
+- target:
+    version: v1
+    kind: Deployment
+    name: external-secrets-webhook
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/args/2
+      value: "--dns-name=external-secrets-webhook.external-secrets-operator-system.svc"
+- target:
+    version: v1
+    kind: Service
+    name: external-secrets-webhook
+  patch: |-
+    - op: add
+      path: /spec/ports/-
+      value:
+        port: 8080
+        protocol: TCP
+        targetPort: metrics
+        name: metrics
+- target:
+    version: v1
+    kind: ValidatingWebhookConfiguration
+  patch: |-
+    - op: add
+      path: /metadata/annotations
+      value:
+        cert-manager.io/inject-ca-from: external-secrets-operator-system/external-secrets-webhook-ca
+
