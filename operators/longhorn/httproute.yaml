@@ -4,7 +4,9 @@ metadata:
   name: longhorn-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: default-https-gateway
       namespace: istio-system
   hostnames:
     - longhorn.home.alden.ai
@@ -12,6 +14,8 @@ spec:
   - backendRefs:
     - name: longhorn-frontend
       port: 80
+      group: ''
+      kind: Service
     matches:
     - path:
         type: PathPrefix
