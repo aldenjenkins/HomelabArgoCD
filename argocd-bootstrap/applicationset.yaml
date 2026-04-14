@@ -73,6 +73,9 @@ spec:
         path: 'operators/{{.path.basename}}'
       destination:
         server: https://kubernetes.default.svc
+      syncPolicy:
+        syncOptions:
+          - ServerSideApply=true    # <-- handles CRDs cleanly
       # syncPolicy:
       #   automated:
       #     prune: true
