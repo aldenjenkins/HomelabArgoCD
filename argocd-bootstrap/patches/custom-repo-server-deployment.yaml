@@ -7,16 +7,20 @@ spec:
     spec:
       initContainers:
         - name: install-ksops
-          image: viaductoss/ksops:v4.3.3
-          command: 
-          - "/bin/sh" 
-          - "-c"
-          args:
-            - echo "Installing KSOPS..."; mv ksops /custom-tools/; mv kustomize /custom-tools/; 
-              echo "Done.";
+          image: viaductoss/ksops:v4.5.1
+          command: ["/usr/local/bin/ksops", "install", "--with-kustomize", "/custom-tools"]
           volumeMounts:
             - mountPath: /custom-tools
               name: custom-tools
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
       containers:
         - name: argocd-repo-server
           env:

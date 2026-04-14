@@ -6,4 +6,4 @@ resources:
   # - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
 patches:
   - path: patch_notification_secret.yaml
-  # - path: patch_delete_networkpolicies.yaml
+  - path: patch_delete_networkpolicies.yaml

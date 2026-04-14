@@ -4,13 +4,13 @@ resources:
   - appproject.yaml
 generators:
   - sopsgenerator.yaml
-patchesStrategicMerge:
-  - patches/custom-cmd-params-cm.yaml
-  - patches/custom-rbac-cm.yaml
-  - patches/custom-cm.yaml
-  - patches/custom-notifications-cm.yaml
-  - patches/custom-repo-server-deployment.yaml
-  # - patches/custom-server-deployment.yaml
+patches:
+  - path: patches/custom-cmd-params-cm.yaml
+  - path: patches/custom-rbac-cm.yaml
+  - path: patches/custom-cm.yaml
+  - path: patches/custom-notifications-cm.yaml
+  - path: patches/custom-repo-server-deployment.yaml
+  # - path: patches/custom-server-deployment.yaml
 replacements:
   - source:
       kind: Secret
