@@ -11,44 +11,44 @@
     "managerFilePatterns": [
       "/\\.yaml$/"
     ]
-  },
-  "customManagers": [
-    {
-      // Rule 1: image uses :latest AND imagePullPolicy: Always
-      // -> bump to highest semver tag and flip policy to IfNotPresent
-      "customType": "regex",
-      "description": "Update :latest images and switch imagePullPolicy Always -> IfNotPresent",
-      "managerFilePatterns": ["/\\.ya?ml$/"],
-      "matchStrings": [
-        // Capture depName, the currentValue (latest), and indentation for the next line
-        "image:\\s*(?<depName>[\\w./-]+):(?<currentValue>latest)\\s*\\n(?<indentation>\\s*)imagePullPolicy:\\s*Always"
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "semver",
-      // Rewrite both lines in one go, preserving indentation before imagePullPolicy
-      "autoReplaceStringTemplate": "image: {{{depName}}}:{{{newValue}}}\n{{{indentation}}}imagePullPolicy: IfNotPresent"
-    },
-    {
-      // Rule 2: image uses :latest but no policy flip needed (handles manifests without the policy line)
-      "customType": "regex",
-      "description": "Update :latest images to highest semver when no policy line follows",
-      "managerFilePatterns": ["/\\.ya?ml$/"],
-      "matchStrings": [
-        "image:\\s*(?<depName>[\\w./-]+):(?<currentValue>latest)\\b"
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "semver",
-      "autoReplaceStringTemplate": "image: {{{depName}}}:{{{newValue}}}"
-    },
-    // in something like grafana.yaml or prometheus.yaml we can set a # renovate: docker=docker.io/grafana/grafana comment on the same line as the spec.version (or whatever attribute has the docker image version)
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/\\.yaml$/",
-      ],
-      "matchStrings": [
-        "(?<currentValue>[\\w+\\.\\-]*)['\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?"
-      ]
-    }
-  ]
+  }
+  //"customManagers": [
+  // // {
+  // //   // Rule 1: image uses :latest AND imagePullPolicy: Always
+  // //   // -> bump to highest semver tag and flip policy to IfNotPresent
+  // //   "customType": "regex",
+  // //   "description": "Update :latest images and switch imagePullPolicy Always -> IfNotPresent",
+  // //   "managerFilePatterns": ["/\\.ya?ml$/"],
+  // //   "matchStrings": [
+  // //     // Capture depName, the currentValue (latest), and indentation for the next line
+  // //     "image:\\s*(?<depName>[\\w./-]+):(?<currentValue>latest)\\s*\\n(?<indentation>\\s*)imagePullPolicy:\\s*Always"
+  // //   ],
+  // //   "datasourceTemplate": "docker",
+  // //   "versioningTemplate": "semver",
+  // //   // Rewrite both lines in one go, preserving indentation before imagePullPolicy
+  // //   "autoReplaceStringTemplate": "image: {{{depName}}}:{{{newValue}}}\n{{{indentation}}}imagePullPolicy: IfNotPresent"
+  // // },
+  // // {
+  // //   // Rule 2: image uses :latest but no policy flip needed (handles manifests without the policy line)
+  // //   "customType": "regex",
+  // //   "description": "Update :latest images to highest semver when no policy line follows",
+  // //   "managerFilePatterns": ["/\\.ya?ml$/"],
+  // //   "matchStrings": [
+  // //     "image:\\s*(?<depName>[\\w./-]+):(?<currentValue>latest)\\b"
+  // //   ],
+  // //   "datasourceTemplate": "docker",
+  // //   "versioningTemplate": "semver",
+  // //   "autoReplaceStringTemplate": "image: {{{depName}}}:{{{newValue}}}"
+  // // },
+  //  // in something like grafana.yaml or prometheus.yaml we can set a # renovate: docker=docker.io/grafana/grafana comment on the same line as the spec.version (or whatever attribute has the docker image version)
+  //  {
+  //    "customType": "regex",
+  //    "managerFilePatterns": [
+  //      "/\\.yaml$/",
+  //    ],
+  //    "matchStrings": [
+  //      "(?<currentValue>[\\w+\\.\\-]*)['\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?"
+  //    ]
+  //  }
+  //]
 }
