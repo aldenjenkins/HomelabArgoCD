@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: header-display
-        image: mendhak/http-https-echo:latest
+        image: mendhak/http-https-echo:40
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
           name: http
