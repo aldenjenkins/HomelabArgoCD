@@ -150,7 +150,7 @@ spec:
           readOnly: true
       # Memcached sidecar - local cache with zero network latency
       - name: memcached
-        image: memcached:1.6.24-alpine
+        image: memcached:1.6.41-alpine
         args:
           - "-m"
           - "4096"  # 4GB cache memory

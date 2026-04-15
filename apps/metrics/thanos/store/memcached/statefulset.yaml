@@ -44,7 +44,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
       - name: memcached
-        image: memcached:1.6.24-alpine
+        image: memcached:1.6.41-alpine
         args:
           - "-m"
           - "4096" # 4GB of dedicated cache memory (adjust based on node size)
