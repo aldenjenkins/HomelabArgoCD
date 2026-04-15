@@ -176,4 +176,4 @@ spec:
     clientType: grpc
     tlsConfig:
       insecureSkipVerify: true
-  version: v3.7.3 # renovate: docker=quay.io/prometheus/prometheus
+  version: v3.11.2 # renovate: docker=quay.io/prometheus/prometheus
