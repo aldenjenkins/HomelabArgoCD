@@ -52,7 +52,7 @@ spec:
             - -target=querier
             - -config.file=/conf/tempo.yaml
             - -mem-ballast-size-mbs=1024
-          image: docker.io/grafana/tempo:2.10.3
+          image: docker.io/grafana/tempo:2.10.4
           imagePullPolicy: IfNotPresent
           name: querier
           ports:
