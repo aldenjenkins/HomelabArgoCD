@@ -41,7 +41,7 @@ spec:
       
       containers:
         - name: nginx
-          image: "docker.io/nginxinc/nginx-unprivileged:1.19-alpine"
+          image: "docker.io/nginxinc/nginx-unprivileged:1.29-alpine"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http-metrics
