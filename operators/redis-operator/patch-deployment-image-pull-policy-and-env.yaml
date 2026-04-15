@@ -6,6 +6,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccount: redis-operator-redis-operator
       containers:
       - name: manager
         imagePullPolicy: IfNotPresent
