@@ -28,7 +28,7 @@ spec:
             runAsGroup: 10000
             capabilities:
               drop: ["ALL"]
-          image: busybox:1.36.0
+          image: busybox:1.37.0
           command:
             - /bin/sh
             - -c
