@@ -6,6 +6,8 @@ resources:
   - https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.90.1/bundle.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+patches:
+  - path: patches/controller-delete-deploy.yaml
 labels:
   - includeSelectors: false
     pairs:
