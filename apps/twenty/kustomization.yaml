@@ -1,12 +1,10 @@
 namespace: twenty
 resources:
   - namespace.yaml
-  - deployment.yaml
+  # - deployment.yaml
   - service.yaml
-  - redis.yaml
-  - grafanadatasource.yaml
-  - servicemonitor.yaml
-  - virtualservice.yaml
-  - authorizationpolicy.yaml
+  # - redis.yaml
+  # - grafanadatasource.yaml
+  # - servicemonitor.yaml
 generators:
   - sopsgenerator.yaml
