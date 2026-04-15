@@ -25,8 +25,8 @@ spec:
       serviceAccountName: alloy-profiles
       containers:
         - name: alloy
-          image: docker.io/grafana/alloy:latest
-          imagePullPolicy: Always
+          image: docker.io/grafana/alloy:v1.15.1
+          imagePullPolicy: IfNotPresent
           args:
             - run
             - /etc/alloy/config.alloy

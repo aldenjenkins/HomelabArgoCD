@@ -20,8 +20,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: adguard-exporter
-          image: ghcr.io/henrywhitaker3/adguard-exporter:latest
-          imagePullPolicy: Always
+          image: ghcr.io/henrywhitaker3/adguard-exporter:v1.2.1
+          imagePullPolicy: IfNotPresent
           env:
             - name: ADGUARD_SERVERS
               value: http://adguard.adguard.svc.cluster.local
