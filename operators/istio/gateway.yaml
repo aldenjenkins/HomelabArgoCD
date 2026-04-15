@@ -22,6 +22,8 @@ spec:
       mode: Terminate
       certificateRefs:
         - name: home-cert-tls
+          group: ''
+          kind: Secret
   - name: forgejo-ssh
     port: 22
     protocol: TCP
