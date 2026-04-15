@@ -42,7 +42,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: kafka
-          image: "apache/kafka-native:4.1.1"
+          image: "apache/kafka-native:4.2.0"
           imagePullPolicy: IfNotPresent
           ports:
             # - containerPort: 7071
