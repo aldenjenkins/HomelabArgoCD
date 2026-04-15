@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: librespeed
-          image: linuxserver/librespeed:5.4.20240804
+          image: linuxserver/librespeed:6.0.2
           imagePullPolicy: IfNotPresent
           env:
             - name: PUID
