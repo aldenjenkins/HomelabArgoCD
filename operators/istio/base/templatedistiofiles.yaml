@@ -18635,7 +18635,7 @@ webhooks:
       name: istiod
       namespace: istio-system
       path: /validate
-  failurePolicy: Ignore
+  failurePolicy: Fail
   name: rev.validation.istio.io
   objectSelector:
     matchExpressions:
