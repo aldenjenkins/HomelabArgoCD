@@ -23,9 +23,9 @@
   ],
   kubernetes: {
     managerFilePatterns: [
-      '/(^|/)apps/.+\\.ya?ml$/'
-      '/(^|/)operators/.+\\.ya?ml$/'
-      '/(^|/)argocd-bootstrap/.+\\.ya?ml$/'
+      '/(^|/)apps/.+\\.ya?ml$/',
+      '/(^|/)operators/.+\\.ya?ml$/',
+      '/(^|/)argocd-bootstrap/.+\\.ya?ml$/',
     ]
   }
   //"customManagers": [
