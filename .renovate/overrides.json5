@@ -1,0 +1,23 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      description: "Override Helmfile Dependency Name",
+      matchDatasources: ["docker"],
+      matchManagers: ["helmfile"],
+      overrideDepName: "{{packageName}}",
+    },
+    {
+      description: "Override Talos Installer Package Name",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/factory\\.talos\\.dev/"],
+      overridePackageName: "ghcr.io/siderolabs/installer",
+    },
+    {
+      description: "pennydreadful/bookshelf uses prefixed tags with 4-part versions",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/pennydreadful/bookshelf"],
+      versioning: "regex:^softcover-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\.(?<build>\\d+)$",
+    },
+  ],
+}

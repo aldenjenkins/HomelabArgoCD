@@ -1,0 +1,141 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  packageRules: [
+    {
+      "description": "1Password Group",
+      "groupName": "1Password",
+      "matchPackagePatterns": ["1password"],
+      "matchDatasources": ["docker"],
+      "group": {
+        "commitMessageTopic": "{{{groupName}}} group"
+      },
+      "separateMinorPatch": true
+    },
+    {
+      description: "Tuppr Group",
+      groupName: "Tuppr",
+      matchDatasources: ["docker", "helm"],
+      matchPackagePatterns: ["home-operations/tuppr", "home-operations/charts/tuppr"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Cert-Manager Group",
+      groupName: "Cert-Manager",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/cert-manager/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Cilium Group",
+      groupName: "Cilium",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackageNames: ["/cilium/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "CNPG Group",
+      groupName: "CNPG",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["cloudnative-pg", "cloudnative-pg/cloudnative-pg"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "CoreDNS Group",
+      groupName: "CoreDNS",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/coredns/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Emqx Group",
+      groupName: "Emqx",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackageNames: ["/emqx-operator/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "External Secrets Operator Group",
+      groupName: "External Secrets Operator",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["external-secrets"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Flux Operator Group",
+      groupName: "Flux Operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/flux-operator/", "/flux-instance/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Intel Device Plugins Group",
+      groupName: "Intel-Device-Plugins",
+      matchDatasources: ["docker", "helm"],
+      matchPackageNames: ["/intel-device-plugins-operator/", "/intel-device-plugins-gpu/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "node-feature-discovery Group",
+      groupName: "node feature discovery",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["node-feature-discovery"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Rook-Ceph Group",
+      groupName: "Rook-Ceph",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["rook", "/rook-ceph/", "/rook-ceph-cluster/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Spegel Group",
+      groupName: "Spegel",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/spegel/"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Silence Operator Group",
+      groupName: "Silence Operator",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["silence-operator", "giantswarm/silence-operator"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+    {
+      description: "Talos Group",
+      groupName: "Talos",
+      matchDatasources: ["docker", "github-releases", "helm", "git-tags"],
+      matchPackagePatterns: ["siderolabs/talosctl", "siderolabs/installer"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
+  ],
+}
