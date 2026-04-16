@@ -211,7 +211,7 @@ data:
   kube-proxy-replacement: "true"
   kube-proxy-replacement-healthz-bind-address: "0.0.0.0:10256"
   bpf-lb-sock: "true"
-  bpf-lb-sock-hostns-only: "true"
+  bpf-lb-sock-hostns-only: "false"
   nodeport-addresses: ""
   enable-health-check-nodeport: "true"
   enable-health-check-loadbalancer-ip: "false"
@@ -229,7 +229,7 @@ data:
   enable-endpoint-lockdown-on-policy-overflow: "false"
   # Tell the agent to generate and write a CNI configuration file
   write-cni-conf-when-ready: /host/etc/cni/net.d/05-cilium.conflist
-  cni-exclusive: "false"
+  cni-exclusive: "true"
   cni-log-file: "/var/run/cilium/cilium-cni.log"
   enable-endpoint-health-checking: "true"
   enable-health-checking: "true"
@@ -1135,7 +1135,7 @@ spec:
                     set -o errexit
                     set -o pipefail
                     set -o nounset
-                    
+
                     # When running in AWS ENI mode, it's likely that 'aws-node' has
                     # had a chance to install SNAT iptables rules. These can result
                     # in dropped traffic, so we should attempt to remove them.
@@ -1151,7 +1151,7 @@ spec:
                         iptables-save | grep -E -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore
                     fi
                     echo 'Done!'
-                    
+
           preStop:
             exec:
               command:
@@ -1232,7 +1232,7 @@ spec:
           mountPath: /run/xtables.lock
         - name: tmp
           mountPath: /tmp
-        
+
       initContainers:
       - name: config
         image: "quay.io/cilium/cilium:v1.18.6@sha256:42ec562a5ff6c8a860c0639f5a7611685e253fd9eb2d2fcdade693724c9166a4"
@@ -1428,7 +1428,7 @@ spec:
       automountServiceAccountToken: true
       terminationGracePeriodSeconds: 1
       hostNetwork: true
-      
+
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -1667,7 +1667,7 @@ spec:
           operator: Exists
         - key: node.cilium.io/agent-not-ready
           operator: Exists
-      
+
       volumes:
         # To read the configuration from the config map
       - name: cilium-config-path

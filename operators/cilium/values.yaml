@@ -18,7 +18,9 @@ cgroup:
     enabled: false
   hostRoot: /sys/fs/cgroup
 cni:
-  exclusive: false
+  # 2026-04-16 istio ambient profile removed
+  # exclusive: false
+  exclusive: true
 dashboards:
   enabled: false
 # devices: bond+
@@ -99,7 +101,9 @@ securityContext:
       - SYS_RESOURCE
 socketLB:
   enabled: true
-  hostNamespaceOnly: true
+  # 2026-04-16 istio ambient profile removed
+  # hostNamespaceOnly: true
+  hostNamespaceOnly: false
 gatewayAPI:
   enabled: true
   enableAlpn: true

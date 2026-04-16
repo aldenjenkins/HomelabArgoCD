@@ -1,7 +1,10 @@
 apiVersion: install.istio.io/v1alpha1
 kind: IstioOperator
 spec:
-  profile: ambient
+  # 2026-04-16 disabling ambient mode and just using minimal so that we have just the crds
+  # and the istio ingress gateway
+  # profile: ambient
+  profile: minimal
   components:
     # Removing this as we're now using gateway-api for ingress gateway config
     # which is more future proof and recommended
@@ -30,42 +33,48 @@ spec:
     #             port: 22
     #             name: ssh
     cni:
-      enabled: true
-      namespace: istio-system
+      # 2026-04-16 disabling these switching to minimal profile (maybe i need some? idk)
+      # enabled: true
+      # namespace: istio-system
+      enabled: false
     # Enable gateway API's TCPRoute Resources for forgejo ssh through the main ingress Gateway CR
     pilot:
+      enabled: true
       k8s:
         env:
           - name: PILOT_ENABLE_ALPHA_GATEWAY_API
             value: "true"
-          # Security: Verify certificates at client side (more secure mTLS)
-          - name: VERIFY_CERTIFICATE_AT_CLIENT
-            value: "true"
-          # Security: Auto SNI for better TLS routing
-          - name: ENABLE_AUTO_SNI
-            value: "true"
-          # Ambient mode: Enable HBONE (HTTP-based overlay network)
-          - name: PILOT_ENABLE_HBONE
-            value: "true"
+          # 2026-04-16 disabling these switching to minimal profile (maybe i need some? idk)
+          # # Security: Verify certificates at client side (more secure mTLS)
+          # - name: VERIFY_CERTIFICATE_AT_CLIENT
+          #   value: "true"
+          # # Security: Auto SNI for better TLS routing
+          # - name: ENABLE_AUTO_SNI
+          #   value: "true"
+          # # Ambient mode: Enable HBONE (HTTP-based overlay network)
+          # - name: PILOT_ENABLE_HBONE
+          #   value: "true"
   values:
     cni:
-      # Exclude critical namespaces from ztunnel interception
-      # This prevents ambient mode from proxying control plane traffic
-      excludeNamespaces:
-        - kube-system
-        # - istio-system
-      # cniBinDir: /usr/libexec/cni
+      enabled: false
+      # # Exclude critical namespaces from ztunnel interception
+      # # This prevents ambient mode from proxying control plane traffic
+      # excludeNamespaces:
+      #   - kube-system
+      #   # - istio-system
+      # # cniBinDir: /usr/libexec/cni
   meshConfig:
-    ambient:
-      enabled: true
+    # ambient:
+    #   enabled: true
     # enableTracing: true
     defaultConfig:
       # tracing: {}
       gatewayTopology:
         numTrustedProxies: 0
-      # Enable HBONE for ambient mode (HTTP-based overlay network)
-      proxyMetadata:
-        ISTIO_META_ENABLE_HBONE: "true"
+      # 2026-04-16
+      # # Enable HBONE for ambient mode (HTTP-based overlay network)
+      # proxyMetadata:
+      #   ISTIO_META_ENABLE_HBONE: "true"
     # defaultProviders:
     #   accessLogging:
     #     - otel-logs
