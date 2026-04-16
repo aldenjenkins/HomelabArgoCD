@@ -1,31 +1,31 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  commitBodyTable: true,
-  extends: [
-    'config:recommended',
-    'docker:enableMajor',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/allowedVersions.json5',
-    //'github>aldenjenkins/HomelabArgoCD//.renovate/autoMerge.json5',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/customManagers.json5',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/grafanaDashboards.json5',
-    //'github>aldenjenkins/HomelabArgoCD//.renovate/overrides.json5',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/groups.json5',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/labels.json5',
-    'github>aldenjenkins/HomelabArgoCD//.renovate/semanticCommits.json5',
-    ':dependencyDashboard',
-    ':disableRateLimiting',
-    ':semanticCommits',
-    ':timezone(America/Chicago)'
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "commitBodyTable": true,
+  "extends": [
+    "config:recommended",
+    "docker:enableMajor",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/allowedVersions.json5",
+    //"github>aldenjenkins/HomelabArgoCD//.renovate/autoMerge.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/customManagers.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/grafanaDashboards.json5",
+    //"github>aldenjenkins/HomelabArgoCD//.renovate/overrides.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/groups.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/labels.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/semanticCommits.json5",
+    ":dependencyDashboard",
+    ":disableRateLimiting",
+    ":semanticCommits",
+    ":timezone(America/Chicago)"
   ],
-  suppressNotifications: [
-    'prEditedNotification',
-    'prIgnoreNotification',
+  "suppressNotifications": [
+    "prEditedNotification",
+    "prIgnoreNotification"
   ],
-  kubernetes: {
-    managerFilePatterns: [
-      '/(^|/)apps/.+\\.ya?ml$/',
-      '/(^|/)operators/.+\\.ya?ml$/',
-      '/(^|/)argocd-bootstrap/.+\\.ya?ml$/',
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/(^|/)apps/.+\\.ya?ml$/",
+      "/(^|/)operators/.+\\.ya?ml$/",
+      "/(^|/)argocd-bootstrap/.+\\.ya?ml$/"
     ]
   }
   //"customManagers": [
@@ -63,7 +63,7 @@
   //      "/\\.yaml$/",
   //    ],
   //    "matchStrings": [
-  //      "(?<currentValue>[\\w+\\.\\-]*)['\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?"
+  //      "(?<currentValue>[\\w+\\.\\-]*)["\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?"
   //    ]
   //  }
   //]
