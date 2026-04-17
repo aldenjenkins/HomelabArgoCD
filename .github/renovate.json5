@@ -10,6 +10,7 @@
     "github>aldenjenkins/HomelabArgoCD//.renovate/grafanaDashboards.json5",
     //"github>aldenjenkins/HomelabArgoCD//.renovate/overrides.json5",
     "github>aldenjenkins/HomelabArgoCD//.renovate/groups.json5",
+    "github>aldenjenkins/HomelabArgoCD//.renovate/ignorePaths.json5",
     "github>aldenjenkins/HomelabArgoCD//.renovate/labels.json5",
     "github>aldenjenkins/HomelabArgoCD//.renovate/semanticCommits.json5",
     ":dependencyDashboard",

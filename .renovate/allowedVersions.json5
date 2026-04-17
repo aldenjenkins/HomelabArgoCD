@@ -13,15 +13,6 @@
       "matchDatasources": ["helm"],
       "matchPackageNames": ["emqx-operator"],
       "allowedVersions": "<2.3.0"
-    },
-    {
-      "description": "Disable kustomize version bumps for istio and cilium operators",
-      "matchManagers": ["kustomize"],
-      "matchFileNames": [
-        "operators/istio/**",
-        "operators/cilium/**"
-      ],
-      "enabled": false
     }
   ]
 }
