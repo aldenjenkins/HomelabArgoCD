@@ -1,0 +1,5 @@
+namespace: memcached
+resources:
+  - namespace.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
