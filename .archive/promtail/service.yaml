@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: promtail-syslog
+spec:
+    type: LoadBalancer
+    loadBalancerIP: ENC[AES256_GCM,data:9ho0vkfH3dBasNVfXjL2,iv:iK/8104Etv9M8PErTjhmpy9OWk1L7bbMeaKyTBx0bp0=,tag:rVG7mz8DVZF6xeWg03M8OQ==,type:str]
+    ports:
+        - port: ENC[AES256_GCM,data:LQU0,iv:Pt6OCLtDr84DFiL9MJqHXbWuw76U44iJUCnVnnQ1Bmo=,tag:ib7pvR4QJGTMbvtCJYGXuw==,type:int]
+          targetPort: ENC[AES256_GCM,data:MX/Ueg==,iv:MjXzyu9+ZyUdsyuLG6IHBFylsJ+PCZDA+rMptfOT+68=,tag:lc/948nL0QDje4TmXBsETg==,type:int]
+          protocol: ENC[AES256_GCM,data:qhkt,iv:3hs+GbEjkFtPZDde+Mlho22tdBSwjMAksFMMXm1yN/c=,tag:3f1z6U9OqRZxkUu/HUKHPw==,type:str]
+          name: ENC[AES256_GCM,data:jY2/GgEGwFK3cA==,iv:HbIg3TwyGL9qwcEdtt4YpCI34KssHq8WTjoOlzbwJC4=,tag:YkLql4Adk/ZJtVwddt8YZg==,type:str]
+        - port: ENC[AES256_GCM,data:ULnXKg==,iv:dciqUAWyI7NTj/t732r3yowf3vDAtfKsL14hBLZz3UQ=,tag:yUsuX4v7sm7JnkAcHWyitg==,type:int]
+          targetPort: ENC[AES256_GCM,data:tUQY8Q==,iv:iePMjd2V0wfuYM7ph1oM3Ri2wi5jByiNdJ2zzp+Q4fs=,tag:z8z8d5r8WIXT/n6Vjs/qmg==,type:int]
+          protocol: ENC[AES256_GCM,data:u5rJ,iv:EB0F18XblZFhKafSXMg3KoMpe4bJ82WctTGXA7PyXTY=,tag:dZfM/v5sLXBt9CJq8QnVhA==,type:str]
+          name: ENC[AES256_GCM,data:G5LtP+pk+aVNdeyA,iv:wCWNOeLG6NVE4KgtVrHwUAPsTSO/0eYY5lF7/ikS+2o=,tag:sy1v2OLqLcGfhBokKceRwA==,type:str]
+    selector:
+        app.kubernetes.io/name: ENC[AES256_GCM,data:wulFOb8CzYU=,iv:LzA4cC7Hm6x4/tzHS9aAR/3S9FY280pYQp/Z/x67w6k=,tag:U9+5bJKSezWZuIH33pHYjw==,type:str]
+        app.kubernetes.io/component: ENC[AES256_GCM,data:U1bOT5fpxF6PZa/QjWkV,iv:ZaP03wNcS9pMskFbKW69yrVoYdlZhU3Yc22o/uS8R+Q=,tag:Ki+C5umsoL4xYuILQSEuNA==,type:str]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBaL1B6UFAzOWNVVUV4YVF1
+            a2UrQ0s4c01PckpIS0dZNkNLTWRGUnl6K0IwCitzNkZhM3FLQmhJNkN4MHN5RlFX
+            b1pTZDlZbWJFSXdiam82T3dlUXNyd2cKLS0tIEdkQW9BZkduanRxM0h4cmh1ZDRD
+            Nnk4WkR3SDZZdWFLKzJRaVRzZW1SbWsKA2/PpXGW/0FEltFvWlaHTieNnHxwB0fT
+            68LufmJu3BM/b+LMnCTQEs1Hl9VZMP3322YO6zuZeDojZnZyTWlJLA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-06T02:59:22Z"
+    mac: ENC[AES256_GCM,data:F6KQJ8DnyTMhsumnhrkkjeGGELr/j3C5YjT+CiFmXj8QHMUoSjZ2W5b8MKzPTTp0LersvntTY9Juj0izUlx+OdDzDF0U3G1vN1q8aigX7sectcBZ8IahxlmEPPfmMwm8HRJrkVq+rwRO6nSrE8LI1XmEFUC1WTFchR/iylhowtM=,iv:MUOtrMLsUGGWf3TtYLN9OobXNUvWbza5Y0RYpRfTVYc=,tag:BoEatMPFNQNZmRDgiq0YgA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.10.2

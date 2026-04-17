@@ -1,0 +1,7 @@
+namespace: valkey-operator-system
+resources:
+  - github.com/valkey-io/valkey-operator/config/default?ref=main
+images:
+  - name: controller
+    newName: registry.home.alden.ai/me/valkey-operator
+    newTag: "v0.1.0"

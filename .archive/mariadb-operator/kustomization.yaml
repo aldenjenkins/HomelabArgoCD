@@ -1,0 +1,13 @@
+namespace: mariadb-operator-system
+
+
+resources:
+  # - https://raw.githubusercontent.com/mariadb-operator/mariadb-operator/refs/heads/main/deploy/crds/crds.yaml
+  - https://github.com/mariadb-operator/mariadb-operator/config/crd
+  - helm-templated-manifests.yaml
+
+# images:
+#   - name: docker-registry3.mariadb.com/mariadb-operator/mariadb-operator
+#     newTag: 25.8.4
+#     
+
