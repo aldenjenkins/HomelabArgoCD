@@ -5,8 +5,7 @@ metadata:
     dashboards: grafana
   name: grafana
 spec:
-  # version: 12.3.0-19020365962 
-  version: 12.4.0-22081664032 # renovate: docker=docker.io/grafana/grafana
+  version: 13.1.0-24541505453 # renovate: docker=docker.io/grafana/grafana
   service:
     metadata:
       labels:
@@ -49,7 +48,7 @@ spec:
           #       allowPrivilegeEscalation: false
           #       # privileged: false
           #       capabilities:
-          #         drop: 
+          #         drop:
           #           - ALL
           #       seccompProfile:
           #         type: RuntimeDefault
@@ -97,7 +96,7 @@ spec:
                 allowPrivilegeEscalation: false
                 # privileged: false
                 capabilities:
-                  drop: 
+                  drop:
                     - ALL
                 seccompProfile:
                   type: RuntimeDefault
