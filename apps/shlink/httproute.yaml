@@ -2,6 +2,19 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: shlink-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: Shlink
+    gethomepage.dev/href: "https://shlink.home.alden.ai"
+    gethomepage.dev/description: "URL Shortener"
+    gethomepage.dev/icon: shlink.svg
+    gethomepage.dev/app: shlink # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app in (
+        shlink,
+        shlink-web-client
+      )
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io

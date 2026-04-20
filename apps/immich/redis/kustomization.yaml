@@ -1,0 +1,5 @@
+namespace: immich
+resources:
+  - redis.yaml
+  - grafanadatasource.yaml
+  - servicemonitor.yaml

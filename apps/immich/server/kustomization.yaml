@@ -1,0 +1,8 @@
+namespace: immich
+resources:
+  - library-persistentvolumeclaim.yaml
+  - nfs-photos-persistentvolumeclaim.yaml
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+  - servicemonitor.yaml

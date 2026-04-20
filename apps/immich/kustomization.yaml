@@ -1,0 +1,9 @@
+namespace: immich
+resources:
+  - namespace.yaml
+  - postgres
+  - redis
+  - server
+  - machine-learning
+generators:
+  - sopsgenerator.yaml

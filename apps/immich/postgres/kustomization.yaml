@@ -1,0 +1,10 @@
+namespace: immich
+resources:
+  - objectstore.yaml
+  - cnpg-cluster.yaml
+  - service.yaml
+  - scheduledbackup.yaml
+  - grafanadatasource.yaml
+  - probe.yaml
+generators:
+  - sopsgenerator.yaml

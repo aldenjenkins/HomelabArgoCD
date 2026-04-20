@@ -1,0 +1,10 @@
+namespace: convertx
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - service.yaml
+  - statefulset.yaml
+  - httproute.yaml
+
+generators:
+  - sopsgenerator.yaml

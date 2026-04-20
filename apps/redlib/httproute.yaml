@@ -1,0 +1,31 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: redlib
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: Redlib
+    gethomepage.dev/group: Privacy
+    gethomepage.dev/href: "https://redlib.home.alden.ai"
+    gethomepage.dev/description: Private Reddit Browsing
+    gethomepage.dev/icon: redlib.svg
+    gethomepage.dev/app: redlib # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - redlib.home.alden.ai
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: redlib
+          port: 8080
+          weight: 1

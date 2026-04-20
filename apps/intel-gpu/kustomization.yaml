@@ -6,3 +6,4 @@ resources:
   - ./intel-gpu-plugin
 patches:
   - path: patches/patch_node_feature_discovery_namespace.yaml
+  - path: patches/patch_gpu_shared.yaml

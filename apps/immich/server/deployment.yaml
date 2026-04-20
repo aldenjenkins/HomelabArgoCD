@@ -1,0 +1,163 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/name: server
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/name: server
+      app.kubernetes.io/instance: immich
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: server
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker-11
+      enableServiceLinks: false
+      serviceAccountName: default
+      automountServiceAccountToken: true
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      dnsPolicy: ClusterFirst
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/controller: main
+              app.kubernetes.io/name: server
+              app.kubernetes.io/instance: immich
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - env:
+            - name: TZ
+              value: "America/Chicago"
+            - name: IMMICH_TRUSTED_PROXIES
+              value: "10.244.0.0/16"
+            - name: IMMICH_MACHINE_LEARNING_URL
+              value: "http://immich-machine-learning.immich.svc.cluster.local:3003"
+            - name: IMMICH_TELEMETRY_INCLUDE
+              value: "all"
+            - name: IMMICH_MEDIA_LOCATION
+              value: /library
+            - name: REDIS_HOSTNAME
+              value: immich-redis.immich.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: DB_HOSTNAME
+              value: "immich-postgres-18-rw.immich.svc.cluster.local"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE_NAME
+              value: "immich"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: immich-postgres-18-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: immich-postgres-18-app
+                  key: password
+          envFrom:
+            - secretRef:
+                name: immich-env
+          image: ghcr.io/immich-app/immich-server:v2.7.5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 6Gi
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          name: main
+          ports:
+            - containerPort: 2283
+              name: http
+              protocol: TCP
+            - containerPort: 8081
+              name: metrics-api
+              protocol: TCP
+            - containerPort: 8082
+              name: metrics-ms
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          # volumeMounts:
+          # - mountPath: /data
+          #   name: data
+          #
+          volumeMounts:
+            - name: library
+              mountPath: /library
+            - name: nfs-photos
+              mountPath: /mnt/photos
+              readOnly: true
+            - name: geocoding
+              mountPath: /usr/src/app/.reverse-geocoding-dump
+            - name: transformers
+              mountPath: /usr/src/app/.transformers_cache
+      # volumes:
+      #   - name: data
+      #     persistentVolumeClaim:
+      #       claimName: immich-data
+      volumes:
+        - name: library
+          persistentVolumeClaim:
+            claimName: immich-library
+        - name: nfs-photos
+          persistentVolumeClaim:
+            claimName: immich-nfs-photos
+        - name: geocoding
+          emptyDir: {}
+        - name: transformers
+          emptyDir: {}

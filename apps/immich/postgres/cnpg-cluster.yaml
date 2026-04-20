@@ -1,0 +1,41 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: immich-postgres-18
+spec:
+  instances: 2
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:18.3
+
+  postgresql:
+    shared_preload_libraries:
+      - "vchord.so"
+
+  storage:
+    size: 20Gi
+    storageClass: local-path
+
+  bootstrap:
+    initdb:
+      database: immich
+      owner: immich
+      # TODO: Use managed extensions (pg 18)
+      postInitApplicationSQL:
+        # Commands based on: https://immich.app/docs/administration/postgres-standalone/#without-superuser-permission
+        - CREATE EXTENSION vchord CASCADE;
+        - CREATE EXTENSION earthdistance CASCADE;
+
+  monitoring:
+    enablePodMonitor: true
+
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "256Mi"
+    limits:
+      memory: "1Gi"
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store

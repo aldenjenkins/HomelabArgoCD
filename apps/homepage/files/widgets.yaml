@@ -1,0 +1,54 @@
+- kubernetes:
+    cluster:
+      # Shows the cluster node
+      show: true
+      # Shows the aggregate CPU stats
+      cpu: true
+      # Shows the aggregate memory stats
+      memory: true
+      # Shows a custom label
+      showLabel: true
+      label: "cluster"
+    nodes:
+      # Shows the clusters
+      show: true
+      # Shows the CPU for each node
+      cpu: true
+      # Shows the memory for each node
+      memory: true
+      # Shows the label, which is always the node name
+      showLabel: true
+- resources:
+    backend: resources
+    expanded: true
+    cpu: true
+    memory: true
+    network: default
+- search:
+    provider: duckduckgo
+    target: _blank
+- openmeteo:
+    label: Austin # optional
+    latitude: 30.266555
+    longitude: -97.733330
+    timezone: America/Chicago # optional
+    units: imperial # or imperial
+    # NOTE: doubling to 10 since we have 2 replicas
+    # cache: 5 # Time in minutes to cache API responses, to stay within limits
+    cache: 10 # Time in minutes to cache API responses, to stay within limits
+    format: # optional, Intl.NumberFormat options
+      maximumFractionDigits: 1
+- longhorn:
+    # Show the expanded view
+    expanded: true
+    # Shows a node representing the aggregate values
+    total: true
+    # Shows the node names as labels
+    labels: true
+    # Show the nodes
+    nodes: true
+- datetime:
+    format:
+      timeStyle: short
+      hour12: false
+

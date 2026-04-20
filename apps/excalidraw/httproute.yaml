@@ -2,6 +2,18 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: excalidraw-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: Excalidraw
+    gethomepage.dev/href: "https://excalidraw.home.alden.ai"
+    gethomepage.dev/description: "Diagram / Visual Builder"
+    gethomepage.dev/icon: excalidraw.svg
+    gethomepage.dev/app: excalidraw # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app in (
+        excalidraw
+      )
 spec:
   parentRefs:
     - name: default-https-gateway

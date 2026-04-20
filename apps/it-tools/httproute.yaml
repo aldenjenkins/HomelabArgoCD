@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: it-tools
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: IT-Tools
+    gethomepage.dev/href: "https://it-tools.home.alden.ai"
+    gethomepage.dev/description: "Useful IT Tools"
+    gethomepage.dev/icon: it-tools-light.svg
+    gethomepage.dev/app: it-tools # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app in (it-tools)
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - it-tools.home.alden.ai
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: it-tools
+          port: 8080
+          weight: 1

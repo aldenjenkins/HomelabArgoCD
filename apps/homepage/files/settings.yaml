@@ -1,0 +1,52 @@
+title: Homelab Dashboard
+background:
+  image: https://cdnb.artstation.com/p/assets/images/images/006/897/659/large/mikael-gustafsson-wallpaper-mikael-gustafsson.jpg
+  blur: md  # sm, md, xl... see https://tailwindcss.com/docs/backdrop-blur
+  saturate: 100  # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
+  brightness: 50  # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
+  opacity: 100  # 0-100
+theme: dark
+color: slate
+useEqualHeights: true
+disableCollapse: true
+# Show pod cpu/mem stats
+showStats: true
+# headerStyle: clean
+target: _blank
+layout:
+  AI:
+    header: true
+    style: row
+    columns: 2
+  Development:
+    header: true
+    style: row
+    columns: 3
+  Home:
+    header: true
+    style: row
+    columns: 4
+  Media:
+    header: true
+    style: row
+    columns: 3
+  Privacy:
+    header: true
+    style: row
+    columns: 3
+  Infrastructure & Monitoring:
+    header: true
+    style: row
+    columns: 3
+  Other:
+    header: true
+    style: row
+    columns: 3
+  Documents:
+    header: true
+    style: row
+    columns: 3
+
+providers:
+  longhorn:
+    url: http://longhorn-frontend.longhorn-system.svc.cluster.local

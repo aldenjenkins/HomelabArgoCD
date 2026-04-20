@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    nfs.io/storage-path: "immich/"
+  labels:
+    app: immich
+  name: immich-nfs-photos
+spec:
+  storageClassName: nfs-media-retain
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Ti

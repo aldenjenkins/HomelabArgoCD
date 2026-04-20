@@ -2,6 +2,22 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: forgejo-httproute
+  namespace: forgejo
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/href: "https://forgejo.home.alden.ai"
+    gethomepage.dev/description: Git Repository Manager
+    gethomepage.dev/group: Development
+    gethomepage.dev/icon: forgejo.svg
+    gethomepage.dev/app: forgejo # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/name: Forgejo
+    gethomepage.dev/widget.type: "gitea"
+    gethomepage.dev/widget.url: "http://forgejo.forgejo.svc.cluster.local:3000"
+    gethomepage.dev/widget.key: "{{HOMEPAGE_VAR_FORGEJO_API_KEY}}"
+    gethomepage.dev/pod-selector: >-
+      app.kubernetes.io/name in (
+        forgejo
+      )
 spec:
   parentRefs:
     - name: default-https-gateway

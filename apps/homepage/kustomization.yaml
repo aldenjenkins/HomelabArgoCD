@@ -1,0 +1,29 @@
+namespace: homepage
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - deployment.yaml
+  - httproute.yaml
+  - service.yaml
+  - destinationrule.yaml
+
+generators:
+  - sopsgenerator.yaml
+
+configMapGenerator:
+  - name: homepage-config
+    files:
+      - files/services.yaml
+      - files/settings.yaml
+      - files/bookmarks.yaml
+      - files/kubernetes.yaml
+      - files/docker.yaml
+      - files/custom.css
+      - files/custom.js
+      - files/widgets.yaml
+      - files/proxmox.yaml
+    options:
+      # Makes the ConfigMap immutable for better stability and performance
+      immutable: true

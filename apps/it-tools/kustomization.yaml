@@ -1,0 +1,7 @@
+namespace: it-tools
+resources:
+  - namespace.yaml
+  - service.yaml
+  - ciliumnetworkpolicy.yaml
+  - deployment.yaml
+  - httproute.yaml

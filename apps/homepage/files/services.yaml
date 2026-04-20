@@ -1,0 +1,257 @@
+- AI:
+    - Open WebUI:
+        icon: open-webui.svg
+        href: https://openwebui.home.alden.ai
+        description: LLM Chat
+    - n8n:
+        icon: n8n.svg
+        href: https://n8n.home.alden.ai
+        description: Workflow Automation
+- Documents:
+    - Paperless-NGX:
+        icon: paperless.svg
+        href: https://paperless.home.alden.ai
+        description: Document Management
+    - Paperless-AI:
+        icon: paperless-ai.png
+        href: https://paperless-ai.home.alden.ai
+        description: AI Document Tagging
+    - Bento PDF:
+        icon: bentopdf.svg
+        href: https://pdf.home.alden.ai
+        description: PDF Management Tools
+- Development:
+    - Argo CD:
+        icon: argo-cd.svg
+        href: https://argocd.home.alden.ai
+        description: GitOps Continuous Delivery
+        widget:
+          type: argocd
+          url: http://argocd-server.argocd.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_ARGOCD_API_KEY}}"
+    - Forgejo:
+        icon: forgejo.png
+        href: https://forgejo.home.alden.ai
+        description: Git Repository Manager
+        widget:
+          type: gitea
+          url: http://forgejo.forgejo.svc.cluster.local:3000
+          key: "{{HOMEPAGE_VAR_FORGEJO_API_KEY}}"
+    - Headlamp:
+        icon: headlamp.png
+        href: https://headlamp.home.alden.ai
+        description: Kubernetes Dashboard
+    - IT-Tools:
+        icon: it-tools.png
+        href: https://it-tools.home.alden.ai
+        description: IT Utility Tools Collection
+    - Mailpit:
+        icon: mailpit.png
+        href: https://mailpit.home.alden.ai
+        description: Email Testing Server
+    - Pairdrop:
+        icon: pairdrop.png
+        href: https://pairdrop.home.alden.ai
+        description: Peer-to-Peer File Transfer
+    - Temporal:
+        icon: mdi-application-outline
+        href: https://temporal.home.alden.ai
+        description: Workflow Orchestration
+    - ConvertX:
+        icon: convertx.png
+        href: https://convertx.home.alden.ai
+        description: File Format Conversion
+    - PostHog:
+        icon: posthog.png
+        href: https://posthog.home.alden.ai
+        description: Product Analytics
+    - DVWA:
+        icon: mdi-shield-bug-outline
+        href: https://dvwa.home.alden.ai
+        description: Security Testing App
+    - Fizzy:
+        icon: mdi-flask-outline
+        href: https://fizzy.home.alden.ai
+        description: Fizzy
+    - Vert:
+        icon: mdi-application-outline
+        href: https://vert.home.alden.ai
+        description: Vert
+    - Echo Server:
+        icon: mdi-server-outline
+        href: https://echo.home.alden.ai
+        description: HTTP Echo & Debug Server
+- Home:
+    - Home Assistant:
+        icon: home-assistant.png
+        href: https://homeassistant.home.alden.ai
+        description: Smart Home Automation
+    - Frigate:
+        icon: frigate.png
+        href: https://frigate.home.alden.ai
+        description: NVR & Object Detection
+    - Netbox:
+        icon: netbox.png
+        href: https://netbox.home.alden.ai
+        description: Network Management Database
+    - Eufy Bridge:
+        icon: mdi-camera-outline
+        href: https://eufy-bridge.home.alden.ai
+        description: Camera Streaming Bridge
+    - Syncthing:
+        icon: syncthing.png
+        href: http://192.168.123.170:8384/
+        description: NAS Syncthing
+- Network:
+    # - Librespeed:
+    #     icon: librespeed.svg
+    #     href: https://librespeed.home.alden.ai
+    #     description: LAN Speed Test to k8s nodes
+    - Mikrotik Switch:
+        icon: mikrotik-light.svg
+        href: http:192.168.123.2
+        description: 10GiB LAN Switch
+        ping: 192.168.123.2
+    - GL-iNet WiFi Access Point:
+        icon: glinet-dark.svg
+        href: http:192.168.123.3
+        description: LAN WiFi Access Point
+        ping: 192.168.123.3
+
+- Database:
+    - Adminer:
+        icon: adminer.svg
+        href: https://adminer.home.alden.ai
+        description: Lightweight DB Client
+- Other:
+    - Shlink:
+        icon: shlink.svg
+        href: https://shlink.home.alden.ai
+        description: URL Shortener
+    - 2FAuth:
+        icon: 2fauth.svg
+        href: https://2fauth.home.alden.ai
+        description: 2FA Manager
+    - Vaultwarden:
+        icon: vaultwarden.svg
+        href: https://vaultwarden.home.alden.ai
+        description: Rust-based Password Manager
+    - Kanboard:
+        icon: kanboard.svg
+        href: https://kanboard.home.alden.ai
+        description: Project & Task Management
+    - Miniflux:
+        icon: miniflux.svg
+        href: https://miniflux.home.alden.ai
+        description: RSS Feed / Newsfeed Browser
+        widget:
+          type: miniflux
+          url: http://miniflux-web.miniflux.svc.cluster.local.:80
+          key: "{{HOMEPAGE_VAR_MINIFLUX_API_KEY}}"
+    - Excalidraw:
+        icon: excalidraw.svg
+        href: https://excalidraw.home.alden.ai
+        description: Diagram / Visual Builder
+    - Shiori:
+        icon: shiori.svg
+        href: https://shiori.home.alden.ai
+        description: Bookmark Manager
+- Media:
+    - Immich:
+        icon: immich.png
+        href: https://photos.home.alden.ai
+        description: Photo & Video Management
+    - Jellyfin:
+        icon: jellyfin.png
+        href: https://jellyfin.home.alden.ai
+        description: Media Streaming Server
+        widget:
+          type: jellyfin
+          url: http://jellyfin.jellyfin.svc.cluster.local.:8096
+          key: "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}"
+          version: 2 # optional, default is 1
+          enableBlocks: true # optional, defaults to false
+          enableNowPlaying: true # optional, defaults to true
+          enableUser: true # optional, defaults to false
+          enableMediaControl: false # optional, defaults to true
+          showEpisodeNumber: true # optional, defaults to false
+          expandOneStreamToTwoRows: false # optional, defaults to true
+    - Kiwix:
+        icon: kiwix.png
+        href: https://kiwix.home.alden.ai
+        description: Offline Encyclopedia
+    - Redlib:
+        icon: redlib.png
+        href: https://redlib.home.alden.ai
+        description: Private Reddit Frontend
+    - CopyParty:
+        icon: mdi-folder-upload-outline
+        href: https://copyparty.home.alden.ai
+        description: File Sharing Server
+    - Nestmtx:
+        icon: mdi-television-play
+        href: https://nestmtx.home.alden.ai
+        description: IPTV Playlist Server
+    - Karakeep:
+        icon: mdi-microphone-variant
+        href: https://karakeep.home.alden.ai
+        description: Karaoke Management
+- Privacy:
+    - Adguard Home:
+        icon: adguard-home.svg
+        href: https://adguard.home.alden.ai
+        description: DNS Blackhole
+        widget:
+          type: adguard
+          url: https://adguard.home.alden.ai
+          username: "{{HOMEPAGE_VAR_ADGUARD_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_ADGUARD_PASSWORD}}"
+    - SearXNG:
+        icon: searxng.png
+        href: https://search.home.alden.ai
+        description: Private Metasearch Engine
+    - ProxiTok:
+        icon: tiktok.svg
+        href: https://proxitok.home.alden.ai
+        description: Private TikTok Frontend
+- Infrastructure & Monitoring:
+    - Grafana:
+        icon: grafana.svg
+        href: https://grafana.home.alden.ai
+        description: Dashboards & Visualization
+    - Mimir:
+        icon: grafana.svg
+        href: https://grafana.home.alden.ai/explore?datasource%22%3A%22prometheus%22
+        description: Metrics & Monitoring
+    - Alertmanager:
+        icon: alertmanager.svg
+        href: https://mimir.home.alden.ai/alertmanager/#/alerts
+        description: Alert Management
+    - Loki:
+        icon: loki.svg
+        href: https://grafana.home.alden.ai/a/grafana-lokiexplore-app/explore
+        description: Centralized Logs
+    - Tempo:
+        icon: grafana.svg
+        href: https://grafana.home.alden.ai/a/grafana-exploretraces-app/explore
+        description: Distributed Traces
+    - Longhorn:
+        icon: longhorn.svg
+        href: https://longhorn.home.alden.ai
+        description: K8S Volume Storage Management
+    - Minio:
+        icon: minio.svg
+        href: https://minio.home.alden.ai
+        description: Object Storage
+    - Authelia:
+        icon: authelia.svg
+        href: https://auth.home.alden.ai
+        description: Forward Proxy Auth
+    - Container Registry:
+        icon: docker.svg
+        href: https://registry.home.alden.ai
+        description: Container Image Registry
+    - Redis Metrics:
+        icon: redis.svg
+        href: https://grafana.home.alden.ai/a/redis-app/
+        description: Redis Management UI

@@ -1,0 +1,28 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: immich-server-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Media
+    gethomepage.dev/name: Immich
+    gethomepage.dev/href: "https://immich.home.alden.ai"
+    gethomepage.dev/description: Photo & Video Management
+    gethomepage.dev/icon: immich.svg
+    gethomepage.dev/app: immich # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app.kubernetes.io/name in (server)
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - immich.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: immich-server
+      port: 2283
+    matches:
+    - path:
+        type: PathPrefix
+        value: /

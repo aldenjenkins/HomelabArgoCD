@@ -4,5 +4,14 @@
     "**/operators/istio/**",
     "**/operators/cilium/**",
     "**/.archive/**"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "registry.home.alden.ai/me/convertx",
+        "registry.home.alden.ai/me/redlib"
+      ],
+      "enabled": false
+    }
   ]
 }

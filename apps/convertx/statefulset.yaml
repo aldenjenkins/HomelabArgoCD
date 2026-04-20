@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: convertx
+spec:
+  revisionHistoryLimit: 5
+  serviceName: convertx
+  replicas: 1
+  selector:
+    matchLabels:
+      app: convertx
+  template:
+    metadata:
+      labels:
+        app: convertx
+    spec:
+      # The image's CMD is bun, which doesnt catch SIGTERM by kubelet,
+      # so it will always take the default 30 seconds unless this is set here.
+      terminationGracePeriodSeconds: 5
+      serviceAccountName: convertx
+      nodeSelector:
+        kubernetes.io/hostname: worker-11
+      # topologySpreadConstraints:
+      #   - maxSkew: 1
+      #     topologyKey: kubernetes.io/hostname
+      #     whenUnsatisfiable: DoNotSchedule
+      #     labelSelector:
+      #       matchLabels:
+      #         app: convertx
+      securityContext:
+        fsGroup: 3100
+        runAsUser: 33
+        runAsGroup: 33
+        runAsNonRoot: true
+        # Needed for hardware transcoding
+        supplementalGroups: [44, 104, 3100]
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: convertx
+          image: registry.home.alden.ai/me/convertx:v0.17.0-vaapi
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              trap 'kill $PID' TERM
+              bun run dist/src/index.js &
+              PID=$!
+              wait $PID
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          env:
+            - name: ALLOW_UNAUTHENTICATED
+              value: "true"
+            - name: UNAUTHENTICATED_USER_SHARING
+              value: "false"
+            - name: ACCOUNT_REGISTRATION
+              value: "false"
+            - name: AUTO_DELETE_EVERY_N_HOURS
+              value: "24"
+            - name: FFMPEG_ARGS
+              value: "-hwaccel vaapi -hwaccel_device /dev/dri/renderD128"
+            - name: LIBVA_DRIVER_NAME
+              value: "iHD"
+            - name: LIBVA_DRIVERS_PATH
+              value: "/usr/lib/x86_64-linux-gnu/dri"
+          envFrom:
+            - secretRef:
+                name: convertx-env
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 3
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+          volumeMounts:
+            - name: convertx-data
+              mountPath: /app/data
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 6000m
+              memory: 4Gi
+              gpu.intel.com/i915: "1"
+  volumeClaimTemplates:
+    - metadata:
+        name: convertx-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi

@@ -2,6 +2,16 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: 2fauth-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: 2FAuth
+    gethomepage.dev/href: "https://2fauth.home.alden.ai"
+    gethomepage.dev/description: 2FA Manager
+    gethomepage.dev/icon: 2fauth-light.svg
+    gethomepage.dev/app: 2fauth # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app in (2fauth)
 spec:
   parentRefs:
     - name: default-https-gateway

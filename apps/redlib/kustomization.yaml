@@ -1,0 +1,14 @@
+namespace: redlib
+
+resources:
+  - namespace.yaml
+  - service.yaml
+  - httproute.yaml
+  - deployment.yaml
+
+configMapGenerator:
+  - name: redlib-env
+    options:
+      immutable: true
+    envs:
+      - files/envs.env

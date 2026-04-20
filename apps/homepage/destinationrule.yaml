@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: homepage-sticky-rule
+spec:
+  # This must match the internal cluster hostname of the service
+  host: homepage-dashboard.homepage.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: "hp-persistence"
+          ttl: 0s # Session cookie (expires when browser closes)
