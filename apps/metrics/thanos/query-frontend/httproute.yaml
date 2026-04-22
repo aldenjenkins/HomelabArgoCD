@@ -4,14 +4,19 @@ metadata:
   name: thanos-query-frontend-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - thanos.home.alden.ai
+  - thanos.home.alden.ai
   rules:
   - backendRefs:
     - name: thanos-query-frontend
       port: 9090
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

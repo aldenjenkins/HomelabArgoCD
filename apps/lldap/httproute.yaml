@@ -13,14 +13,19 @@ metadata:
     gethomepage.dev/pod-selector: app=lldap
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - lldap.home.alden.ai
+  - lldap.home.alden.ai
   rules:
   - backendRefs:
     - name: lldap-web
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

@@ -4,14 +4,19 @@ metadata:
   name: header-inspection-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - header-display.home.alden.ai
+  - header-display.home.alden.ai
   rules:
   - backendRefs:
     - name: header-display
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

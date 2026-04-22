@@ -14,14 +14,19 @@ metadata:
       app in (searxng)
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - search.home.alden.ai
+  - search.home.alden.ai
   rules:
   - backendRefs:
     - name: searxng
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

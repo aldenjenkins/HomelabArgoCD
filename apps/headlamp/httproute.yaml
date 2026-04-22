@@ -14,14 +14,19 @@ metadata:
       app.kubernetes.io/name in (headlamp)
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - headlamp.home.alden.ai
+  - headlamp.home.alden.ai
   rules:
   - backendRefs:
     - name: headlamp
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

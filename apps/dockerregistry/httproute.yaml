@@ -41,14 +41,19 @@ metadata:
   name: dockerregistry-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - registry.home.alden.ai
+  - registry.home.alden.ai
   rules:
   - backendRefs:
     - name: docker-registry-s3
       port: 5000
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

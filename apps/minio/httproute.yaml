@@ -4,10 +4,12 @@ metadata:
   name: minio-web-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - minio.home.alden.ai
+  - minio.home.alden.ai
   rules:
   - backendRefs:
     - name: minio-web
@@ -16,6 +18,9 @@ spec:
     # - path:
     #     type: PathPrefix
     #     value: /
+      group: ''
+      kind: Service
+      weight: 1
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -23,10 +28,12 @@ metadata:
   name: minio-api-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - minio-api.home.alden.ai
+  - minio-api.home.alden.ai
   rules:
   - backendRefs:
     - name: minio-api
@@ -35,3 +42,6 @@ spec:
     # - path:
     #     type: PathPrefix
     #     value: /
+      group: ''
+      kind: Service
+      weight: 1

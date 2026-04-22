@@ -4,14 +4,19 @@ metadata:
   name: grafana-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - grafana.home.alden.ai
+  - grafana.home.alden.ai
   rules:
   - backendRefs:
     - name: grafana-service
       port: 3000
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

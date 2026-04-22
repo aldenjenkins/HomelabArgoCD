@@ -4,14 +4,19 @@ metadata:
   name: cockpit-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - cockpit.home.alden.ai
+  - cockpit.home.alden.ai
   rules:
   - backendRefs:
     - name: cockpit
       port: 9090
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

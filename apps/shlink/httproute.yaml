@@ -17,16 +17,19 @@ metadata:
       )
 spec:
   parentRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: default-https-gateway
-      namespace: istio-system
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: default-https-gateway
+    namespace: istio-system
   hostnames:
-    - s.home.alden.ai
+  - s.home.alden.ai
   rules:
   - backendRefs:
     - name: shlink
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -38,16 +41,19 @@ metadata:
   name: shlink-web-client-httproute
 spec:
   parentRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: default-https-gateway
-      namespace: istio-system
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: default-https-gateway
+    namespace: istio-system
   hostnames:
-    - shlink.home.alden.ai
+  - shlink.home.alden.ai
   rules:
   - backendRefs:
     - name: shlink-web-client
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

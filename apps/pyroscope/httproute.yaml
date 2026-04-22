@@ -4,14 +4,19 @@ metadata:
   name: pyroscope-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - pyroscope.home.alden.ai
+  - pyroscope.home.alden.ai
   rules:
   - backendRefs:
     - name: pyroscope
       port: 4040
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

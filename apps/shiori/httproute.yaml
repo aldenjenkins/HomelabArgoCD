@@ -4,14 +4,19 @@ metadata:
   name: shiori-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - shiori.home.alden.ai
+  - shiori.home.alden.ai
   rules:
   - backendRefs:
     - name: shiori
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

@@ -4,14 +4,19 @@ metadata:
   name: jellyfin-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - jellyfin.home.alden.ai
+  - jellyfin.home.alden.ai
   rules:
   - backendRefs:
     - name: jellyfin
       port: 8096
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

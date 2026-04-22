@@ -4,10 +4,12 @@ metadata:
   name: loki-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - loki.home.alden.ai
+  - loki.home.alden.ai
   rules:
   - backendRefs:
     - name: loki-gateway
@@ -16,3 +18,6 @@ spec:
     # - path:
     #     type: PathPrefix
     #     value: /
+      group: ''
+      kind: Service
+      weight: 1

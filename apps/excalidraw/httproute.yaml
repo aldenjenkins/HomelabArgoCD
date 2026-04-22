@@ -16,14 +16,19 @@ metadata:
       )
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - excalidraw.home.alden.ai
+  - excalidraw.home.alden.ai
   rules:
   - backendRefs:
     - name: excalidraw
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

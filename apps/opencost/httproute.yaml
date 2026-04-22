@@ -4,14 +4,19 @@ metadata:
   name: opencost-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - opencost.home.alden.ai
+  - opencost.home.alden.ai
   rules:
   - backendRefs:
     - name: opencost
       port: 9090
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

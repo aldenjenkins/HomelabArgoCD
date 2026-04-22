@@ -4,14 +4,19 @@ metadata:
   name: thanos-ruler-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - ruler.home.alden.ai
+  - ruler.home.alden.ai
   rules:
   - backendRefs:
     - name: thanos-ruler-operated
       port: 10902
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

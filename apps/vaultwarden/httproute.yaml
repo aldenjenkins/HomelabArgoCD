@@ -4,14 +4,19 @@ metadata:
   name: vaultwarden-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - vaultwarden.home.alden.ai
+  - vaultwarden.home.alden.ai
   rules:
   - backendRefs:
     - name: vaultwarden
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

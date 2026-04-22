@@ -4,11 +4,13 @@ metadata:
   name: kanboard-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
 
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - kanboard.home.alden.ai
+  - kanboard.home.alden.ai
 
   # parentRefs:
   # # - name: default-https-gateway
@@ -22,6 +24,9 @@ spec:
   - backendRefs:
     - name: kanboard
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

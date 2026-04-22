@@ -4,14 +4,19 @@ metadata:
   name: dashy-httproute
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - dashy.home.alden.ai
+  - dashy.home.alden.ai
   rules:
   - backendRefs:
     - name: argocd-server.argocd.svc.cluster.local
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -19,6 +24,9 @@ spec:
   - backendRefs:
     - name: dashy
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

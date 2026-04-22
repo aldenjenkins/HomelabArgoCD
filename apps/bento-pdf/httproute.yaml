@@ -4,16 +4,19 @@ metadata:
   name: bento-pdf-httproute
 spec:
   parentRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: default-https-gateway
-      namespace: istio-system
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: default-https-gateway
+    namespace: istio-system
   hostnames:
-    - pdf.home.alden.ai
+  - pdf.home.alden.ai
   rules:
   - backendRefs:
     - name: bentopdf
       port: 8080
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

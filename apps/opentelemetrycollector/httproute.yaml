@@ -4,14 +4,19 @@ metadata:
   name: logs-gateway-collector-otlp-http
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - logs-gateway.home.alden.ai
+  - logs-gateway.home.alden.ai
   rules:
   - backendRefs:
     - name: logs-gateway-collector
       port: 4318
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -23,14 +28,19 @@ metadata:
   name: logs-agent-collector-zpages
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - logs-agent-collector.home.alden.ai
+  - logs-agent-collector.home.alden.ai
   rules:
   - backendRefs:
     - name: logs-agent-collector
       port: 55679
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -42,14 +52,19 @@ metadata:
   name: logs-gateway-collector-zpages
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - logs-gateway-collector.home.alden.ai
+  - logs-gateway-collector.home.alden.ai
   rules:
   - backendRefs:
     - name: logs-gateway-collector
       port: 55679
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -61,14 +76,19 @@ metadata:
   name: kubernetes-events-collector-zpages
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - kubernetes-events-collector.home.alden.ai
+  - kubernetes-events-collector.home.alden.ai
   rules:
   - backendRefs:
     - name: kubernetes-events-collector
       port: 55679
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -80,14 +100,19 @@ metadata:
   name: otlp-collector-zpages
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - otlp-collector.home.alden.ai
+  - otlp-collector.home.alden.ai
   rules:
   - backendRefs:
     - name: otlp-collector
       port: 55679
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
@@ -99,14 +124,19 @@ metadata:
   name: trace-collector-zpages
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - trace-collector.home.alden.ai
+  - trace-collector.home.alden.ai
   rules:
   - backendRefs:
     - name: trace-collector
       port: 55679
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

@@ -15,14 +15,14 @@ metadata:
       app in (authelia)
 spec:
   parentRefs:
-    - group: gateway.networking.k8s.io
+  - group: gateway.networking.k8s.io
     # - group: networking.istio.io
-      kind: Gateway
-      name: default-https-gateway
-      namespace: istio-system
+    kind: Gateway
+    name: default-https-gateway
+    namespace: istio-system
 
   hostnames:
-    - auth.home.alden.ai
+  - auth.home.alden.ai
   # parentRefs:
   # # - name: default-https-gateway
   # #   namespace: istio-system
@@ -35,6 +35,9 @@ spec:
   - backendRefs:
     - name: authelia
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix

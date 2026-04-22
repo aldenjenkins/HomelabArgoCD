@@ -4,14 +4,19 @@ metadata:
   name: adguard
 spec:
   parentRefs:
-    - name: default-https-gateway
-      namespace: istio-system
+  - name: default-https-gateway
+    namespace: istio-system
+    group: gateway.networking.k8s.io
+    kind: Gateway
   hostnames:
-    - adguard.home.alden.ai
+  - adguard.home.alden.ai
   rules:
   - backendRefs:
     - name: adguard
       port: 80
+      group: ''
+      kind: Service
+      weight: 1
     matches:
     - path:
         type: PathPrefix
