@@ -185,6 +185,8 @@ spec:
           app.kubernetes.io/instance: mimir-store-gateway
           app.kubernetes.io/name: mimir-store-gateway
         name: data
+      apiVersion: v1
+      kind: PersistentVolumeClaim
       spec:
         accessModes:
           - ReadWriteOnce
