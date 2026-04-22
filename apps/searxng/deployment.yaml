@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searxng
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: searxng
+  template:
+    metadata:
+      labels:
+        app: searxng
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: searxng
+      securityContext:
+        fsGroup: 977
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: searxng
+          image: ghcr.io/searxng/searxng:2026.4.17-e8299a4c3
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+            runAsGroup: 977
+            runAsNonRoot: true
+            runAsUser: 977
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: searxng-env
+          env:
+            - name: SEARXNG_PORT
+              value: "8080"
+            - name: TZ
+              value: "America/Chicago"
+            - name: FORCE_OWNERSHIP
+              value: "false"
+          volumeMounts:
+            - name: searxng-config
+              mountPath: /etc/searxng
+            - name: searxng-data
+              mountPath: /var/cache/searxng
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "150m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 9
+            periodSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 8
+            periodSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: searxng-config
+          configMap:
+            name: searxng-config
+        - name: searxng-data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

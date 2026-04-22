@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lldap
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lldap
+  template:
+    metadata:
+      labels:
+        app: lldap
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: lldap
+      securityContext:
+        fsGroup: 11001
+        runAsGroup: 11001
+        runAsNonRoot: true
+        runAsUser: 11001
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: lldap
+          image: ghcr.io/lldap/lldap:v0.6.2-alpine-rootless
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+            runAsGroup: 11001
+            runAsNonRoot: true
+            runAsUser: 11001
+          ports:
+            - name: ldap
+              containerPort: 3890
+            - name: web
+              containerPort: 17170
+          envFrom:
+            - secretRef:
+                name: lldap-env
+          env:
+            - name: LLDAP_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lldap-postgres-18-app
+                  key: uri
+            - name: TZ
+              value: "America/Chicago"
+            - name: GID
+              value: "11001"
+            - name: UID
+              value: "11001"
+          volumeMounts:
+            - name: lldap-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "150m"
+          livenessProbe:
+            exec:
+              command: [ /app/lldap, healthcheck ]
+            initialDelaySeconds: 5
+      volumes:
+        - name: lldap-data
+          emptyDir: { }

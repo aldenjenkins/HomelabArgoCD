@@ -1,0 +1,33 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+    name: syncthing-nas
+    labels:
+        kubernetes.io/service-name: syncthing-nas
+addressType: ENC[AES256_GCM,data:+EchzQ==,iv:aCiEKz5skmZITBccjMe8KHtnFVIE1ktpLww05Jvz4SM=,tag:dkNMYSgTOiw25fTWC5qyEg==,type:str]
+ports:
+    - name: ENC[AES256_GCM,data:miaN,iv:l60XRgQX8nYdivGZUlTVcK2G/9bl1ib0CiUgmtVpCFs=,tag:fB3wcjN8A0pSqHxTO9e+Fw==,type:str]
+      protocol: ENC[AES256_GCM,data:9dPd,iv:bOmU3Z/Ob4ejz+GM7WOBaJSb2ASG7/A7juT7kjZ+ey0=,tag:j40kOhU+RYdncnzeu4VJWA==,type:str]
+      port: ENC[AES256_GCM,data:U8SFZA==,iv:b3Z+zkMrje3CpnCkzGpO8lj3djxcc1KL8Jy7IfVf2n8=,tag:uZw1dpGdZihfyE1MIpqcTA==,type:int]
+endpoints:
+    - addresses:
+        - ENC[AES256_GCM,data:CoSBWUCq8uLqjcUdsVzX,iv:8TzRX52RyeZKB29NqfBT8xtzSUHK5eYuoWOYE9BSI/8=,tag:KEX4aiz7pDBA3TbGeFBazw==,type:str]
+      conditions:
+        ready: ENC[AES256_GCM,data:AzgQ0w==,iv:ul7BcuLEe76uGxZcCWdtwWjCBLl6z45+5mFZqU/TlS0=,tag:EKnroCED6AFL+y8pTwoiSg==,type:bool]
+        serving: ENC[AES256_GCM,data:FCcC3g==,iv:aRSCT7WAc/bdxfkuaZyVrsdYmQIIO0BeHFMM8/ytMIo=,tag:D3KxMHJ6MIVI0L4itOWWqQ==,type:bool]
+        terminating: ENC[AES256_GCM,data:o6qy9RY=,iv:vI8DCjJykUgJE0aMTMNeLJ4bY4NfqpDhPSqAyDkMiUU=,tag:qS3A+soMeWfKzpUPxD6p9w==,type:bool]
+sops:
+    age:
+        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUdWFnU1M0Slo4bXVuN1cw
+            QS90eW9YNHk1aWMvYXdUL2NkczZLQStib0ZzClBCZ3lMb1BGRXhOdHRUbnQ1VmhL
+            WDUvUjhDZXBFbFR1c1FnM2NTVlFkRWMKLS0tIHJycG1haWdsaG8vWUdlMks5eWRQ
+            aklZK2dJVDZQSU9wR2ErdjRCUU1VUHcKnnT0mkY8xPwPb3kcX4+p2O7VrNYY+zYf
+            4UAItvSu30TYyvs3ZxdQcSchNN4AxWXHIR5viuBQ9H8g2LqMnx2+Gg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-04-21T18:35:44Z"
+    mac: ENC[AES256_GCM,data:t38J7QsRRWcAztGp07KlJWf+f9yruJgHmdux51Pq0HC6HXGJltVyr860k7MpnVm6n0QTgsj3CpHK9kqkPSakwcb7IOzqNQL7n4aNmFiex0jkiOUruJfauBWmCE4a5aTrGEbiyELIG/7WwmuMauGQjWwcqFAEvT3X19nWX9bRIno=,iv:gyuSpPHTKVK1wI+tYIWechtsBTiFcOT9mQGyE4dCV1k=,tag:bWRojuw9MK2L2p5yN/+okA==,type:str]
+    unencrypted_regex: ^(apiVersion|metadata|kind|type)$
+    version: 3.12.2

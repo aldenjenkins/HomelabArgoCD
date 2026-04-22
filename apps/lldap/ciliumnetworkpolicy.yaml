@@ -1,0 +1,32 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: lldap-ldap-ingress
+spec:
+  endpointSelector:
+    matchLabels:
+      app: lldap
+  ingress:
+    # Allow LDAP only from Authelia
+    - fromEndpoints:
+        - matchLabels:
+            app: authelia
+            component: authelia
+            app.kubernetes.io/name: authelia
+            app.kubernetes.io/instance: authelia
+            io.kubernetes.pod.namespace: authelia
+      toPorts:
+        - ports:
+            - port: "3890"
+              protocol: TCP
+    # Allow web UI from only istio-system's main ingress gateway
+    - fromEndpoints:
+        - matchLabels:
+            gateway.istio.io/managed: istio.io-gateway-controller
+            gateway.networking.k8s.io/gateway-class-name: istio
+            gateway.networking.k8s.io/gateway-name: default-https-gateway
+            io.kubernetes.pod.namespace: istio-system  # lock down or open up as needed
+      toPorts:
+        - ports:
+            - port: "17170"
+              protocol: TCP

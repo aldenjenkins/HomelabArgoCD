@@ -56,6 +56,9 @@ spec:
             requests:
               cpu: 5m
               memory: 150Mi
+          envFrom:
+            - secretRef:
+                name: authelia-secret-env
           env:
             - name: AUTHELIA_SERVER_DISABLE_HEALTHCHECK
               value: "true"
@@ -124,16 +127,17 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            - mountPath: /config/users_database.yml
-              name: secret-config
-              readOnly: true
-              subPath: users_database.yml
             - mountPath: /configuration.yaml
-              name: secret-config
-              readOnly: true
+              name: authelia-config
               subPath: configuration.yaml
+            - mountPath: /secrets
+              name: authelia-secret-files
+              readOnly: true
       volumes:
-        - name: secret-config
+        - name: authelia-config
+          configMap:
+            name: authelia-config
+        - name: authelia-secret-files
           secret:
-            secretName: authelia-config
+            secretName: authelia-secret-files
       automountServiceAccountToken: false

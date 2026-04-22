@@ -25,7 +25,11 @@
     memory: true
     network: default
 - search:
-    provider: duckduckgo
+    provider: custom # google, duckduckgo, bing, baidu, brave or custom
+    focus: true # Optional, will set focus to the search bar on page load
+    url: https://search.home.alden.ai/search?q=
+    showSearchSuggestions: true # Optional
+    suggestionUrl: https://ac.ecosia.org/autocomplete?type=list&q=
     target: _blank
 - openmeteo:
     label: Austin # optional

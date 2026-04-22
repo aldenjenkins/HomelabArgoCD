@@ -1,10 +1,10 @@
-namespace: syncthing
+namespace: lldap
 resources:
   - namespace.yaml
-  - grafanafolder.yaml
-  - grafanadashboard.yaml
+  - postgres
+  - deployment.yaml
   - service.yaml
   - httproute.yaml
-
+  - ciliumnetworkpolicy.yaml
 generators:
   - sopsgenerator.yaml

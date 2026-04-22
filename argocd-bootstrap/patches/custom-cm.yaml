@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
 data:
   accounts.alden: login
+  accounts.readonly: apiKey
   kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
   dex.config: |
     connectors:

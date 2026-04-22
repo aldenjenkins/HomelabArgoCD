@@ -13,5 +13,6 @@ resources:
   # 2026-04-14 disabling this (although its been disabled until now, just disabling here so new argocd deploy doesnt pull it.)
   # - prometheusrule.yaml
   - dashboards
+  - authorizationpolicy.yaml
 generators:
   - sopsgenerator.yaml

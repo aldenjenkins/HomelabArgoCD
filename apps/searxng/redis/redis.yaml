@@ -1,0 +1,38 @@
+# Source: redis/templates/redis-standalone.yaml
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: Redis
+metadata:
+  name: searxng-redis
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/instance: redis
+    app.kubernetes.io/version: 0.16.5
+    app.kubernetes.io/component: middleware
+spec:
+  kubernetesConfig:
+    image: "quay.io/opstree/redis:v8.6.2"
+    imagePullPolicy: "IfNotPresent"
+  redisExporter:
+    enabled: true
+    image: "quay.io/opstree/redis-exporter:v1.82.0"
+    imagePullPolicy: "IfNotPresent"
+    securityContext:                      # applied to ALL containers incl. exporter
+      allowPrivilegeEscalation: false     # CRITICAL
+      readOnlyRootFilesystem: true        # HIGH
+      runAsNonRoot: true                  # HIGH (belt-and-suspenders at container level)
+      runAsUser: 1000
+      capabilities:                       # CRITICAL
+        drop: ["ALL"]
+  podSecurityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+    runAsNonRoot: true                  # HIGH: runAsNonRoot
+    seccompProfile:                     # MEDIUM: seccompProfile
+      type: RuntimeDefault
+  securityContext:                      # applied to ALL containers incl. exporter
+    allowPrivilegeEscalation: false     # CRITICAL
+    runAsNonRoot: true                  # HIGH (belt-and-suspenders at container level)
+    runAsUser: 1000
+    runAsGroup: 1000
+    capabilities:                       # CRITICAL
+      drop: ["ALL"]

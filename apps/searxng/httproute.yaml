@@ -1,0 +1,28 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: searxng-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Privacy
+    gethomepage.dev/name: SearxNG
+    gethomepage.dev/href: "https://search.home.alden.ai"
+    gethomepage.dev/description: Private Metasearch Engine
+    gethomepage.dev/icon: searxng.svg
+    gethomepage.dev/app: searxng # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: >-
+      app in (searxng)
+spec:
+  parentRefs:
+    - name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - search.home.alden.ai
+  rules:
+  - backendRefs:
+    - name: searxng
+      port: 8080
+    matches:
+    - path:
+        type: PathPrefix
+        value: /

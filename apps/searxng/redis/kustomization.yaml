@@ -1,4 +1,5 @@
+namespace: searxng
 resources:
   - redis.yaml
-  # - grafanadatasource.yaml
+  - grafanadatasource.yaml
   - servicemonitor.yaml

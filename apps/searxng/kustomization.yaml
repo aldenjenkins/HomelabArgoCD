@@ -1,0 +1,20 @@
+namespace: searxng
+
+resources:
+  - namespace.yaml
+  - redis
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+
+configMapGenerator:
+  - name: searxng-config
+    files:
+      - files/settings.yml
+      - files/limiter.toml
+      - files/favicons.toml
+    options:
+      immutable: true
+
+generators:
+  - sopsgenerator.yaml

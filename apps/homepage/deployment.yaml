@@ -18,6 +18,16 @@ spec:
       #annotations:
       #  instrumentation.opentelemetry.io/inject-nodejs: "opentelemetry/default"
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - worker-11
+                      - control-plane-01
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -116,7 +126,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 500m
+              cpu: 2000m
               memory: 256Mi
       volumes:
         - name: homepage-config

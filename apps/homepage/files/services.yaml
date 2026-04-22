@@ -29,22 +29,22 @@
           type: argocd
           url: http://argocd-server.argocd.svc.cluster.local.:80
           key: "{{HOMEPAGE_VAR_ARGOCD_API_KEY}}"
-    - Forgejo:
-        icon: forgejo.png
-        href: https://forgejo.home.alden.ai
-        description: Git Repository Manager
-        widget:
-          type: gitea
-          url: http://forgejo.forgejo.svc.cluster.local:3000
-          key: "{{HOMEPAGE_VAR_FORGEJO_API_KEY}}"
-    - Headlamp:
-        icon: headlamp.png
-        href: https://headlamp.home.alden.ai
-        description: Kubernetes Dashboard
-    - IT-Tools:
-        icon: it-tools.png
-        href: https://it-tools.home.alden.ai
-        description: IT Utility Tools Collection
+    # - Forgejo:
+    #     icon: forgejo.png
+    #     href: https://forgejo.home.alden.ai
+    #     description: Git Repository Manager
+    #     widget:
+    #       type: gitea
+    #       url: http://forgejo.forgejo.svc.cluster.local:3000
+    #       key: "{{HOMEPAGE_VAR_FORGEJO_API_KEY}}"
+    # - Headlamp:
+    #     icon: headlamp.png
+    #     href: https://headlamp.home.alden.ai
+    #     description: Kubernetes Dashboard
+    # - IT-Tools:
+    #     icon: it-tools.png
+    #     href: https://it-tools.home.alden.ai
+    #     description: IT Utility Tools Collection
     - Mailpit:
         icon: mailpit.png
         href: https://mailpit.home.alden.ai
@@ -100,8 +100,9 @@
         description: Camera Streaming Bridge
     - Syncthing:
         icon: syncthing.png
-        href: http://192.168.123.170:8384/
+        href: https://syncthing.home.alden.ai
         description: NAS Syncthing
+        siteMonitor: http://192.168.123.170:8384/rest/noauth/health
 - Network:
     # - Librespeed:
     #     icon: librespeed.svg
@@ -148,19 +149,19 @@
           type: miniflux
           url: http://miniflux-web.miniflux.svc.cluster.local.:80
           key: "{{HOMEPAGE_VAR_MINIFLUX_API_KEY}}"
-    - Excalidraw:
-        icon: excalidraw.svg
-        href: https://excalidraw.home.alden.ai
-        description: Diagram / Visual Builder
+    # - Excalidraw:
+    #     icon: excalidraw.svg
+    #     href: https://excalidraw.home.alden.ai
+    #     description: Diagram / Visual Builder
     - Shiori:
         icon: shiori.svg
         href: https://shiori.home.alden.ai
         description: Bookmark Manager
 - Media:
-    - Immich:
-        icon: immich.png
-        href: https://photos.home.alden.ai
-        description: Photo & Video Management
+    # - Immich:
+    #     icon: immich.png
+    #     href: https://photos.home.alden.ai
+    #     description: Photo & Video Management
     - Jellyfin:
         icon: jellyfin.png
         href: https://jellyfin.home.alden.ai

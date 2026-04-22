@@ -1,0 +1,10 @@
+namespace: kube-system
+resources:
+  - httproute.yaml
+  - service.yaml
+  - deployment.yaml
+  - serviceaccount.yaml
+  - clusterrolebinding.yaml
+
+generators:
+  - sopsgenerator.yaml

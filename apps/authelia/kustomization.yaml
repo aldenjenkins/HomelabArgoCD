@@ -12,3 +12,9 @@ resources:
   - probe.yaml
 generators:
   - sopsgenerator.yaml
+configMapGenerator:
+  - name: authelia-config
+    files:
+      - files/configuration.yaml
+    options:
+      immutable: true

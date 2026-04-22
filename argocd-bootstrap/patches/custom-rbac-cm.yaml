@@ -6,5 +6,6 @@ metadata:
 data:
   policy.csv: |
     g, alden, role:admin
+    g, readonly, role:readonly
   policy.default: role:readonly
   scopes: '[groups, email]'

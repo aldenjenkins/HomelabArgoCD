@@ -1,0 +1,127 @@
+# see https://docs.searxng.org/admin/engines/settings.html#use-default-settings
+# use_default_settings: true
+use_default_settings:
+  engines:
+    keep_only:
+      # Core search (own index)
+      - duckduckgo
+      - google
+      - google images
+      - google videos
+      - google news
+      - google scholar
+      - bing
+      - bing images
+      - bing videos
+      - bing news
+      - mojeek
+      - mojeek images
+      - mojeek news
+      # Knowledge/reference
+      - wikipedia
+      # - wikidata
+      - currency
+      - mdn
+      # Video/music
+      - youtube
+      - genius
+      # IT/developer
+      - github
+      - stackoverflow
+      - arch linux wiki
+      - gitlab
+      # Maps/weather
+      - openstreetmap
+      - openmeteo
+    # remove:
+    #   - google
+    #   - torch
+    #   - ahmia
+    #   - wikidata
+    #   - braveapi
+    #   - brave.news
+    #   - brave.videos
+    #   - brave.images
+    #   - brave
+    #   - karmasearch videos
+    #   - karmasearch
+
+general:
+  debug: false
+  instance_name: "SearXNG"
+  privacypolicy_url: false
+  donation_url: false
+  contact_url: false
+  enable_metrics: true
+
+# brand:
+#   new_issue_url: ""
+#   docs_url: ""
+#   public_instances: ""
+#   wiki_url: ""
+#   issue_url: ""
+
+# engines:
+#   - name: brave
+#     disabled: true
+#     inactive: true
+#   - name: braveapi
+#     disabled: true
+#     inactive: true
+
+search:
+  safe_search: 2
+  autocomplete: "duckduckgo"
+  autocomplete_min: 4
+  default_lang: "en"
+  favicon_resolver: "duckduckgo"
+  # max_page: 0
+  # ban_time_on_fail: 5
+  # max_ban_time_on_fail: 120
+  # default_doi_resolver: "https://doi.org/"
+  # suspended_times:
+  #   SearxEngineAccessDenied: 86400
+  #   SearxEngineCaptcha: 86400
+  #   SearxEngineTooManyRequests: 3600
+  #   cf_SearxEngineCaptcha: 1296000
+  #   cf_SearxEngineAccessDenied: 86400
+  #   recaptcha_SearxEngineCaptcha: 604800
+  formats:
+    - html
+    - json
+
+server:
+  # bind_address: "0.0.0.0"
+  # overwritten by ${SEARXNG_SECRET}
+  # secret_key: "ultrasecretkey_change_this_in_production"
+  # disable rate limiter for better performance
+  limiter: false
+  public_instance: false
+  image_proxy: true
+  http_protocol_version: "1.1"
+  # method: "GET"
+
+# valkey:
+#   # URL to connect valkey database. Is overwritten by ${SEARXNG_VALKEY_URL}.
+#   # https://docs.searxng.org/admin/settings/settings_valkey.html#settings-valkey
+#   url: valkey://searxng-redis.searxng:6379/0
+
+# ui:
+#   static_use_hash: true
+#   default_locale: "en"
+#   query_in_title: false
+#   infinite_scroll: false
+#   center_alignment: false
+#   cache_url: ""
+#   default_theme: simple
+#   theme_args:
+#     simple_style: auto
+
+outgoing:
+  request_timeout: 10.0
+  max_request_timeout: 15.0
+  # Reduce fingerprinting
+  useragent_suffix: ""
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true

@@ -36,15 +36,31 @@ spec:
               - adminer.home.alden.ai
               - 2fauth.home.alden.ai
               - hubble.home.alden.ai
-              - adguard.home.alden.ai
               - header-display.home.alden.ai
               - shiori.home.alden.ai
+              - homepage.home.alden.ai
+              - immich.home.alden.ai
+              - convertx.home.alden.ai
+              - it-tools.home.alden.ai
+              - redlib.home.alden.ai
+              - headlamp.home.alden.ai
+              - lldap.home.alden.ai
+        - operation:
+            hosts:
+              - search.home.alden.ai
+            notPaths:
+              - /manifest.json
         - operation:
             hosts:
               - s.home.alden.ai
             notMethods:
               - OPTIONS
               - GET
+        - operation:
+            hosts:
+              - adguard.home.alden.ai
+            notPaths:
+              - /control/stats
         - operation:
             hosts:
               - prometheus.home.alden.ai
@@ -69,6 +85,7 @@ spec:
               - forgejo.home.alden.ai
             notPaths:
               - /alden/nvim.git*
+              - /alden/modular-backup-framework.git*
         - operation:
             hosts:
               - argocd.home.alden.ai

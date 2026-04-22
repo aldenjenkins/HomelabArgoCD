@@ -43,6 +43,9 @@ spec:
           name: redis-operator-redis-operator
           jsonPointers:
             - /spec/template/spec/serviceAccount
+      syncPolicy:
+        syncOptions:
+          - ServerSideApply=true    # <-- removes the last-applied-configuration annotation from resources
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
