@@ -76,6 +76,8 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: jellyfin-cache
+      apiVersion: v1
+      kind: PersistentVolumeClaim
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:
@@ -86,6 +88,8 @@ spec:
         name: jellyfin-media
         annotations:
           nfs.io/storage-path: "jellyfin/"
+      apiVersion: v1
+      kind: PersistentVolumeClaim
       spec:
         accessModes: ["ReadWriteMany"]
         resources:
@@ -96,6 +100,8 @@ spec:
         name: jellyfin-config
         annotations:
           nfs.io/storage-path: "jellyfin/"
+      apiVersion: v1
+      kind: PersistentVolumeClaim
       spec:
         accessModes: ["ReadWriteMany"]
         storageClassName: nfs-appdata-retain

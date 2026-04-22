@@ -142,6 +142,8 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: vaultwarden-data-pvc
+      apiVersion: v1
+      kind: PersistentVolumeClaim
       spec:
         accessModes:
           - ReadWriteOnce

@@ -47,6 +47,7 @@ spec:
     - port: metrics
       metricRelabelings:
         - sourceLabels: [job]
+          action: replace
           targetLabel: job
           replacement: argocd-repo-server-metrics
 ---
@@ -67,6 +68,7 @@ spec:
     - port: metrics
       metricRelabelings:
         - sourceLabels: [job]
+          action: replace
           targetLabel: job
           replacement: argocd-applicationset-controller-metrics
 ---
