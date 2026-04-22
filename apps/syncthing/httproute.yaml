@@ -14,10 +14,10 @@ spec:
   - backendRefs:
     - name: syncthing-nas
       port: 8384
-    # matches:
-    # - path:
-    #     type: PathPrefix
-    #     value: /
       group: ''
       kind: Service
       weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
