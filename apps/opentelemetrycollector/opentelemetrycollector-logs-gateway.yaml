@@ -15,7 +15,7 @@ spec:
   volumeClaimTemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
-      metadata: 
+      metadata:
         name: file-storage
       spec:
         accessModes:
@@ -25,6 +25,7 @@ spec:
             storage: 5Gi
         storageClassName: local-path
         # volumeMode: Filesystem
+      status: {}
   volumeMounts:
     - mountPath: /var/lib/storage/otc
       name: file-storage
@@ -44,7 +45,7 @@ spec:
       # debug:
       #   verbosity: detailed
 
-      # Exporter for sending logs via otlphttp to the logs gateway 
+      # Exporter for sending logs via otlphttp to the logs gateway
       otlphttp/loki:
         compression: gzip
         endpoint: http://loki-gateway.loki.svc.cluster.local./otlp
@@ -401,7 +402,7 @@ spec:
               - set(attributes["level"], "error") where attributes["level"] == "CRITICAL"
               - set(attributes["level"], "debug") where attributes["level"] == "DEBUG"
               - set(attributes["level"], "trace") where attributes["level"] == "TRACE"
-              - delete_key(attributes, "level") where attributes["level"] != nil and 
+              - delete_key(attributes, "level") where attributes["level"] != nil and
                 not IsMatch(attributes["level"], "(info|warn|error|debug|trace|unknown)")
               - set(attributes["level"], "info") where IsString(body) and IsMatch(body,
                 "[\\[\\s]?(INFO|info)[\\]\\s:]")
@@ -421,7 +422,7 @@ spec:
               - set(attributes["category"], body["category"]) where IsMap(body)
               # - delete_key(attributes, "category") where attributes["category"] != nil
               #   and not IsMatch(attributes["category"], "(access|application)")
-              
+
       transform/containers_parse_json:
         error_mode: ignore
         log_statements:
@@ -466,7 +467,7 @@ spec:
             record_attributes:
               - key: http.direction
                 value: .+
-      
+
       # Filter to exclude Istio logs from the general container pipeline.
       filter/not_istio:
         logs:
@@ -519,9 +520,9 @@ spec:
 
       pipelines:
         logs/otlp/containers:
-          receivers: 
+          receivers:
           - otlp
-          processors: 
+          processors:
           - memory_limiter
           - filter/exclude_external
           - filter/include_containers
@@ -540,12 +541,12 @@ spec:
           # test adding this for loki ingester to not be overwhelmed
           # - transform/remove_high_cardinality_resource_attrs
           - batch
-          exporters: 
+          exporters:
           - otlphttp/loki
         logs/otlp/kubelet:
-          receivers: 
+          receivers:
           - otlp
-          processors: 
+          processors:
           - memory_limiter
           - filter/exclude_external
           - filter/include_fluent_tag_host
@@ -564,12 +565,12 @@ spec:
           - transform/flatten
           - transform/post_flatten
           - batch
-          exporters: 
+          exporters:
           - otlphttp/loki
         logs/otlp/istio:
-          receivers: 
+          receivers:
           - otlp
-          processors: 
+          processors:
           - memory_limiter
           # 1. Filter to only process Istio logs sent via otel-als
           - filter/istio_only
@@ -584,11 +585,11 @@ spec:
           - groupbyattrs/label_fields
           # 5. Batch before sending
           - batch
-          exporters: 
+          exporters:
           - otlphttp/loki
 
         logs/otlp/external:
-          receivers: 
+          receivers:
           - otlp
           processors:
           - memory_limiter

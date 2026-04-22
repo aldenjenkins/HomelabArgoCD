@@ -7,7 +7,12 @@ spec:
   - name: default-https-gateway
     namespace: istio-system
     sectionName: forgejo-ssh  # References the listener name
+    group: gateway.networking.k8s.io
+    kind: Gateway
   rules:
   - backendRefs:
     - name: forgejo-ssh
       port: 22
+      group: ''
+      kind: Service
+      weight: 1

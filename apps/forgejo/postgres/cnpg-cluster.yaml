@@ -30,5 +30,6 @@ spec:
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
+      enabled: true
       parameters:
         barmanObjectName: minio-store

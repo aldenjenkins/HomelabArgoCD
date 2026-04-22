@@ -109,6 +109,8 @@ spec:
         labels:
           app.kubernetes.io/name: immich
           app.kubernetes.io/component: machine-learning
+      kind: PersistentVolumeClaim
+      apiVersion: v1
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: local-path
