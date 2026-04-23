@@ -45,7 +45,7 @@ spec:
           requests:
             cpu: 10m
             memory: 20Mi
-        image: docker.io/enix/x509-certificate-exporter:3.20.1
+        image: docker.io/enix/x509-certificate-exporter:3.21.0
         imagePullPolicy: IfNotPresent
         args:
         - --listen-address=:9793
@@ -203,7 +203,7 @@ spec:
           requests:
             cpu: 10m
             memory: 20Mi
-        image: docker.io/enix/x509-certificate-exporter:3.20.1
+        image: docker.io/enix/x509-certificate-exporter:3.21.0
         imagePullPolicy: IfNotPresent
         args:
         - --listen-address=:9793
