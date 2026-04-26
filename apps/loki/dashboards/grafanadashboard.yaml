@@ -1262,7 +1262,7 @@ spec:
               },
               "direction": "backward",
               "editorMode": "code",
-              "expr": "sum by (server_address) (sum_over_time({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | http_response_status_code=200 | unwrap http_request_size |  __error__=\"\" [$__range]))",
+              "expr": "sum by (server_address) (rate({$label_name=~\"$label_value\", service_name=~\"$service_name\", instance=~\"$instance\"} | http_response_status_code=200 | unwrap http_request_size |  __error__=\"\" [$__interval]))",
               "hide": false,
               "legendFormat": "{{server_address}}",
               "queryType": "range",

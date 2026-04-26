@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: lldap
   ingress:
-    # Allow LDAP only from Authelia
+    # Allow LDAP from Authelia server pods
     - fromEndpoints:
         - matchLabels:
             app: authelia
@@ -19,13 +19,22 @@ spec:
         - ports:
             - port: "3890"
               protocol: TCP
+    # Allow LDAP from Jellyfin server pods
+    - fromEndpoints:
+        - matchLabels:
+            app: jellyfin
+            io.kubernetes.pod.namespace: jellyfin
+      toPorts:
+        - ports:
+            - port: "3890"
+              protocol: TCP
     # Allow web UI from only istio-system's main ingress gateway
     - fromEndpoints:
         - matchLabels:
             gateway.istio.io/managed: istio.io-gateway-controller
             gateway.networking.k8s.io/gateway-class-name: istio
             gateway.networking.k8s.io/gateway-name: default-https-gateway
-            io.kubernetes.pod.namespace: istio-system  # lock down or open up as needed
+            io.kubernetes.pod.namespace: istio-system
       toPorts:
         - ports:
             - port: "17170"

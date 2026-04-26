@@ -1,0 +1,23 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: vikunja-redis
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    name: vikunja-redis
+    type: redis-datasource
+    url: redis://vikunja-redis.vikunja.svc.cluster.local:6379
+  plugins:
+    - name: redis-datasource
+      version: latest

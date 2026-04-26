@@ -1,0 +1,23 @@
+# You can add Vikunja configuration items from https://vikunja.io/docs/config-options/ to this file
+service:
+  # Required after Vikunja 1.0.0
+  publicurl: "https://vikunja.home.alden.ai"  # e.g. "https://example.com"
+redis:
+  enabled: true
+  host: vikunja-redis.vikunja.svc.cluster.local:6379
+keyvalue:
+  type: redis
+log:
+  format: structured
+files:
+  type: s3
+  s3:
+    usepathstyle: true
+auth:
+  openid:
+    enabled: true
+    providers:
+      authelia:
+        name: 'Authelia'
+        authurl: 'https://auth.home.alden.ai'
+        scope: 'openid profile email'

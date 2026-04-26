@@ -18,7 +18,6 @@ spec:
             hosts:
               - kanboard.home.alden.ai
               - grafana.home.alden.ai
-              - jellyfin.home.alden.ai
               - miniflux.home.alden.ai
               - shlink.home.alden.ai
               - thanos.home.alden.ai
@@ -45,6 +44,7 @@ spec:
               - redlib.home.alden.ai
               - headlamp.home.alden.ai
               - lldap.home.alden.ai
+              - vikunja.home.alden.ai
         - operation:
             hosts:
               - search.home.alden.ai

@@ -1,0 +1,16 @@
+namespace: vikunja
+resources:
+  - namespace.yaml
+  - postgres
+  - redis
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+generators:
+  - sopsgenerator.yaml
+configMapGenerator:
+  - name: vikunja-config
+    files:
+      - files/config.yml
+    options:
+      immutable: true

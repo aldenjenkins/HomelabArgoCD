@@ -31,6 +31,8 @@ spec:
             capabilities:
               drop: ["ALL"]
           env:
+            - name: JELLYFIN_PublishedServerUrl
+              value: https://jellyfin.home.alden.ai
             - name: NODE_NAME
               valueFrom:
                 fieldRef:

@@ -1,6 +1,874 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
+  name: nas-backup-framework
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 10m
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  folderUID: nas-uid
+  json: |-
+    {
+      "__inputs": [
+        {
+          "name": "DS_PROMETHEUS",
+          "label": "Prometheus / Mimir",
+          "description": "",
+          "type": "datasource",
+          "pluginId": "prometheus",
+          "pluginName": "Prometheus"
+        }
+      ],
+      "__requires": [
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "10.0.0"
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        },
+        {
+          "type": "panel",
+          "id": "stat",
+          "name": "Stat",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "table",
+          "name": "Table",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "timeseries",
+          "name": "Time series",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "text",
+          "name": "Text",
+          "version": ""
+        }
+      ],
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Backup framework monitoring — job health, age, size, and collector status",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "panels": [
+
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "Overall Health",
+          "type": "row"
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "FAILED" },
+                               "1": { "color": "green", "index": 1, "text": "OK" } },
+                  "type": "value" }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red",   "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+          "id": 1,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "mailinabox — Last Run",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_success{backup_name=\"mailinabox\",backup_type=\"rsync\"}",
+              "legendFormat": "mailinabox",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "FAILED" },
+                               "1": { "color": "green", "index": 1, "text": "OK" } },
+                  "type": "value" }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red",   "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+          "id": 2,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "mariadb — Last Run",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_success{backup_name=\"mariadb\",backup_type=\"database\"}",
+              "legendFormat": "mariadb",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 24 },
+                  { "color": "red",    "value": 26 }
+                ]
+              },
+              "unit": "h",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+          "id": 3,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "value_and_name"
+          },
+          "title": "mailinabox — Age",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "(time() - backup_last_success_timestamp{backup_name=\"mailinabox\",backup_type=\"rsync\"}) / 3600",
+              "legendFormat": "mailinabox",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 24 },
+                  { "color": "red",    "value": 26 }
+                ]
+              },
+              "unit": "h",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+          "id": 4,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "value_and_name"
+          },
+          "title": "mariadb — Age",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "(time() - backup_last_success_timestamp{backup_name=\"mariadb\",backup_type=\"database\"}) / 3600",
+              "legendFormat": "mariadb",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "STALE" },
+                               "1": { "color": "green", "index": 1, "text": "OK" } },
+                  "type": "value" }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red",   "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+          "id": 5,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Collector Runner",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "collector_runner_success",
+              "legendFormat": "runner",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 120 },
+                  { "color": "red",    "value": 300 }
+                ]
+              },
+              "unit": "s",
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+          "id": 6,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto"
+          },
+          "title": "Collector Last Seen",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "time() - collector_runner_last_run_timestamp",
+              "legendFormat": "seconds ago",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 101,
+          "title": "Backup Job Summary",
+          "type": "row"
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "cellOptions": { "type": "auto" },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red",   "value": 80 }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "Success" },
+                "properties": [
+                  {
+                    "id": "mappings",
+                    "value": [
+                      { "options": { "0": { "color": "red",   "index": 0, "text": "Failed" },
+                                     "1": { "color": "green", "index": 1, "text": "OK" } },
+                        "type": "value" }
+                    ]
+                  },
+                  { "id": "custom.cellOptions", "value": { "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Age (hours)" },
+                "properties": [
+                  { "id": "unit", "value": "none" },
+                  { "id": "decimals", "value": 1 },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        { "color": "green",  "value": null },
+                        { "color": "yellow", "value": 24 },
+                        { "color": "red",    "value": 26 }
+                      ]
+                    }
+                  },
+                  { "id": "custom.cellOptions", "value": { "type": "color-background" } }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Size" },
+                "properties": [
+                  { "id": "unit", "value": "bytes" }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Duration" },
+                "properties": [
+                  { "id": "unit", "value": "s" }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Last Success" },
+                "properties": [
+                  { "id": "unit", "value": "dateTimeFromNow" }
+                ]
+              }
+            ]
+          },
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 6 },
+          "id": 10,
+          "options": {
+            "cellHeight": "sm",
+            "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+            "showHeader": true,
+            "sortBy": [{ "desc": false, "displayName": "Job" }]
+          },
+          "pluginVersion": "10.0.0",
+          "title": "All Backup Jobs",
+          "transformations": [
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true, "endpoint": true, "service": true },
+                "renameByName": {
+                  "backup_name": "Job",
+                  "backup_type": "Type",
+                  "Value #success": "Success",
+                  "Value #age": "Age (hours)",
+                  "Value #size": "Size",
+                  "Value #duration": "Duration",
+                  "Value #timestamp": "Last Success"
+                }
+              }
+            }
+          ],
+          "type": "table",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_success",
+              "instant": true,
+              "legendFormat": "",
+              "refId": "success"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "(time() - backup_last_success_timestamp) / 3600",
+              "instant": true,
+              "legendFormat": "",
+              "refId": "age"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_size_bytes",
+              "instant": true,
+              "legendFormat": "",
+              "refId": "size"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_duration_seconds",
+              "instant": true,
+              "legendFormat": "",
+              "refId": "duration"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_last_success_timestamp * 1000",
+              "instant": true,
+              "legendFormat": "",
+              "refId": "timestamp"
+            }
+          ]
+        },
+
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
+          "id": 102,
+          "title": "Backup Age Over Time",
+          "type": "row"
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Age (hours)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "line+area" }
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "red",         "value": 26 }
+                ]
+              },
+              "unit": "h",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 13 },
+          "id": 20,
+          "options": {
+            "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Backup Age (hours since last success)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "(time() - backup_last_success_timestamp{backup_name=\"mailinabox\"}) / 3600",
+              "legendFormat": "mailinabox",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "(time() - backup_last_success_timestamp{backup_name=\"mariadb\"}) / 3600",
+              "legendFormat": "mariadb",
+              "refId": "B"
+            }
+          ]
+        },
+
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+          "id": 103,
+          "title": "Backup Size",
+          "type": "row"
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Size",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "stepAfter",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "green", "value": null }]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+          "id": 21,
+          "options": {
+            "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Backup Size Over Time",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_size_bytes{backup_name=\"mailinabox\"}",
+              "legendFormat": "mailinabox",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_size_bytes{backup_name=\"mariadb\"}",
+              "legendFormat": "mariadb",
+              "refId": "B"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Duration (s)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "stepAfter",
+                "lineWidth": 2,
+                "pointSize": 6,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "always",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "off" }
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "green", "value": null }]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+          "id": 22,
+          "options": {
+            "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Backup Duration Over Time",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_duration_seconds{backup_name=\"mailinabox\"}",
+              "legendFormat": "mailinabox",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "backup_duration_seconds{backup_name=\"mariadb\"}",
+              "legendFormat": "mariadb",
+              "refId": "B"
+            }
+          ]
+        },
+
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 },
+          "id": 104,
+          "title": "Collector Health",
+          "type": "row"
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "palette-classic" },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Seconds since last run",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": { "type": "linear" },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": { "group": "A", "mode": "none" },
+                "thresholdsStyle": { "mode": "line+area" }
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "transparent", "value": null },
+                  { "color": "red",         "value": 600 }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 31 },
+          "id": 30,
+          "options": {
+            "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "none" }
+          },
+          "title": "Collector Runner — Staleness",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "time() - collector_runner_last_run_timestamp",
+              "legendFormat": "seconds since last run",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [
+                { "options": { "0": { "color": "red",   "index": 0, "text": "Failed" },
+                               "1": { "color": "green", "index": 1, "text": "OK" } },
+                  "type": "value" }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red",   "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 6, "x": 12, "y": 31 },
+          "id": 31,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "value_and_name"
+          },
+          "title": "Individual Collector Status",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "collector_success",
+              "legendFormat": "{{collector_name}}",
+              "refId": "A"
+            }
+          ]
+        },
+
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green",  "value": null },
+                  { "color": "yellow", "value": 60 },
+                  { "color": "red",    "value": 120 }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 6, "x": 18, "y": 31 },
+          "id": 32,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "value_and_name"
+          },
+          "title": "Individual Collector — Last Seen",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "expr": "time() - collector_last_run_timestamp",
+              "legendFormat": "{{collector_name}}",
+              "refId": "A"
+            }
+          ]
+        }
+
+      ],
+      "refresh": "1m",
+      "schemaVersion": 38,
+      "tags": ["backups", "nas", "monitoring"],
+      "templating": {
+        "list": [
+          {
+            "current": {},
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "DS_PROMETHEUS",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": {},
+            "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+            "definition": "label_values(backup_success, instance)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Instance",
+            "multi": false,
+            "name": "instance",
+            "options": [],
+            "query": {
+              "query": "label_values(backup_success, instance)",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 2,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          }
+        ]
+      },
+      "time": { "from": "now-24h", "to": "now" },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Backup Framework",
+      "uid": "backup-framework-v1",
+      "version": 1
+    }
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
   name: nas-cadvisor
 spec:
   allowCrossNamespaceImport: true

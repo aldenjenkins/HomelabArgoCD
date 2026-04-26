@@ -237,7 +237,7 @@ spec:
             summary: "Mail-in-a-Box backup is too old"
             description: >-
               Mail-in-a-Box last successful backup was
-              {{ printf "%.1f" (div (sub (now | unixEpoch | float64) $value) 3600.0) }} hours ago
+              {{ $value | printf "%.1f" }} hours ago
               on {{ $labels.instance }}, exceeding the 26-hour threshold.
 
         # Alert if backup size is suspiciously small

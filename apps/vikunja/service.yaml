@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vikunja
+  labels:
+    app.kubernetes.io/service: vikunja
+    app.kubernetes.io/instance: vikunja
+    app.kubernetes.io/name: vikunja
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3456
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/instance: vikunja
+    app.kubernetes.io/name: vikunja

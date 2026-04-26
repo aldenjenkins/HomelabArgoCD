@@ -1,0 +1,5 @@
+namespace: vikunja
+resources:
+  - redis.yaml
+  - grafanadatasource.yaml
+  - servicemonitor.yaml

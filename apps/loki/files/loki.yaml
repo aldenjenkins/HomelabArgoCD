@@ -175,7 +175,7 @@ limits_config:
   max_streams_per_user: 0 # unlimited (we have 100000 for global, this setting is per ingester)
   max_global_streams_per_user: 100000
   max_query_series: 5000 # default is 500
-  max_line_size: 512KB  # Default is 256KB and i'd like to batch more using my logs-gateway otel collector. currently getting errors with the default 
+  max_line_size: 512KB  # Default is 256KB and i'd like to batch more using my logs-gateway otel collector. currently getting errors with the default
   max_line_size_truncate: true # truncate lines rather than drop them
   per_stream_rate_limit: 15MB # default is 3
   per_stream_rate_limit_burst: 75MB # default is 15
@@ -203,7 +203,7 @@ limits_config:
   # ingestion_rate_mb: 32
   # ingestion_burst_size_mb: 64
 
-  # max_line_size: 3MB  # Default is 256KB and i'd like to batch more using my logs-gateway otel collector. currently getting errors with the default 
+  # max_line_size: 3MB  # Default is 256KB and i'd like to batch more using my logs-gateway otel collector. currently getting errors with the default
   # for big logs tune
   # max_chunks_per_query: 2000000
   # max_streams_matchers_per_query: 1000
@@ -261,19 +261,27 @@ ruler:
     s3:
       access_key_id: minio
       secret_access_key: miniominio
-      bucketnames: loki
+      bucketnames: loki-rules
       endpoint: http://minio.minio.svc.cluster.local:9000
       # endpoint: minio.minio.svc.cluster.local:9000
       insecure: true
       s3forcepathstyle: true
     type: s3
   # rule_path: /var/loki
-  alertmanager_url: http://alertmanager-main.alertmanager.svc.cluster.local.:9093
+  # alertmanager_url: http://alertmanager-main.alertmanager.svc.cluster.local.:9093
+  # Mimir Alertmanager via SRV discovery against the headless service.
+  # Each AM pod becomes its own target in the HA group; replicas dedupe
+  # via gossip on port 9094. The port in the URL is ignored when discovery
+  # is on — SRV records provide it (8080 from the http-metrics named port).
+  alertmanager_url: http://_http-metrics._tcp.mimir-alertmanager-headless.mimir.svc.cluster.local./alertmanager
+  enable_alertmanager_discovery: true
+  alertmanager_refresh_interval: 1m # default 1m
   remote_write:
     enabled: true
     client:
       # url: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
-      url: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      # url: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      url: http://mimir-gateway.mimir.svc.cluster.local.:80/api/v1/push
   evaluation:
     mode: remote
     query_frontend:
