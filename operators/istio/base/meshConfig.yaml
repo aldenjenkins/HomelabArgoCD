@@ -160,5 +160,6 @@ spec:
             X-Forwarded-Proto: '%REQ(:SCHEME)%'
           headersToDownstreamOnDeny:
             - 'set-cookie'
+            - location
           headersToDownstreamOnAllow:
             - 'set-cookie'
