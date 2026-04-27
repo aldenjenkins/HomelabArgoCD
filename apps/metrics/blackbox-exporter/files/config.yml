@@ -30,6 +30,7 @@
   # Crucial for Cloudflare Tunnels
   "http_cloudflare_tunnel_60s":
     "timeout": "50s"
+    "prober": "http"
     "http":
       "preferred_ip_protocol": "ip4"
       # Adding a specific header can sometimes bypass edge caching
