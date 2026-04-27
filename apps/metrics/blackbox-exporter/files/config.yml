@@ -27,14 +27,6 @@
     "prober": "tcp"
     "tcp":
       "preferred_ip_protocol": "ip4"
-  # Generic DNS probe for your cluster/internal services
-  "dns_generic":
-    "prober": "dns"
-    "timeout": "5s"
-    "dns":
-      "preferred_ip_protocol": "ip4"
-      "query_type": "A"
-      "valid_rcodes": ["NOERROR"]
   # Crucial for Cloudflare Tunnels
   "http_cloudflare_tunnel_60s":
     "timeout": "50s"
