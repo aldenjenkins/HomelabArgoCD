@@ -7,17 +7,37 @@ spec:
     matchLabels:
       dashboards: grafana
   allowCrossNamespaceImport: true
+  valuesFrom:
+    - targetPath: secureJsonData.password
+      valueFrom:
+        secretKeyRef:
+          name: authelia-redis-secret
+          key: password
+    - targetPath: secureJsonData.sentinelPassword
+      valueFrom:
+        secretKeyRef:
+          name: authelia-redis-sentinel-secret
+          key: password
   datasource:
     access: proxy
     jsonData:
-      client: standalone
+      client: sentinel
+      sentinelName: authelia-redis-master
+      acl: false
+      sentinelAcl: false
       poolSize: 5
       timeout: 10
+      tlsAuth: false
+      tlsSkipVerify: false
       pingInterval: 0
       pipelineWindow: 0
     name: authelia-redis
     type: redis-datasource
-    url: redis://authelia-redis.authelia.svc.cluster.local:6379
+    url: redis://authelia-redis-sentinel-0.authelia-redis-sentinel-headless.authelia:26379,redis://authelia-redis-sentinel-1.authelia-redis-sentinel-headless.authelia:26379,redis://authelia-redis-sentinel-2.authelia-redis-sentinel-headless.authelia:26379
+    # url: redis://authelia-redis-sentinel.authelia:26379
+    secureJsonData:
+      password: $password
+      sentinelPassword: $password
   plugins:
     - name: redis-datasource
       version: latest

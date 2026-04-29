@@ -1,4 +1,8 @@
+namespace: authelia
 resources:
-  - redis.yaml
+  - redisreplication.yaml
+  - redissentinel.yaml
   # - grafanadatasource.yaml
-  - servicemonitor.yaml
+  # - servicemonitor.yaml
+generators:
+  - sopsgenerator.yaml

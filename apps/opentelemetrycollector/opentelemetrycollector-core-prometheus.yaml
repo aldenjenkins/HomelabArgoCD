@@ -729,8 +729,9 @@ spec:
                 #   regex: (kube-system|homelab-system)
                 #   source_labels:
                 #     - __meta_kubernetes_namespace
+                # drop redis operator services that auto-annotate scrape but have no exporter
                 - action: drop
-                  regex: (.+)-redis-additional
+                  regex: (.+)-redis-(additional|master|replica|sentinel|sentinel-additional|sentinel-headless)
                   source_labels:
                     - __meta_kubernetes_service_name
                 - action: drop

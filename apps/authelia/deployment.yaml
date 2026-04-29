@@ -1,4 +1,3 @@
-# Source: authelia/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,20 +7,19 @@ metadata:
     component: authelia
     app.kubernetes.io/name: authelia
     app.kubernetes.io/instance: authelia
-    app.kubernetes.io/version: 4.38.17
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: authelia
       app.kubernetes.io/instance: authelia
   revisionHistoryLimit: 5
-  replicas: 2
+  replicas: 3
   minReadySeconds: 0
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: "100%"
-      maxUnavailable: 25%
+      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -29,16 +27,18 @@ spec:
         component: authelia
         app.kubernetes.io/name: authelia
         app.kubernetes.io/instance: authelia
-        # sidecar.istio.io/inject: "true"
-        app.kubernetes.io/version: 4.38.17
     spec:
       hostNetwork: false
       hostPID: false
       hostIPC: false
       affinity:
-        nodeAffinity: {}
-        podAffinity: {}
-        podAntiAffinity: {}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: authelia
+                  app.kubernetes.io/instance: authelia
+              topologyKey: kubernetes.io/hostname
       enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
@@ -138,6 +138,25 @@ spec:
           configMap:
             name: authelia-config
         - name: authelia-secret-files
-          secret:
-            secretName: authelia-secret-files
+          projected:
+            defaultMode: 0400
+            sources:
+              # Existing Authelia secret files.
+              # This preserves your current /secrets/<key> files.
+              - secret:
+                  name: authelia-secret-files
+              # Redis data-node password:
+              # becomes /secrets/redis/password
+              - secret:
+                  name: authelia-redis-secret
+                  items:
+                    - key: password
+                      path: redis/password
+              # Redis Sentinel password:
+              # becomes /secrets/redis/ha-password
+              - secret:
+                  name: authelia-redis-sentinel-secret
+                  items:
+                    - key: password
+                      path: redis/ha-password
       automountServiceAccountToken: false

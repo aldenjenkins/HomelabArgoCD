@@ -1,0 +1,109 @@
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisReplication
+metadata:
+  name: authelia-redis
+spec:
+  # High Availability Configuration
+  # 1 master + 2 replicas for robust failover
+  clusterSize: 3
+
+  # Kubernetes Configuration
+  kubernetesConfig:
+    image: quay.io/opstree/redis:v8.6.2
+    imagePullPolicy: IfNotPresent
+    redisSecret:
+      name: authelia-redis-secret
+      key: password
+
+    # Resource allocation for platform workloads
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+
+  # Note: External LoadBalancer service defined separately in platform-kv-repl-svc.yaml
+  # Redis Configuration
+  # redisConfig:
+  #   additionalRedisConfig: redis-external-config
+
+  # Persistent Storage
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi
+
+  # Pod Anti-Affinity for HA
+  # Ensure Redis pods are spread across different nodes
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - authelia-redis
+          topologyKey: kubernetes.io/hostname
+
+  # Redis Exporter for Monitoring
+  redisExporter:
+    enabled: true
+    image: quay.io/opstree/redis-exporter
+    imagePullPolicy: IfNotPresent
+    securityContext:                      # applied to ALL containers incl. exporter
+      allowPrivilegeEscalation: false     # CRITICAL
+      readOnlyRootFilesystem: true        # HIGH
+      runAsNonRoot: true                  # HIGH (belt-and-suspenders at container level)
+      runAsUser: 1000
+      capabilities:                       # CRITICAL
+        drop: ["ALL"]
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+  # Health Checks
+  readinessProbe:
+    failureThreshold: 5
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    successThreshold: 1
+    timeoutSeconds: 5
+  livenessProbe:
+    failureThreshold: 5
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  # Pod Disruption Budget
+  pdb:
+    enabled: true
+    maxUnavailable: 1
+
+  # Security Context
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: false # Redis needs write for RDB/AOF
+    runAsNonRoot: true
