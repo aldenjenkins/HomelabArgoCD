@@ -69,7 +69,7 @@ spec:
             #     readOnlyRootFilesystem: true
       containers:
         - name: forgejo
-          image: codeberg.org/forgejo/forgejo:15.0.0-rootless
+          image: codeberg.org/forgejo/forgejo:15.0.1-rootless
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
