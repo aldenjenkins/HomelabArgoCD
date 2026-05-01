@@ -1,12 +1,12 @@
 namespace: x509-certificate-exporter
 resources:
   - namespace.yaml
-  - clusterrole.yaml
-  - clusterrolebinding.yaml
-  - daemonset.yaml
-  - deployment.yaml
-  - prometheusrule.yaml
-  - service.yaml
-  - serviceaccount.yaml
-  - servicemonitor.yaml
-  - grafanadashboard.yaml
+  # - clusterrole.yaml
+  # - clusterrolebinding.yaml
+  # - daemonset.yaml
+  # - deployment.yaml
+  # - prometheusrule.yaml
+  # - service.yaml
+  # - serviceaccount.yaml
+  # - servicemonitor.yaml
+  # - grafanadashboard.yaml

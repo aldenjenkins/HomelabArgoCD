@@ -892,6 +892,7 @@ spec:
     matchLabels:
       dashboards: "grafana"
   resyncPeriod: 10m
+  suspend: false
   datasources:
     - inputName: "DS_LXD-HOSTS"
       datasourceName: "prometheus"
@@ -971,7 +972,7 @@ spec:
       "liveNow": false,
       "panels": [
         {
-          "collapsed": true,
+          "collapsed": false,
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -1084,7 +1085,7 @@ spec:
                   },
                   "editorMode": "code",
                   "exemplar": true,
-                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}",
                   "interval": "",
                   "legendFormat": "available",
                   "range": true,
@@ -1097,7 +1098,7 @@ spec:
                   },
                   "editorMode": "code",
                   "exemplar": true,
-                  "expr": "zfs_dataset_used_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}",
+                  "expr": "zfs_dataset_used_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "used",
@@ -1111,7 +1112,7 @@ spec:
                   },
                   "editorMode": "code",
                   "exemplar": true,
-                  "expr": "zfs_pool_size_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\"}",
+                  "expr": "zfs_pool_size_bytes{instance=\"$instance\",pool=\"$pool_name\"}",
                   "hide": false,
                   "interval": "",
                   "legendFormat": "size",
@@ -1186,7 +1187,7 @@ spec:
                   },
                   "editorMode": "code",
                   "exemplar": false,
-                  "expr": "((zfs_pool_allocated_bytes{instance=\"$instance:9134\",pool=\"$pool_name\"} * 100) / zfs_pool_size_bytes{instance=\"$instance:9134\",job=\"nas\", pool=\"$pool_name\"})",
+                  "expr": "((zfs_pool_allocated_bytes{instance=\"$instance\",pool=\"$pool_name\"} * 100) / zfs_pool_size_bytes{instance=\"$instance\", pool=\"$pool_name\"})",
                   "instant": true,
                   "interval": "",
                   "legendFormat": "{{pool}}",
@@ -1285,7 +1286,7 @@ spec:
                     "uid": "${DS_LXD-HOSTS}"
                   },
                   "editorMode": "code",
-                  "expr": "zfs_dataset_used_bytes{instance=\"$instance:9134\", pool=\"$pool_name\"}",
+                  "expr": "zfs_dataset_used_bytes{instance=\"$instance\", pool=\"$pool_name\"}",
                   "legendFormat": "{{name}}",
                   "range": true,
                   "refId": "A"
@@ -1396,7 +1397,7 @@ spec:
                   },
                   "editorMode": "code",
                   "exemplar": false,
-                  "expr": "zfs_pool_health{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\"}",
+                  "expr": "zfs_pool_health{instance=\"$instance\",pool=\"$pool_name\"}",
                   "instant": true,
                   "interval": "",
                   "legendFormat": "pool: {{pool}}",
@@ -1462,7 +1463,7 @@ spec:
                     "uid": "${DS_LXD-HOSTS}"
                   },
                   "editorMode": "code",
-                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0)",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0)",
                   "legendFormat": "100%",
                   "range": true,
                   "refId": "A"
@@ -1473,7 +1474,7 @@ spec:
                     "uid": "${DS_LXD-HOSTS}"
                   },
                   "editorMode": "code",
-                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.95",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.95",
                   "hide": false,
                   "legendFormat": "95%",
                   "range": true,
@@ -1485,7 +1486,7 @@ spec:
                     "uid": "${DS_LXD-HOSTS}"
                   },
                   "editorMode": "code",
-                  "expr": "zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance:9134\",job=\"nas\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.9",
+                  "expr": "zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}/abs(delta(zfs_dataset_available_bytes{instance=\"$instance\",pool=\"$pool_name\", name=\"$pool_name\"}[1d]) < 0) * 0.9",
                   "hide": false,
                   "legendFormat": "90%",
                   "range": true,
@@ -1832,7 +1833,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "topk(10, zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"})",
+              "expr": "topk(10, zfs_dataset_used_bytes{instance=\"$instance\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"})",
               "legendFormat": "{{name}}",
               "range": true,
               "refId": "A"
@@ -1940,7 +1941,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "delta(zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\"}[2h])",
+              "expr": "delta(zfs_dataset_used_bytes{instance=\"$instance\", name=~\"$pool_name/.*\", pool=\"$pool_name\"}[2h])",
               "legendFormat": "{{name}}",
               "range": true,
               "refId": "A"
@@ -2032,7 +2033,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "topk(5, rate(zfs_dataset_written_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[4h]))",
+              "expr": "topk(5, rate(zfs_dataset_written_bytes{instance=\"$instance\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[4h]))",
               "interval": "",
               "legendFormat": "{{name}}",
               "range": true,
@@ -2114,7 +2115,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "topk(5, rate(zfs_dataset_used_bytes{instance=\"$instance:9134\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[24h]))",
+              "expr": "topk(5, rate(zfs_dataset_used_bytes{instance=\"$instance\", name=~\"$pool_name/.*\", pool=\"$pool_name\", type=\"filesystem\"}[24h]))",
               "legendFormat": "{{name}}",
               "range": true,
               "refId": "A"
@@ -2242,7 +2243,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_disk_read_time_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])/irate(node_disk_reads_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m]) * 100",
+              "expr": "irate(node_disk_read_time_seconds_total{instance=\"$instance\"}[5m])/irate(node_disk_reads_completed_total{instance=\"$instance\"}[5m]) * 100",
               "legendFormat": "{{device}} sec-per-Read-completed",
               "range": true,
               "refId": "A"
@@ -2253,7 +2254,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_disk_write_time_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])/irate(node_disk_writes_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m]) * 100",
+              "expr": "irate(node_disk_write_time_seconds_total{instance=\"$instance\"}[5m])/irate(node_disk_writes_completed_total{instance=\"$instance\"}[5m]) * 100",
               "hide": false,
               "legendFormat": "{{device}} sec-per-Write-completed",
               "range": true,
@@ -2317,7 +2318,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "node_zfs_arc_size{instance=\"$instance:9100\", job=\"nas\"}",
+              "expr": "node_zfs_arc_size{instance=\"$instance\"}",
               "hide": false,
               "legendFormat": "ARC Free",
               "range": true,
@@ -2430,7 +2431,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_schedstat_running_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "expr": "irate(node_schedstat_running_seconds_total{instance=\"$instance\"}[5m])",
               "legendFormat": "CPU {{cpu}} - seconds spent by this CPU running a process",
               "range": true,
               "refId": "A"
@@ -2441,7 +2442,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_schedstat_waiting_seconds_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "expr": "irate(node_schedstat_waiting_seconds_total{instance=\"$instance\"}[5m])",
               "hide": false,
               "legendFormat": "CPU {{ cpu }} - seconds spent by processing waiting for this CPU",
               "range": true,
@@ -2550,7 +2551,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_disk_reads_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "expr": "irate(node_disk_reads_completed_total{instance=\"$instance\"}[5m])",
               "legendFormat": "{{device}}-Reads Completed",
               "range": true,
               "refId": "A"
@@ -2561,7 +2562,7 @@ spec:
                 "uid": "${DS_LXD-HOSTS}"
               },
               "editorMode": "code",
-              "expr": "irate(node_disk_writes_completed_total{instance=\"$instance:9100\",job=\"nas\"}[5m])",
+              "expr": "irate(node_disk_writes_completed_total{instance=\"$instance\"}[5m])",
               "hide": false,
               "legendFormat": "{{device}}-writes Completed",
               "range": true,
@@ -2579,7 +2580,10 @@ spec:
       "templating": {
         "list": [
           {
-            "current": {},
+            "current": {
+              "text": "nas",
+              "value": "nas"
+            },
             "datasource": {
               "type": "prometheus",
               "uid": "${DS_LXD-HOSTS}"
@@ -2596,13 +2600,16 @@ spec:
               "refId": "PrometheusVariableQueryEditor-VariableQuery"
             },
             "refresh": 1,
-            "regex": "/(.+):\\d+$/",
+            "regex": "",
             "skipUrlSync": false,
             "sort": 0,
             "type": "query"
           },
           {
-            "current": {},
+            "current": {
+              "text": "vault",
+              "value": "vault"
+            },
             "datasource": {
               "type": "prometheus",
               "uid": "${DS_LXD-HOSTS}"
@@ -2625,7 +2632,10 @@ spec:
             "type": "query"
           },
           {
-            "current": {},
+            "current": {
+              "text": "home-server",
+              "value": "home-server"
+            },
             "datasource": {
               "type": "prometheus",
               "uid": "${DS_LXD-HOSTS}"
