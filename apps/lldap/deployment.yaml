@@ -29,7 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: lldap
-          image: ghcr.io/lldap/lldap:v0.6.2-alpine-rootless
+          image: ghcr.io/lldap/lldap:v0.6.3-alpine-rootless
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
