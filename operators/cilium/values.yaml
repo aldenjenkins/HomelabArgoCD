@@ -9,7 +9,9 @@ bpf:
   masquerade: true
   # masquerade: false
   preallocateMaps: true
-  tproxy: true
+  # 2026-05-03 updating to newest cilium version (today its 1.19.3) and this is not compatible with netkit mode
+  # tproxy: true
+  tproxy: false
 bpfClockProbe: true
 bgpControlPlane:
   enabled: true
@@ -32,7 +34,6 @@ endpointRoutes:
 envoy:
   enabled: false
 hubble:
-  # enabled: false
   enabled: false
   relay:
     enabled: false

@@ -23,41 +23,43 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
-      prometheusremotewrite/thanos:
-        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
-        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
-        add_metric_suffixes: false
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: true
-        remote_write_queue:
-          enabled: true
-          num_consumers: 50
-          queue_size: 1000
-        timeout: 10s
+      # prometheusremotewrite/thanos:
+      #   # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      #   add_metric_suffixes: false
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: true
+      #   remote_write_queue:
+      #     enabled: true
+      #     num_consumers: 50
+      #     queue_size: 1000
+      #   timeout: 10s
       prometheusremotewrite/mimir:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
-        add_metric_suffixes: false
+        # add_metric_suffixes: false
+        translation_strategy: UnderscoreEscapingWithoutSuffixes # <- new equivalent
         tls:
           insecure: true
         retry_on_failure:
           enabled: true
         remote_write_queue:
           enabled: true
-          num_consumers: 50
+          # num_consumers: 50
           queue_size: 1000
+        max_batch_request_parallelism: 50
         timeout: 10s
-      otlphttp/prometheus:
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: true
-        sending_queue:
-          num_consumers: 50
-        timeout: 30s
+      # otlphttp/prometheus:
+      #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: true
+      #   sending_queue:
+      #     num_consumers: 50
+      #   timeout: 30s
     extensions:
       pprof: {}
       health_check:
@@ -229,7 +231,7 @@ spec:
               # - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"])
               - set(resource.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil
               - set(resource.attributes["k8s.container.name"], resource.attributes["k8s_container_name"]) where resource.attributes["k8s_container_name"] != nil
-      k8sattributes:
+      k8s_attributes:
         auth_type: serviceAccount
         extract:
           labels:
@@ -402,7 +404,7 @@ spec:
                     - __meta_kubernetes_pod_label_app_kubernetes_io_part_of
                     - __meta_kubernetes_pod_label_app_kubernetes_io_component
                 # - action: keep
-                #   regex: 
+                #   regex:
                 #   source_labels:
                 #     - __meta_kubernetes_pod_label_app_kubernetes_io_name
                 # - action: keep
@@ -527,7 +529,7 @@ spec:
             - batch
             - groupbyattrs
             - transform/set_match_resource_attributes
-            - k8sattributes
+            - k8s_attributes
             - transform/label_metrics
             - transform/normalize_service_name
           receivers:
@@ -548,5 +550,7 @@ spec:
                     port: 8888
                     without_units: true
         resource:
-          homelab_otel_component: selfmetrics-collector
+          attributes:
+            - name: homelab_otel_component
+              value: selfmetrics-collector
 

@@ -38,7 +38,7 @@ spec:
         verbosity: detailed
 
       # Exporter for sending Prometheus data to Mimir.
-      otlphttp/loki:
+      otlp_http/loki:
         compression: gzip
         endpoint: http://loki-gateway.loki/otlp
         tls:
@@ -100,7 +100,7 @@ spec:
       pipelines:
         logs/events:
           exporters:
-            - otlphttp/loki
+            - otlp_http/loki
           processors:
             - resource/extra_structured_metadata
             - batch

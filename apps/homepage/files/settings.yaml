@@ -1,3 +1,4 @@
+# https://gethomepage.dev/configs/settings/
 title: Homelab Dashboard
 background:
   image: https://cdnb.artstation.com/p/assets/images/images/006/897/659/large/mikael-gustafsson-wallpaper-mikael-gustafsson.jpg
@@ -7,42 +8,79 @@ background:
   opacity: 100  # 0-100
 theme: dark
 color: slate
+# https://developer.mozilla.org/en-US/docs/Web/Manifest/start_url
+# Used by some browsers to determine the start page of the web application
+startUrl: https://homepage.home.alden.ai
+base: https://homepage.home.alden.ai
+# make all cards in a row the same height.
 useEqualHeights: true
-disableCollapse: true
+# disableCollapse: true
+disableCollapse: false
 # Show pod cpu/mem stats
 showStats: true
 # headerStyle: clean
+# headerStyle: boxed
+headerStyle: boxedWidgets
+disableIndexing: true
 target: _blank
+language: en
+quicklaunch:
+  searchDescriptions: true # default false
+  hideInternetSearch: false # default false
+  showSearchSuggestions: true # default false. show search suggestions for the internet search. If this is not specified then the setting will be inherited from the search widget.
+  mobileButtonPosition: top-right # default empty, disabling the feature.
+  hideVisitURL: false # default false, enabling the feature. toggles disabling detecting and offering an option to open URLs.
+  provider: custom # search engine provider. if none is specified it will use the provider set for the search widget, if neither is set, internet search is disabled.
+  url: https://search.home.alden.ai/search?q=
+  target: _blank
+  suggestionUrl: https://ac.ecosia.org/autocomplete?type=list&q=
+disableUpdateCheck: true # enabled by default
 layout:
   AI:
+    tab: Main
+    icon: mdi-chart-bell-curve-cumulative
     header: true
     style: row
     columns: 2
   Development:
+    tab: Main
+    icon: mdi-apps
     header: true
     style: row
     columns: 3
   Home:
+    tab: Home
+    icon: mdi-home
     header: true
     style: row
     columns: 4
   Media:
+    tab: Media
+    icon: mdi-multimedia
     header: true
     style: row
     columns: 3
   Privacy:
+    tab: Cluster
+    icon: mdi-security
     header: true
     style: row
     columns: 3
   Infrastructure & Monitoring:
+    tab: Cluster
+    icon: mdi-eye
     header: true
     style: row
     columns: 3
   Other:
+    tab: Cluster
+    icon: mdi-tools
     header: true
     style: row
     columns: 3
   Documents:
+    tab: Media
+    icon: mdi-file-document-multiple
     header: true
     style: row
     columns: 3

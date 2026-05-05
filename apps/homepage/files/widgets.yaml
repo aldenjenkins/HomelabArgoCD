@@ -19,18 +19,29 @@
       # Shows the label, which is always the node name
       showLabel: true
 - resources:
-    backend: resources
+    label: System
     expanded: true
     cpu: true
     memory: true
-    network: default
-- search:
-    provider: custom # google, duckduckgo, bing, baidu, brave or custom
-    focus: true # Optional, will set focus to the search bar on page load
-    url: https://search.home.alden.ai/search?q=
-    showSearchSuggestions: true # Optional
-    suggestionUrl: https://ac.ecosia.org/autocomplete?type=list&q=
-    target: _blank
+    uptime: true
+    cputemp: true
+    tempmin: 20
+    tempmax: 75 # good recs are that warning = 75-80c, critical=85-90c, emergency=95c+
+    units: metric
+    # network: true # default = true
+    network: default # or specify a network interface name
+- resources:
+    label: Network (Just this pod)
+    expanded: true
+    network: true
+# 2026-05-02 disabling to instead just use the QuickLaunch integration for internet search
+# - search:
+#     provider: custom # google, duckduckgo, bing, baidu, brave or custom
+#     focus: false # Optional, will set focus to the search bar on page load
+#     url: https://search.home.alden.ai/search?q=
+#     showSearchSuggestions: true # Optional
+#     suggestionUrl: https://ac.ecosia.org/autocomplete?type=list&q=
+#     target: _blank
 - openmeteo:
     label: Austin # optional
     latitude: 30.266555

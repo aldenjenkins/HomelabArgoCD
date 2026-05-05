@@ -21,7 +21,17 @@ limits:
   # Compactor
   compactor_blocks_retention_period: 1y
   # Out-of-order
-  out_of_order_time_window: 30m
+  # TODO: Maybe we can set this back to 0?
+  # (experimental) Non-zero value enables out-of-order support for most recent
+  # samples that are within the time window in relation to the TSDB's maximum
+  # time, i.e., within [db.maxTime-timeWindow, db.maxTime]). The ingester will
+  # need more memory as a factor of rate of out-of-order samples being ingested
+  # and the number of series that are getting out-of-order samples. If query falls
+  # into this window, cached results will use value from
+  # -query-frontend.results-cache-ttl-for-out-of-order-time-window option to
+  # specify TTL for resulting cache entry.
+  # CLI flag: -ingester.out-of-order-time-window
+  out_of_order_time_window: 30m # default = 0s
   # Ruler limits
   ruler_max_rules_per_rule_group: 50
   ruler_max_rule_groups_per_tenant: 100
@@ -34,7 +44,12 @@ limits:
   # This presents caching incomplete results
   max_cache_freshness: 10m
   cardinality_analysis_enabled: true
-  query_ingesters_within: &query_ingesters_within 4h  # *query_store_after + 1
+  # 2026-05-02 reverting to default mimir config values to reduce MimirHighNumberOfLevel1BlocksQueried alerts
+  # query_ingesters_within: &query_ingesters_within 4h  # *query_store_after + 1
+  query_ingesters_within: &query_ingesters_within 13h  # *query_store_after + 1
+  ruler_alertmanager_client_config:
+    # alertmanager_url: dnssrvnoa+http://_web._tcp.alertmanager-operated.alertmanager.svc.cluster.local.
+    alertmanager_url: dnssrvnoa+http://_http-metrics._tcp.mimir-alertmanager-headless.mimir.svc.cluster.local./alertmanager
 
 ingester_client:
   grpc_client_config:
@@ -79,7 +94,9 @@ ingest_storage:
 querier:
   # Query ingesters for recent data and store-gateway for historical
   # query_store_after: 12h
-  query_store_after: &query_store_after 3h
+  # query_store_after: &query_store_after 3h
+  # 2026-05-02 attempting to reduce the MimirHighNumberOfLevel1BlocksQueried alert
+  query_store_after: &query_store_after 12h
   max_concurrent: 16  # Default 20
   timeout: &timeout 2m
 
@@ -99,6 +116,17 @@ frontend:
   log_queries_longer_than: 10s
   parallelize_shardable_queries: true
   cache_results: true
+  # TODO maybe try this for speedups?
+  # (experimental) If set to true and the Mimir query engine is in use, use remote
+  # execution to evaluate queries in queriers.
+  # CLI flag: -query-frontend.enable-remote-execution
+  enable_remote_execution: false  # default = false
+  # TODO maybe try this for speedups?
+  # (experimental) Set to true to enable performing query sharding inside the
+  # Mimir query engine (MQE). This setting has no effect if sharding is disabled.
+  # Requires remote execution and MQE to be enabled.
+  # CLI flag: -query-frontend.use-mimir-query-engine-for-sharding
+  use_mimir_query_engine_for_sharding: false # default = false
   results_cache:
     backend: memcached
     memcached:
@@ -108,9 +136,11 @@ frontend:
     compression: snappy
   # Connect to query-scheduler instead of embedding the queue
   scheduler_address: mimir-query-scheduler-headless.mimir.svc.cluster.local.:9095
-  split_queries_by_interval: 6h
+  # 2026-05-02 MimirHighNumberOfLevel1BlocksQueried alert remediation
+  # split_queries_by_interval: 6h
+  split_queries_by_interval: 24h # default 24h
   query_sharding_target_series_per_shard: 2500
-  scheduler_worker_concurrency: 5
+  scheduler_worker_concurrency: 5 # default = 5
   grpc_client_config:
     max_recv_msg_size: *max_recv_msg_size
     max_send_msg_size: *max_send_msg_size
@@ -124,6 +154,11 @@ frontend_worker:
   query_scheduler_grpc_client_config:
     max_recv_msg_size: *max_recv_msg_size
     max_send_msg_size: *max_send_msg_size
+  # (experimental) Enables streaming of responses from querier to query-frontend
+  # for response types that support it (currently only `active_series` responses
+  # do).
+  # CLI flag: -querier.response-streaming-enabled
+  response_streaming_enabled: true # default false
 
 # Query scheduler - enables query queuing and fair scheduling
 query_scheduler:
@@ -137,8 +172,6 @@ query_scheduler:
 ruler:
   external_url: https://mimir.home.alden.ai/alertmanager
   enable_api: true
-  # alertmanager_url: dnssrvnoa+http://_web._tcp.alertmanager-operated.alertmanager.svc.cluster.local.
-  alertmanager_url: dnssrvnoa+http://_http-metrics._tcp.mimir-alertmanager-headless.mimir.svc.cluster.local./alertmanager
   query_frontend:
     address: dns:///mimir-query-frontend.mimir.svc.cluster.local.:9095
     grpc_client_config:
@@ -157,12 +190,14 @@ compactor:
     kvstore:
       store: memberlist
   # Time before a block marked for deletion is deleted from bucket
-  deletion_delay: 2h  # default valu from helm chart's templated manifest. normal default it 12h
+  # 2026-05-02 MimirHighNumberOfLevel1BlocksQueried resolution step
+  # deletion_delay: 2h  # default valu from helm chart's templated manifest. normal default it 12h
+  deletion_delay: 12h # default = 12h
   # Block ranges for compaction
   block_ranges:
-    - 2h
-    - 12h
-    - 24h
+    - 2h0m0s
+    - 12h0m0s
+    - 24h0m0s
 
 # Store gateway configuration
 store_gateway:
@@ -187,7 +222,15 @@ blocks_storage:
     insecure: true
   bucket_store:
     sync_dir: /data/tsdb-sync
-    ignore_blocks_within: 2h # *query_store_after - 1
+    # (advanced) Blocks with minimum time within this duration are ignored, and
+    # not loaded by store-gateway. Useful when used together with
+    # -querier.query-store-after to prevent loading young blocks, because there
+    # are usually many of them (depending on number of ingesters) and they are not
+    # yet compacted. Negative values or 0 disable the filter.
+    # CLI flag: -blocks-storage.bucket-store.ignore-blocks-within
+    # 2026-05-02 going back to default mimir config values to reduce MimirHighNumberOfLevel1BlocksQueried alerts
+    # ignore_blocks_within: 2h # *query_store_after - 1
+    ignore_blocks_within: 10h # *query_store_after - 2
     # Index cache configuration - using embedded memcached sidecar
     index_cache:
       backend: memcached
@@ -223,8 +266,24 @@ blocks_storage:
         max_idle_connections: 150
   tsdb:
     dir: /data/tsdb
+    # TSDB blocks retention in the ingester before a block is removed. If shipping
+    # is enabled, the retention will be relative to the time when the block was
+    # uploaded to storage. If shipping is disabled then its relative to the
+    # creation time of the block. This should be larger than the
+    # -blocks-storage.tsdb.block-ranges-period, -querier.query-store-after and
+    # large enough to give store-gateways and queriers enough time to discover
+    # newly uploaded blocks.
+    # CLI flag: -blocks-storage.tsdb.retention-period
     retention_period: *query_ingesters_within
-    ship_interval: 1m  # default
+    # (advanced) How frequently the TSDB blocks are scanned and new ones are
+    # shipped to the storage. 0 means shipping is disabled.
+    ship_interval: 1m  # default 1m
+    # (advanced) How frequently the ingester checks whether the TSDB head should
+    # be compacted and, if so, triggers the compaction. Mimir applies a jitter to
+    # the first check, and subsequent checks will happen at the configured
+    # interval. A block is only created if data covers the smallest block range.
+    # The configured interval must be between 0 and 15 minutes.
+    # CLI flag: -blocks-storage.tsdb.head-compaction-interval
     head_compaction_interval: 15m
     flush_blocks_on_shutdown: true
 

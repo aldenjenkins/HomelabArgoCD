@@ -3,6 +3,8 @@ kind: OpenTelemetryCollector
 metadata:
   name: trace
 spec:
+  args:
+    feature-gates: connector.spanmetrics.includeCollectorInstanceID
   autoscaler:
     maxReplicas: 3
     minReplicas: 1
@@ -37,7 +39,7 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#connectors
     connectors:
       # The spanmetrics connector is used to output span metrics based on received trace spans.
-      spanmetrics:
+      span_metrics:
 
         namespace: traces.spanmetrics  # Prefix all metrics with `traces.spanmetrics` (this becomes `traces_spanmetrics`) because by default it's traces.span_metrics
 
@@ -51,7 +53,10 @@ spec:
           - name: k8s.cluster.name
           - name: http.method
             default: GET
-          - name: http.target
+          # 2026-05-04 this http.target creates high cardinality because it includes query attributes in the url
+          # so we're replacing this with http.route below
+          # - name: http.target
+          - name: http.route
           - name: http.status_code
           - name: service.version
 
@@ -78,8 +83,8 @@ spec:
           - telemetry.sdk.language
           - telemetry.sdk.name
 
-      # The servicegraph connector is used to output service node metrics based on received trace spans.
-      servicegraph:
+      # The service_graph connector is used to output service node metrics based on received trace spans.
+      service_graph:
         # # Explicitly flush metrics every 60 seconds. Note, this will double active series count for the
         # # `trace.servicegraph` metric namespace.
         # metrics_flush_interval: 60s
@@ -142,7 +147,7 @@ spec:
           - k8s_namespace_name
           - k8s.pod.ip
 
-      k8sattributes:
+      k8s_attributes:
         auth_type: "serviceAccount"
         passthrough: false
         wait_for_metadata: true
@@ -224,6 +229,17 @@ spec:
               # Rename the `traces.spanmetrics.calls` metric to `traces.spanmetrics.calls.total` to pre-suffix name.
               - set(metric.name, "traces.spanmetrics.calls.total") where metric.name == "traces.spanmetrics.calls"
 
+      transform/sanitize_spans:
+        error_mode: ignore
+        trace_statements:
+          - context: span
+            statements:
+              # Rewrite span.name to OTel semconv low-cardinality form to prevent span metrics cardinality explosion..
+              # The second arg preserves the original name on the span as an attribute,
+              # so traces still show the full URL — only metrics get the sanitized name.
+              # - set_semconv_span_name("1.37.0", "unsanitized_span_name")
+              - set_semconv_span_name("1.37.0")
+
     # Define the protocols to receive data for.
     # See https://opentelemetry.io/docs/collector/configuration/#receivers
     receivers:
@@ -248,7 +264,7 @@ spec:
       # debug:
       #   verbosity: detailed
 
-      otlp/cluster-local-metrics:
+      otlp_grpc/cluster-local-metrics:
         endpoint: http://otlp-collector.observability.svc.cluster.local:4317
         retry_on_failure:
           enabled: true
@@ -257,7 +273,7 @@ spec:
           insecure: true
 
       # Exporter for sending trace data to Tempo.
-      otlphttp/tempo:
+      otlp_http/tempo:
         endpoint: http://tempo-gateway.tempo.svc.cluster.local./otlp
         tls:
           insecure: true
@@ -286,8 +302,8 @@ spec:
             - batch
           # Generate span metrics from within the OpenTelemetry Collector as well as exporting traces to Tempo.
           exporters:
-            - spanmetrics
-            - servicegraph
+            - span_metrics
+            - service_graph
 
         traces/tempo:
           receivers:
@@ -295,11 +311,11 @@ spec:
           processors:
             - memory_limiter
             - groupbyattrs
-            - k8sattributes
+            - k8s_attributes
             # - probabilistic_sampler
             - batch
           exporters:
-            - otlphttp/tempo
+            - otlp_http/tempo
 
         # Define the metrics pipeline.
         # metrics:
@@ -311,13 +327,13 @@ spec:
         # Define the metrics pipeline.
         # metrics/spanmetrics:
         metrics:
-          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, servicegraph, exceptions]
-          receivers: [spanmetrics, servicegraph]
+          # receivers: [otlp, otlp/internal_metrics, kubeletstats, k8s_cluster, spanmetrics, service_graph, exceptions]
+          receivers: [span_metrics, service_graph]
           # Use the `batch` processor to process received metrics, use the transform metric to ensure that spanmetric
           # metrics are in the correct format for Grafana Cloud (doesn't take effect unless receivers above are used.)
           processors: [transform/span_metrics, batch]
           # Export to the `prometheusremtotewrite` exporter.
-          exporters: [otlp/cluster-local-metrics]
+          exporters: [otlp_grpc/cluster-local-metrics]
 
       extensions:
         - health_check

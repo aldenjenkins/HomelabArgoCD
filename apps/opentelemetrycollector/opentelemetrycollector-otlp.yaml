@@ -35,31 +35,33 @@ spec:
       debug:
         verbosity: detailed
 
-      # Exporter for sending Prometheus data to Mimir.
-      prometheusremotewrite/thanos:
-        # Don't add suffixes to the metrics. We've already renamed the `traces.spanmetrics.calls` metric to
-        # `traces.spanmetrics.calls.total`, and we don't want to add the `_milliseconds` suffix to the
-        # `traces.spanmetrics.latency` metric.
-        add_metric_suffixes: false
-        # Send to the locally running Mimir service.
-        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
-        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
-        # TLS is not enabled for the instance.
-        tls:
-          insecure: true
+      # # Exporter for sending Prometheus data to Mimir.
+      # prometheusremotewrite/thanos:
+      #   # Don't add suffixes to the metrics. We've already renamed the `traces.spanmetrics.calls` metric to
+      #   # `traces.spanmetrics.calls.total`, and we don't want to add the `_milliseconds` suffix to the
+      #   # `traces.spanmetrics.latency` metric.
+      #   add_metric_suffixes: false
+      #   # Send to the locally running Mimir service.
+      #   # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      #   # TLS is not enabled for the instance.
+      #   tls:
+      #     insecure: true
 
       prometheusremotewrite/mimir:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
-        add_metric_suffixes: false
+        # add_metric_suffixes: false
+        translation_strategy: UnderscoreEscapingWithoutSuffixes # <- new equivalent
         tls:
           insecure: true
         retry_on_failure:
           enabled: true
         remote_write_queue:
           enabled: true
-          num_consumers: 50
+          # num_consumers: 50
           queue_size: 1000
+        max_batch_request_parallelism: 50
         timeout: 10s
 
       # prometheusremotewrite/keda:
@@ -135,7 +137,7 @@ spec:
       #     - k8s.node.name
 
       # Most of these below processors were taken from this: https://github.com/softwaremill/meerkat/blob/3d5d8590fac865d4d672210475019e8b7c330ae0/otel/jvm-collector.yaml#L87-L102
-      k8sattributes:
+      k8s_attributes:
         auth_type: serviceAccount
         passthrough: false
         wait_for_metadata: true
@@ -315,22 +317,22 @@ spec:
         - health_check
       pipelines:
         metrics:
-          receivers: 
+          receivers:
           - otlp
-          processors: 
+          processors:
           - memory_limiter
           - resource/set_known_attributes
           - resource/drop_attributes
           - metricstransform/add_standard_labels
           - resource/service-instance
-          - batch 
+          - batch
           - transform/set_match_resource_attributes
           - groupbyattrs
-          - k8sattributes
+          - k8s_attributes
           # - resourcedetection/homelab
           - transform/label_metrics
           - transform/cleanup_empty_labels
-          exporters: 
+          exporters:
           # - forward/keda
           # - prometheusremotewrite/thanos
           - prometheusremotewrite/mimir
@@ -356,4 +358,6 @@ spec:
                     port: 8888
                     without_units: true
         resource:
-          homelab_otel_component: otlp-collector
+          attributes:
+            - name: homelab_otel_component
+              value: otlp-collector

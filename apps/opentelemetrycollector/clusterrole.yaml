@@ -111,7 +111,7 @@ rules:
     resources:
       - configmaps
       - secrets
-    verbs: ["get"]
+    verbs: ["get", "list", "watch"]
   - apiGroups:
       - discovery.k8s.io
     resources:

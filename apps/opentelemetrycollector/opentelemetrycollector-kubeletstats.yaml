@@ -36,41 +36,47 @@ spec:
     exporters:
       debug:
         verbosity: detailed
-      otlphttp/prometheus:
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: false
-        sending_queue:
-          num_consumers: 50
-        timeout: 10s
-      prometheusremotewrite/thanos:
-        # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
-        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
-        add_metric_suffixes: false
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: true
-        remote_write_queue:
-          enabled: true
-          num_consumers: 50
-          queue_size: 1000
-        timeout: 10s
+      # otlphttp/prometheus:
+      #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: false
+      #   sending_queue:
+      #     num_consumers: 50
+      #   timeout: 10s
+      # prometheusremotewrite/thanos:
+      #   # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
+      #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      #   # 2026-05-04 deprecate, use below instead
+      #   # add_metric_suffixes: false
+      #   translation_strategy: UnderscoreEscapingWithoutSuffixes # <- new equivalent
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: true
+      #   remote_write_queue:
+      #     enabled: true
+      #     # num_consumers: 50
+      #     queue_size: 1000
+      #   timeout: 10s
+      #   max_batch_request_parallelism: 50
       prometheusremotewrite/mimir:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
-        add_metric_suffixes: false
+        # 2026-05-04 deprecate, use below instead
+        # add_metric_suffixes: false
+        translation_strategy: UnderscoreEscapingWithoutSuffixes # <- new equivalent
         tls:
           insecure: true
         retry_on_failure:
           enabled: true
         remote_write_queue:
           enabled: true
-          num_consumers: 50
+          # num_consumers: 50
           queue_size: 1000
         timeout: 10s
+        max_batch_request_parallelism: 50
     extensions:
       pprof: {}
       health_check:
@@ -539,5 +545,7 @@ spec:
                     port: 8888
                     without_units: true
         resource:
-          homelab_otel_component: kubeletstats-collector
+          attributes:
+            - name: homelab_otel_component
+              value: kubeletstats-collector
 

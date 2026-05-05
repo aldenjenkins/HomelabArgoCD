@@ -45,8 +45,8 @@ spec:
       # debug:
       #   verbosity: detailed
 
-      # Exporter for sending logs via otlphttp to the logs gateway
-      otlphttp/loki:
+      # Exporter for sending logs via otlp_http to the logs gateway
+      otlp_http/loki:
         compression: gzip
         endpoint: http://loki-gateway.loki.svc.cluster.local./otlp
         tls:
@@ -223,7 +223,7 @@ spec:
           - service_name
 
       #
-      # k8sattributes/from_access_logs:
+      # k8s_attributes/from_access_logs:
       #   auth_type: "serviceAccount"
       #   passthrough: false
       #   wait_for_metadata: true
@@ -280,7 +280,7 @@ spec:
       #         from: pod
 
 
-      k8sattributes:
+      k8s_attributes:
         extract:
           labels:
             - from: pod
@@ -528,7 +528,7 @@ spec:
           - filter/include_containers
           - filter/not_istio
           - groupbyattrs/containers
-          - k8sattributes
+          - k8s_attributes
           - resource/add_cluster
           - transform/containers_parse_json
           - resource/remove_pod_name
@@ -542,7 +542,7 @@ spec:
           # - transform/remove_high_cardinality_resource_attrs
           - batch
           exporters:
-          - otlphttp/loki
+          - otlp_http/loki
         logs/otlp/kubelet:
           receivers:
           - otlp
@@ -566,7 +566,7 @@ spec:
           - transform/post_flatten
           - batch
           exporters:
-          - otlphttp/loki
+          - otlp_http/loki
         logs/otlp/istio:
           receivers:
           - otlp
@@ -574,10 +574,10 @@ spec:
           - memory_limiter
           # 1. Filter to only process Istio logs sent via otel-als
           - filter/istio_only
-          # add pod attributes from meshconfig's log labels to the resource.attributes for k8sattrs to use
+          # add pod attributes from meshconfig's log labels to the resource.attributes for k8s_attrs to use
           - groupbyattrs/istio_access_logs
           # 2. Add k8s metadata
-          - k8sattributes
+          - k8s_attributes
           - resource/add_cluster
           # 3. Set level and category based on status code
           - transform/set_istio_level_and_category
@@ -586,7 +586,7 @@ spec:
           # 5. Batch before sending
           - batch
           exporters:
-          - otlphttp/loki
+          - otlp_http/loki
 
         logs/otlp/external:
           receivers:
@@ -596,7 +596,7 @@ spec:
           - filter/include_external  # Only process NAS/Desktop logs here
           # - resource/add_cluster     # Optional: if you want to enforce cluster name
           - batch
-          exporters: [otlphttp/loki]
+          exporters: [otlp_http/loki]
 
       telemetry:
         logs:

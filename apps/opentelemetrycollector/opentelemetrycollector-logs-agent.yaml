@@ -11,7 +11,7 @@ spec:
       maxUnavailable: "100%"
   image: otel/opentelemetry-collector-contrib:0.151.0
   imagePullPolicy: IfNotPresent
-  # Unfortunately the operator doesnt automatically expose zpages in the correlated service automatically. 
+  # Unfortunately the operator doesnt automatically expose zpages in the correlated service automatically.
   # Maybe that will change in the future, but for now, we have to define all exposed ports to add it.
   ports:
     - name: metrics
@@ -72,8 +72,8 @@ spec:
       debug:
         verbosity: detailed
 
-      # Exporter for sending logs via otlphttp to the logs gateway 
-      otlphttp:
+      # Exporter for sending logs via otlp_http to the logs gateway
+      otlp_http:
         disable_keep_alives: true
         endpoint: http://logs-gateway-collector.observability.svc.cluster.local.:4318
         tls:
@@ -109,7 +109,7 @@ spec:
     # Define the protocols to receive data for.
     # See https://opentelemetry.io/docs/collector/configuration/#receivers
     receivers:
-      filelog/containers:
+      file_log/containers:
         exclude:
           # don't collect logs from otel logs pods otherwise that would create infinite loop when debug logs are enabled.
           - /var/log/pods/observability_logs-agent-collector*/*/*.log
@@ -144,7 +144,7 @@ spec:
             regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*)(
               |)(?P<log>.*)$
             timestamp:
-              layout: '%Y-$m-%dT%H:%M:%S.%LZ'
+              layout: '%Y-%m-%dT%H:%M:%S.%LZ'
               parse_from: body.time
             type: regex_parser
           - id: parser-docker
@@ -231,12 +231,12 @@ spec:
 
       pipelines:
         logs/containers:
-          receivers: 
-          - filelog/containers
-          processors: 
-          - batch 
-          exporters: 
-          - otlphttp
+          receivers:
+          - file_log/containers
+          processors:
+          - batch
+          exporters:
+          - otlp_http
 
       telemetry:
         logs:

@@ -74,24 +74,26 @@ spec:
     # See https://opentelemetry.io/docs/collector/configuration/#exporters
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
-      # Thanos Receive - existing metrics backend
-      prometheusremotewrite/thanos:
-        endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
-        add_metric_suffixes: false
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: true
-        remote_write_queue:
-          enabled: true
-          num_consumers: 50
-          queue_size: 1000
-        timeout: 10s
+      # # Thanos Receive - existing metrics backend
+      # prometheusremotewrite/thanos:
+      #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
+      #   add_metric_suffixes: false
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: true
+      #   remote_write_queue:
+      #     enabled: true
+      #     num_consumers: 50
+      #     queue_size: 1000
+      #   timeout: 10s
 
       # Mimir Distributor - testing new metrics backend
       prometheusremotewrite/mimir:
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
-        add_metric_suffixes: false
+        # 2026-05-04 add_metric_suffixes is deprecated, use translation_strategy UnderscoreEscapingWithoutSuffixes instead.
+        # add_metric_suffixes: false
+        translation_strategy: UnderscoreEscapingWithoutSuffixes # <- new equivalent
         resource_to_telemetry_conversion:
           exclude_service_attributes: false
         tls:
@@ -100,19 +102,21 @@ spec:
           enabled: true
         remote_write_queue:
           enabled: true
-          num_consumers: 50
+          # 2026-05-04 this will be used to reference processing parallelism for the queue rather than the curent request parallelism, so use new max_batch_request_parallelism below instead.
+          # num_consumers: 50
           queue_size: 1000
+        max_batch_request_parallelism: 50
         timeout: 10s
 
-      otlphttp/prometheus:
-        endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
-        tls:
-          insecure: true
-        retry_on_failure:
-          enabled: true
-        sending_queue:
-          num_consumers: 50
-        timeout: 10s
+      # otlphttp/prometheus:
+      #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/otlp
+      #   tls:
+      #     insecure: true
+      #   retry_on_failure:
+      #     enabled: true
+      #   sending_queue:
+      #     num_consumers: 50
+      #   timeout: 10s
       # prometheusremotewrite/keda:
       #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
       #   tls:
@@ -325,7 +329,7 @@ spec:
         keys:
           - k8s_pod_name
           - k8s_namespace_name
-      k8sattributes:
+      k8s_attributes:
         auth_type: serviceAccount
         extract:
           labels:
@@ -525,8 +529,8 @@ spec:
               - set(datapoint.attributes["k8s.container.name"], resource.attributes["k8s.container.name"]) where resource.attributes["k8s.container.name"] != nil and resource.attributes["k8s.container.name"] != ""
               - set(datapoint.attributes["k8s.pod.name"], resource.attributes["k8s_pod_name"]) where resource.attributes["k8s_pod_name"] != nil and resource.attributes["k8s_pod_name"] != ""
               - set(datapoint.attributes["k8s.namespace.name"], resource.attributes["k8s_namespace_name"]) where resource.attributes["k8s_namespace_name"] != nil and resource.attributes["k8s_namespace_name"] != ""
-              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "homelab-system"
-              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where attributes["k8s.namespace.name"] == "kube-system"
+              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where datapoint.attributes["k8s.namespace.name"] == "homelab-system"
+              - set(datapoint.attributes["homelab_source"], "cloud_system_metrics") where datapoint.attributes["k8s.namespace.name"] == "kube-system"
               - set(datapoint.attributes["homelab.service"], resource.attributes["homelab.service"]) where resource.attributes["homelab.service"] != nil and resource.attributes["homelab.service"] != ""
               - set(datapoint.attributes["homelab.owner"], resource.attributes["homelab.owner"]) where resource.attributes["homelab.owner"] != nil and resource.attributes["homelab.owner"] != ""
               - set(datapoint.attributes["homelab.huid"], resource.attributes["homelab.huid"]) where resource.attributes["homelab.huid"] != nil and resource.attributes["homelab.huid"] != ""
@@ -843,7 +847,7 @@ spec:
             - batch
             - groupbyattrs
             - transform/set_match_resource_attributes
-            - k8sattributes
+            - k8s_attributes
             - transform/label_metrics
             - metricstransform/aggregate_istio  # Aggregate istio metrics before sending to Thanos
             - transform/normalize_service_name
@@ -879,5 +883,7 @@ spec:
                     port: 8888
                     without_units: true
         resource:
-          homelab_otel_component: core-prometheus-collector
+          attributes:
+            - name: homelab_otel_component
+              value: core-prometheus-collector
 

@@ -57,10 +57,10 @@
         icon: mdi-application-outline
         href: https://temporal.home.alden.ai
         description: Workflow Orchestration
-    - ConvertX:
-        icon: convertx.png
-        href: https://convertx.home.alden.ai
-        description: File Format Conversion
+    # - ConvertX:
+    #     icon: convertx.png
+    #     href: https://convertx.home.alden.ai
+    #     description: File Format Conversion
     - PostHog:
         icon: posthog.png
         href: https://posthog.home.alden.ai
@@ -125,18 +125,22 @@
         href: https://adminer.home.alden.ai
         description: Lightweight DB Client
 - Other:
-    - Shlink:
-        icon: shlink.svg
-        href: https://shlink.home.alden.ai
-        description: URL Shortener
-    - 2FAuth:
-        icon: 2fauth.svg
-        href: https://2fauth.home.alden.ai
-        description: 2FA Manager
+    # - Shlink:
+    #     icon: shlink.svg
+    #     href: https://shlink.home.alden.ai
+    #     description: URL Shortener
+    # - 2FAuth:
+    #     icon: 2fauth.svg
+    #     href: https://2fauth.home.alden.ai
+    #     description: 2FA Manager
     - Vaultwarden:
         icon: vaultwarden.svg
         href: https://vaultwarden.home.alden.ai
         description: Rust-based Password Manager
+    - Vikunja:
+        icon: vikunja.svg
+        href: https://vikunja.home.alden.ai
+        description: Project & Task Management
     - Kanboard:
         icon: kanboard.svg
         href: https://kanboard.home.alden.ai
@@ -181,10 +185,10 @@
         icon: kiwix.png
         href: https://kiwix.home.alden.ai
         description: Offline Encyclopedia
-    - Redlib:
-        icon: redlib.png
-        href: https://redlib.home.alden.ai
-        description: Private Reddit Frontend
+    # - Redlib:
+    #     icon: redlib.png
+    #     href: https://redlib.home.alden.ai
+    #     description: Private Reddit Frontend
     - CopyParty:
         icon: mdi-folder-upload-outline
         href: https://copyparty.home.alden.ai
@@ -207,10 +211,10 @@
           url: https://adguard.home.alden.ai
           username: "{{HOMEPAGE_VAR_ADGUARD_USERNAME}}"
           password: "{{HOMEPAGE_VAR_ADGUARD_PASSWORD}}"
-    - SearXNG:
-        icon: searxng.png
-        href: https://search.home.alden.ai
-        description: Private Metasearch Engine
+    # - SearXNG:
+    #     icon: searxng.png
+    #     href: https://search.home.alden.ai
+    #     description: Private Metasearch Engine
     - ProxiTok:
         icon: tiktok.svg
         href: https://proxitok.home.alden.ai
@@ -244,10 +248,10 @@
         icon: minio.svg
         href: https://minio.home.alden.ai
         description: Object Storage
-    - Authelia:
-        icon: authelia.svg
-        href: https://auth.home.alden.ai
-        description: Forward Proxy Auth
+    # - Authelia:
+    #     icon: authelia.svg
+    #     href: https://auth.home.alden.ai
+    #     description: Forward Proxy Auth
     - Container Registry:
         icon: docker.svg
         href: https://registry.home.alden.ai
