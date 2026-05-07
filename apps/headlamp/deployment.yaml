@@ -41,7 +41,7 @@ spec:
             runAsNonRoot: true
             readOnlyRootFilesystem: true
             runAsUser: 100
-          image: "ghcr.io/headlamp-k8s/headlamp:v0.41.0"
+          image: "ghcr.io/headlamp-k8s/headlamp:v0.42.0"
           imagePullPolicy: IfNotPresent
           args:
             - "-in-cluster"
