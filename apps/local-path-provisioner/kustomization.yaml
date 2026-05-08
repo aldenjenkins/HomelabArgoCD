@@ -1,6 +1,6 @@
 namespace: local-path-storage
 resources:
-  - https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.35/deploy/local-path-storage.yaml
+  - https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.36/deploy/local-path-storage.yaml
   # - grafanafolder.yaml
   # - grafanadashboard.yaml
 patches:
