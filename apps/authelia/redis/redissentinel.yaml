@@ -26,7 +26,7 @@ spec:
         name: authelia-redis-secret
         key: password
     # Redis connection port
-    redisPort: "6379"
+    #redisPort: "6379"
     # Quorum: Number of sentinels that need to agree for failover
     # With 3 sentinels, quorum of 2 provides fault tolerance
     quorum: "2"
@@ -36,9 +36,10 @@ spec:
     #
     # # Down-after-milliseconds (5 seconds)
     # # Time after which sentinel considers master down
-    # downAfterMilliseconds: "5000"
-    downAfterMilliseconds: "30000"   # was 5000 — avoid false-positive failovers
-    failoverTimeout: "180000"        # was 10000 — Redis default, gives failover time to complete
+    downAfterMilliseconds: "5000"
+    # downAfterMilliseconds: "30000"   # was 5000 — avoid false-positive failovers
+    # failoverTimeout: "180000"        # was 10000 — Redis default, gives failover time to complete
+    failoverTimeout: "10000"        # was 10000 — Redis default, gives failover time to complete
     # Parallel syncs during failover
     # Number of replicas that can sync with new master simultaneously
     parallelSyncs: "1"
@@ -55,19 +56,25 @@ spec:
       limits:
         cpu: 101m
         memory: 128Mi
-  # Pod Anti-Affinity for HA
-  # Ensure sentinel pods are spread across different nodes
+  # Ensure sentinel pods are spread across different nodes and dont land on nodes with replication pods
   affinity:
     podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        # Sentinels not co-located with each other
+        - labelSelector:
             matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - authelia-redis
+              - key: app
+                operator: In
+                values:
+                  - authelia-redis-sentinel
+          topologyKey: kubernetes.io/hostname
+        # Sentinels not co-located with replication pods
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - authelia-redis
           topologyKey: kubernetes.io/hostname
   # health checks
   livenessProbe:

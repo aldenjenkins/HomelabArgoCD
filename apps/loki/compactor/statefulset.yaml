@@ -81,11 +81,15 @@ spec:
               mountPath: /mnt
             - name: data
               mountPath: /var/loki
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: loki
           configMap:
             name: loki
         - name: data
+          emptyDir: {}
+        - name: tmp
           emptyDir: {}
   # volumeClaimTemplates:
   #   - metadata:

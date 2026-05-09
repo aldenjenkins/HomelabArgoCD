@@ -1,0 +1,10 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: ec2
+spec:
+  uid: ec2-uid
+  parentFolderUID: aws-uid
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"

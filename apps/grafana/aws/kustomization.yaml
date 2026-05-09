@@ -1,3 +1,4 @@
+namespace: grafana
 resources:
   - grafanafolder.yaml
   - grafanadatasource.yaml
@@ -5,5 +6,6 @@ resources:
   - dynamodb
   - s3
   - billing
+  - ec2
 generators:
   - sopsgenerator.yaml

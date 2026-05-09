@@ -17,7 +17,7 @@ limits:
   # Query limits
   max_fetched_series_per_query: 100000
   # max_fetched_chunk_bytes_per_query: 2147483648  # 2GB
-  max_fetched_chunk_bytes_per_query: 2000000  # default
+  max_fetched_chunks_per_query: 2000000  # default
   # Compactor
   compactor_blocks_retention_period: 1y
   # Out-of-order

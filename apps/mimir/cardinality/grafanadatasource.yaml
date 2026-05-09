@@ -1,0 +1,24 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: cardinality
+  namespace: mimir
+spec:
+  allowCrossNamespaceImport: true
+  datasource:
+    name: cardinality
+    uid: cardinality
+    type: marcusolsson-json-datasource
+    jsonData:
+      typeName: "JSON API"
+    access: proxy
+    url: http://mimir-gateway.mimir.svc.cluster.local:80/prometheus/api/v1/cardinality/
+    isDefault: false
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  plugins:
+    - name: marcusolsson-json-datasource
+      version: 1.3.28
+    - name: marcusolsson-treemap-panel
+      version: 2.1.1

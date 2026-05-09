@@ -1,0 +1,4 @@
+namespace: mimir
+resources:
+  - grafanadashboard.yaml
+  - grafanadatasource.yaml

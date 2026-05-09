@@ -92,6 +92,7 @@ distributor:
 
 frontend:
   encoding: protobuf
+  log_queries_longer_than: 1s # default = 0s meaning disabled by default
   grpc_client_config:
     # max_recv_msg_size: *max_recv_msg_size
     # max_send_msg_size: *max_send_msg_size
@@ -285,7 +286,7 @@ ruler:
   evaluation:
     mode: remote
     query_frontend:
-      address: loki-query-frontend.loki.svc.cluster.local.:9095
+      address: dns:///loki-query-frontend.loki.svc.cluster.local.:9095
 
 schema_config:
   configs:

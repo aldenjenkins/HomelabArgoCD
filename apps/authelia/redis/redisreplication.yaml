@@ -18,11 +18,11 @@ spec:
     # Resource allocation for platform workloads
     resources:
       requests:
-        cpu: 200m
-        memory: 512Mi
+        cpu: 10m
+        memory: 16Mi
       limits:
-        cpu: "1"
-        memory: 1Gi
+        cpu: "100m"
+        memory: 128Mi
 
   # Note: External LoadBalancer service defined separately in platform-kv-repl-svc.yaml
   # Redis Configuration
@@ -38,21 +38,19 @@ spec:
         storageClassName: local-path
         resources:
           requests:
-            storage: 10Gi
+            storage: 3Gi
 
   # Pod Anti-Affinity for HA
   # Ensure Redis pods are spread across different nodes
   affinity:
     podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
             matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - authelia-redis
+              - key: app
+                operator: In
+                values:
+                  - authelia-redis
           topologyKey: kubernetes.io/hostname
 
   # Redis Exporter for Monitoring
@@ -69,10 +67,10 @@ spec:
         drop: ["ALL"]
     resources:
       requests:
-        cpu: 50m
+        cpu: 10m
         memory: 64Mi
       limits:
-        cpu: 200m
+        cpu: 50m
         memory: 128Mi
 
   # Health Checks

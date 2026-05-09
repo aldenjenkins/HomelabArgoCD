@@ -18,22 +18,22 @@
       memory: true
       # Shows the label, which is always the node name
       showLabel: true
-- resources:
-    label: System
-    expanded: true
-    cpu: true
-    memory: true
-    uptime: true
-    cputemp: true
-    tempmin: 20
-    tempmax: 75 # good recs are that warning = 75-80c, critical=85-90c, emergency=95c+
-    units: metric
-    # network: true # default = true
-    network: default # or specify a network interface name
-- resources:
-    label: Network (Just this pod)
-    expanded: true
-    network: true
+# - resources:
+#     label: System
+#     expanded: true
+#     cpu: true
+#     memory: true
+#     uptime: true
+#     cputemp: true
+#     tempmin: 20
+#     tempmax: 75 # good recs are that warning = 75-80c, critical=85-90c, emergency=95c+
+#     units: metric
+#     # network: true # default = true
+#     network: default # or specify a network interface name
+# - resources:
+#     label: Network (Just this pod)
+#     expanded: true
+#     network: true
 # 2026-05-02 disabling to instead just use the QuickLaunch integration for internet search
 # - search:
 #     provider: custom # google, duckduckgo, bing, baidu, brave or custom
