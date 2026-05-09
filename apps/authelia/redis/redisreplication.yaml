@@ -6,6 +6,13 @@ spec:
   # High Availability Configuration
   # 1 master + 2 replicas for robust failover
   clusterSize: 3
+  sentinel:
+    size: 3
+    image: quay.io/opstree/redis-sentinel:v8.6.2
+    imagePullPolicy: IfNotPresent
+    redisSecret:
+      name: authelia-redis-sentinel-secret
+      key: password
 
   # Kubernetes Configuration
   kubernetesConfig:
@@ -38,7 +45,7 @@ spec:
         storageClassName: local-path
         resources:
           requests:
-            storage: 3Gi
+            storage: 2Gi
 
   # Pod Anti-Affinity for HA
   # Ensure Redis pods are spread across different nodes
@@ -56,7 +63,7 @@ spec:
   # Redis Exporter for Monitoring
   redisExporter:
     enabled: true
-    image: quay.io/opstree/redis-exporter
+    image: quay.io/opstree/redis-exporter:v1.83.0
     imagePullPolicy: IfNotPresent
     securityContext:                      # applied to ALL containers incl. exporter
       allowPrivilegeEscalation: false     # CRITICAL
@@ -65,6 +72,8 @@ spec:
       runAsUser: 1000
       capabilities:                       # CRITICAL
         drop: ["ALL"]
+      seccompProfile:
+        type: RuntimeDefault
     resources:
       requests:
         cpu: 10m
@@ -97,6 +106,8 @@ spec:
     runAsUser: 1000
     runAsGroup: 1000
     fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
 
   securityContext:
     allowPrivilegeEscalation: false
@@ -105,3 +116,5 @@ spec:
       - ALL
     readOnlyRootFilesystem: false # Redis needs write for RDB/AOF
     runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault

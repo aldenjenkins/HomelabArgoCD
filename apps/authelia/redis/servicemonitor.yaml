@@ -3,16 +3,14 @@ kind: ServiceMonitor
 metadata:
   name: authelia-redis
   labels:
-    app.kubernetes.io/name: redis
+    app.kubernetes.io/name: authelia-redis
     app.kubernetes.io/instance: redis
-    app.kubernetes.io/version: 0.16.5
-    app.kubernetes.io/component: middleware
 spec:
   selector:
     matchLabels:
       app: authelia-redis
-      redis_setup_type: standalone
-      role: standalone
+      redis_setup_type: replication
+      role: replication
   endpoints:
     - port: redis-exporter
       interval: 30s
@@ -20,3 +18,26 @@ spec:
   namespaceSelector:
     matchNames:
       - authelia
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: authelia-redis
+#   labels:
+#     app.kubernetes.io/name: redis
+#     app.kubernetes.io/instance: redis
+#     app.kubernetes.io/version: 0.16.5
+#     app.kubernetes.io/component: middleware
+# spec:
+#   selector:
+#     matchLabels:
+#       app: authelia-redis
+#       redis_setup_type: standalone
+#       role: standalone
+#   endpoints:
+#     - port: redis-exporter
+#       interval: 30s
+#       scrapeTimeout: 10s
+#   namespaceSelector:
+#     matchNames:
+#       - authelia

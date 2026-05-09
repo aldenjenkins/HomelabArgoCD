@@ -1,0 +1,87 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: authelia-redis-policy
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: "app"
+        operator: "In"
+        values:
+          - "authelia-redis"
+          - "authelia-redis-s"
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: authelia
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: "TCP"
+            - port: "26379"
+              protocol: "TCP"
+    - fromEndpoints:
+        - matchLabels:
+            control-plane: redis-operator
+            io.kubernetes.pod.namespace: redis-operator-system
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: "TCP"
+            - port: "26379"
+              protocol: "TCP"
+    - fromEndpoints:
+        - matchExpressions:
+            - key: "app"
+              operator: "In"
+              values:
+                - "authelia-redis"
+                - "authelia-redis-s"
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: "TCP"
+            - port: "26379"
+              protocol: "TCP"
+    # Blackbox exporter
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: blackbox-exporter
+            io.kubernetes.pod.namespace: blackbox-exporter
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: "TCP"
+            - port: "26379"
+              protocol: "TCP"
+    # Core prometheus collector scrape replication pod's exporter container metrics
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: opentelemetry-collector
+            app.kubernetes.io/instance: observability.core-prometheus
+            app.kubernetes.io/managed-by: opentelemetry-operator
+            app.kubernetes.io/name: core-prometheus-collector
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "9121"
+              protocol: "TCP"
+
+  egress:
+    # Allow them to talk to the Redis Data nodes (for sync and health checks)
+    - toEndpoints:
+        - matchLabels:
+            app: "authelia-redis"
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: "TCP"
+
+    # Allow them to talk to Sentinel nodes (for quorum/voting)
+    - toEndpoints:
+        - matchLabels:
+            "app": "authelia-redis-s"
+      toPorts:
+        - ports:
+            - port: "26379"
+              protocol: "TCP"

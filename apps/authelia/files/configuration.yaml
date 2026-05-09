@@ -300,19 +300,20 @@ session:
       default_redirection_url: https://homepage.home.alden.ai
       name: authelia_session
   redis:
-    host: authelia-redis-sentinel.authelia.svc.cluster.local
-    port: 26379
-    timeout: 3s
+    timeout: 10s
     database_index: 0
     high_availability:
-      sentinel_name: authelia-redis-master
+      sentinel_name: mymaster
       nodes:
-        - host: authelia-redis-sentinel-0.authelia-redis-sentinel-headless.authelia.svc.cluster.local
+        - host: authelia-redis-s-0.authelia-redis-s-hl.authelia.svc.cluster.local
           port: 26379
-        - host: authelia-redis-sentinel-1.authelia-redis-sentinel-headless.authelia.svc.cluster.local
+        - host: authelia-redis-s-1.authelia-redis-s-hl.authelia.svc.cluster.local
           port: 26379
-        - host: authelia-redis-sentinel-2.authelia-redis-sentinel-headless.authelia.svc.cluster.local
+        - host: authelia-redis-s-2.authelia-redis-s-hl.authelia.svc.cluster.local
           port: 26379
+    max_retries: 3
+    maximum_active_connections: 8
+    minimum_idle_connections: 0
     # timeout: 5s
     # max_retries: 0
     # maximum_active_connections: 8
