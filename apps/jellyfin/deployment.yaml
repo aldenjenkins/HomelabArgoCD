@@ -23,7 +23,7 @@ spec:
               drop: ["ALL"]
             seccompProfile:
               type: RuntimeDefault
-          image: rebelcore/jellyfin-exporter:v1.5.0
+          image: rebelcore/jellyfin-exporter:v1.5.1
           imagePullPolicy: IfNotPresent
           args:
             - "--jellyfin.address=http://jellyfin.jellyfin:8096"
