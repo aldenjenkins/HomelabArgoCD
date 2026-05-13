@@ -1225,6 +1225,10 @@ spec:
               command:
               - /cni-uninstall.sh
         ports:
+        - containerPort: 4244
+          hostPort: 4244
+          name: peer-service
+          protocol: TCP
         - name: health
           containerPort: 9879
           hostPort: 9879
@@ -1240,10 +1244,6 @@ spec:
         - name: hubble-metrics
           containerPort: 9965
           hostPort: 9965
-          protocol: TCP
-        - containerPort: 4244
-          hostPort: 4244
-          name: peer-service
           protocol: TCP
         securityContext:
           seLinuxOptions:
