@@ -422,6 +422,8 @@ spec:
               - set(attributes["category"], body["category"]) where IsMap(body)
               # - delete_key(attributes, "category") where attributes["category"] != nil
               #   and not IsMatch(attributes["category"], "(access|application)")
+              # 2026-05-11 adding detected_level structured metadata which is what loki explore plugin looks for to display the level
+              - set(attributes["detected_level"], attributes["level"]) where attributes["level"] != nil
 
       transform/containers_parse_json:
         error_mode: ignore
@@ -603,6 +605,7 @@ spec:
           encoding: json
           level: info
         metrics:
+          level: detailed
           readers:
             - pull:
                 exporter:
@@ -610,3 +613,9 @@ spec:
                     host: 0.0.0.0
                     port: 8888
                     without_units: true
+                    with_resource_constant_labels:
+                      included:
+                        - service.name
+        resource:
+          homelab_otel_component: logs-gateway-collector
+          service.name: grafana-opentelemetry/metrics

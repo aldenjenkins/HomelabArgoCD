@@ -343,6 +343,7 @@ spec:
           encoding: json
         # Push collector internal metrics to Prometheus
         metrics:
+          level: detailed
           readers:
             - pull:
                 exporter:
@@ -350,6 +351,12 @@ spec:
                     host: 0.0.0.0
                     port: 8888
                     without_units: true
+                    with_resource_constant_labels:
+                      included:
+                        - service.name
+        resource:
+          homelab_otel_component: trace-collector
+          service.name: grafana-opentelemetry/metrics
         # metrics:
         #   level: detailed
         #   readers:

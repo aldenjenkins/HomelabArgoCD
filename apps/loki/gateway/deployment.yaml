@@ -68,7 +68,9 @@ spec:
               mountPath: /tmp
             - name: docker-entrypoint-d-override
               mountPath: /docker-entrypoint.d
-          resources: {}
+          resources:
+            requests:
+              cpu: 30m
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

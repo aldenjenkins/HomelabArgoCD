@@ -535,8 +535,10 @@ spec:
       telemetry:
         logs:
           encoding: json
+          level: info
           # level: debug
         metrics:
+          level: detailed
           readers:
             - pull:
                 exporter:
@@ -544,8 +546,9 @@ spec:
                     host: 0.0.0.0
                     port: 8888
                     without_units: true
+                    with_resource_constant_labels:
+                      included:
+                        - service.name
         resource:
-          attributes:
-            - name: homelab_otel_component
-              value: kubeletstats-collector
-
+          homelab_otel_component: kubeletstats-collector
+          service.name: grafana-opentelemetry/metrics

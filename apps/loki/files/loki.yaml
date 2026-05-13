@@ -60,7 +60,7 @@ distributor:
       # - homelab_type
       # - format
       # - k8s_cronjob_name
-      # - level
+      - level
       # - namespace
       # - service_name
       # - source

@@ -81,6 +81,9 @@ spec:
               port: http-metrics
             initialDelaySeconds: 30
             timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 200m
           # resources:
           #   limits:
           #     memory: 2560Mi
@@ -115,7 +118,7 @@ spec:
               app.kubernetes.io/name: tempo
               app.kubernetes.io/instance: tempo
               app.kubernetes.io/component: distributor
-        
+
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -125,7 +128,7 @@ spec:
                   app.kubernetes.io/instance: tempo
                   app.kubernetes.io/component: distributor
               topologyKey: kubernetes.io/hostname
-        
+
       volumes:
         - name: config
           configMap:

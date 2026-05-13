@@ -350,6 +350,7 @@ spec:
           level: info
         # Push collector internal metrics to Prometheus
         metrics:
+          level: detailed
           readers:
             - pull:
                 exporter:
@@ -357,7 +358,9 @@ spec:
                     host: 0.0.0.0
                     port: 8888
                     without_units: true
+                    with_resource_constant_labels:
+                      included:
+                        - service.name
         resource:
-          attributes:
-            - name: homelab_otel_component
-              value: otlp-collector
+          homelab_otel_component: otlp-collector
+          service.name: grafana-opentelemetry/metrics
