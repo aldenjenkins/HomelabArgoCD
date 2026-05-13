@@ -71,22 +71,22 @@ spec:
           action: replace
           targetLabel: job
           replacement: argocd-applicationset-controller-metrics
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: argocd-dex-server
-  labels:
-    release: prometheus-operator
-spec:
-  namespaceSelector:
-    matchNames:
-      - argocd
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: argocd-dex-server
-  endpoints:
-    - port: metrics
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: argocd-dex-server
+#   labels:
+#     release: prometheus-operator
+# spec:
+#   namespaceSelector:
+#     matchNames:
+#       - argocd
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: argocd-dex-server
+#   endpoints:
+#     - port: metrics
 
 # ---
 # apiVersion: monitoring.coreos.com/v1
