@@ -10,3 +10,4 @@ files:
   - "coredns-configmap.yaml"
   - "custom-slack-secret.yaml"
   - "github-readonly-token-secret.yaml"
+  - "authelia-oidc-secret.yaml"

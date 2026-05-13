@@ -86,10 +86,11 @@ spec:
             notPaths:
               - /alden/nvim.git*
               - /alden/modular-backup-framework.git*
-        - operation:
-            hosts:
-              - argocd.home.alden.ai
-            notPaths:
-              - "/auth/token"
-              - "/api/v1/session"
-              - "/session.SessionService/Create"  # Exclude gRPC session creation from authentication
+        # 2026-05-13 removing this because now argocd uses oidc
+        # - operation:
+        #     hosts:
+        #       - argocd.home.alden.ai
+        #     notPaths:
+        #       - "/auth/token"
+        #       - "/api/v1/session"
+        #       - "/session.SessionService/Create"  # Exclude gRPC session creation from authentication

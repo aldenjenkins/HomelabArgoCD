@@ -7,12 +7,27 @@ data:
   accounts.alden: login
   accounts.readonly: apiKey
   kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
-  dex.config: |
-    connectors:
-      - type: 'authproxy'
-        id: authelia
-        name: Authelia
-        config:
-          userHeader: "Remote-User"
-          redirectURI: "https://argocd.home.alden.ai/auth/callback"
+  # 2026-05-13 argocd dex authproxy type now includes federation
+  # which breaks the authproxy connector which used to work,
+  # so switching to authelia oidc (sad face).
+  # dex.config: |
+  #   connectors:
+  #     - type: 'authproxy'
+  #       id: authelia
+  #       name: Authelia
+  #       config:
+  #         userHeader: "Remote-User"
+  #         redirectURI: "https://argocd.home.alden.ai/auth/callback"
+  oidc.config: |
+    name: Authelia
+    issuer: https://auth.home.alden.ai
+    clientID: argocd
+    clientSecret: $authelia-oidc-secret:oidc.authelia.clientSecret
+    cliClientID: argocd-cli
+    requestedScopes:
+      - openid
+      - email
+      - groups
+    enableUserInfoGroups: true
+    userInfoPath: /api/oidc/userinfo
   url: https://argocd.home.alden.ai
