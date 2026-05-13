@@ -242,6 +242,8 @@ data:
   operator-api-serve-addr: "127.0.0.1:9234"
 
   enable-hubble: "false"
+  enable-internal-traffic-policy: 'true'
+  enable-svc-source-range-check: 'true'
   ipam: "kubernetes"
   ipam-cilium-node-update-rate: "15s"
 
@@ -1201,7 +1203,7 @@ spec:
                     set -o errexit
                     set -o pipefail
                     set -o nounset
-                    
+
                     # When running in AWS ENI mode, it's likely that 'aws-node' has
                     # had a chance to install SNAT iptables rules. These can result
                     # in dropped traffic, so we should attempt to remove them.
@@ -1217,7 +1219,7 @@ spec:
                         iptables-save | grep -E -v 'AWS-SNAT-CHAIN|AWS-CONNMARK-CHAIN' | iptables-restore
                     fi
                     echo 'Done!'
-                    
+
           preStop:
             exec:
               command:
@@ -1238,6 +1240,10 @@ spec:
         - name: hubble-metrics
           containerPort: 9965
           hostPort: 9965
+          protocol: TCP
+        - containerPort: 4244
+          hostPort: 4244
+          name: peer-service
           protocol: TCP
         securityContext:
           seLinuxOptions:
@@ -1298,7 +1304,7 @@ spec:
           mountPath: /run/xtables.lock
         - name: tmp
           mountPath: /tmp
-        
+
       initContainers:
       - name: config
         image: "quay.io/cilium/cilium:v1.19.3@sha256:2e61680593cddca8b6c055f6d4c849d87a26a1c91c7e3b8b56c7fb76ab7b7b10"
@@ -1503,7 +1509,7 @@ spec:
       automountServiceAccountToken: true
       terminationGracePeriodSeconds: 1
       hostNetwork: true
-      
+
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -1712,7 +1718,7 @@ spec:
         - name: cilium-config-path
           mountPath: /tmp/cilium/config-map
           readOnly: true
-        
+
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -1746,7 +1752,7 @@ spec:
           operator: Exists
         - key: node.cilium.io/agent-not-ready
           operator: Exists
-      
+
       volumes:
         # To read the configuration from the config map
       - name: cilium-config-path
