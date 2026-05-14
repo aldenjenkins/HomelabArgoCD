@@ -63,12 +63,12 @@ spec:
             - containerPort: 4317
               name: grpc-otlp
               protocol: TCP
-          env:
-            - name: GOMEMLIMIT
-              valueFrom:
-                resourceFieldRef:
-                  divisor: "0"
-                  resource: requests.memory
+          # env:
+          #   - name: GOMEMLIMIT
+          #     valueFrom:
+          #       resourceFieldRef:
+          #         divisor: "0"
+          #         resource: requests.memory
           livenessProbe:
             httpGet:
               path: /ready
@@ -84,6 +84,8 @@ spec:
           resources:
             requests:
               cpu: 200m
+            limits:
+              cpu: 500m
           # resources:
           #   limits:
           #     memory: 2560Mi

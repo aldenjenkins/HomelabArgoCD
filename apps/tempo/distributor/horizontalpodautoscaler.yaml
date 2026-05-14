@@ -15,28 +15,38 @@ spec:
     kind: Deployment
     name: tempo-distributor
   minReplicas: 2
-  maxReplicas: 5
+  # maxReplicas: 5
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
-          type: Utilization
-          averageUtilization: 70
+          # type: Utilization
+          # averageUtilization: 80
+          type: AverageValue
+          averageValue: 250m
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 300
+      # stabilizationWindowSeconds: 300
+      stabilizationWindowSeconds: 600
       policies:
         - type: Percent
-          value: 100
-          periodSeconds: 15
+          # value: 100
+          value: 50
+          # periodSeconds: 15
+          periodSeconds: 60
     scaleUp:
-      stabilizationWindowSeconds: 0
+      # stabilizationWindowSeconds: 0
+      stabilizationWindowSeconds: 30
       policies:
         - type: Percent
           value: 100
-          periodSeconds: 15
+          # periodSeconds: 15
+          periodSeconds: 60
         - type: Pods
-          value: 4
-          periodSeconds: 15
+          # value: 4
+          value: 2
+          # periodSeconds: 15
+          periodSeconds: 60
       selectPolicy: Max
