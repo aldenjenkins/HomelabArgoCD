@@ -61,7 +61,7 @@ spec:
       serviceMonitorSelector: {}
       scrapeConfigSelector: {}
       probeSelector: {}
-  image: otel/opentelemetry-collector-contrib:0.152.0
+  image: otel/opentelemetry-collector-contrib:0.152.1
   imagePullPolicy: IfNotPresent
   config:
     # # Define connectors which connect two pipelines, acting as both exporter and receiver.
