@@ -16,7 +16,7 @@ spec:
       owner: shiori
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

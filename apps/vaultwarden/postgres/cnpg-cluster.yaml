@@ -19,7 +19,7 @@ spec:
       parameters:
         barmanObjectName: minio-store
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
   resources:
     requests:
       cpu: 100m

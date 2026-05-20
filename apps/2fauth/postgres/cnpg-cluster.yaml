@@ -16,7 +16,7 @@ spec:
       owner: 2fauth
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

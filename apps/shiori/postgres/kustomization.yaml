@@ -1,8 +1,10 @@
+namespace: shiori
 resources:
   - objectstore.yaml
   - cnpg-cluster.yaml
   - service.yaml
   - scheduledbackup.yaml
   - grafanadatasource.yaml
+  - podmonitor.yaml
 generators:
   - sopsgenerator.yaml

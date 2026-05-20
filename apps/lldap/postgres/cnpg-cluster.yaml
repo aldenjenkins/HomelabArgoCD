@@ -15,7 +15,7 @@ spec:
     storageClass: local-path
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

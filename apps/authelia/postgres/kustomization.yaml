@@ -6,5 +6,6 @@ resources:
   - scheduledbackup.yaml
   # - grafanadatasource.yaml
   - podmonitor.yaml
+  - probe.yaml
 generators:
   - sopsgenerator.yaml

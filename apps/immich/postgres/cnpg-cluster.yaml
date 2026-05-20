@@ -25,7 +25,7 @@ spec:
         - CREATE EXTENSION earthdistance CASCADE;
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

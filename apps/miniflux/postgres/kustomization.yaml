@@ -4,5 +4,6 @@ resources:
   - service.yaml
   - scheduledbackup.yaml
   - grafanadatasource.yaml
+  - podmonitor.yaml
 generators:
   - sopsgenerator.yaml

@@ -17,7 +17,7 @@ spec:
       owner: forgejo
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

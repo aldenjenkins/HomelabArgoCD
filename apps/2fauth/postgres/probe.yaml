@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: 2fauth-postgres-https-30s
+spec:
+  jobName: 2fauth-postgres-healthz-https  # Unique job name for Prometheus
+  interval: 30s
+  scrapeTimeout: 30s
+  module: https_skip_verify_30s  # Use the new module you created
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115  # Your Blackbox Exporter service
+    scheme: http  # The scheme to connect to the exporter itself
+  targets:
+    staticConfig:
+      static:
+        - https://twofauth-postgres-healthz.2fauth.svc.cluster.local.:8000/healthz

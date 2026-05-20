@@ -2,6 +2,7 @@ namespace: authelia
 resources:
   - redisreplication.yaml
   - ciliumnetworkpolicy.yaml
+  - probe.yaml
   # - redissentinel.yaml
   # - grafanadatasource.yaml
   # - servicemonitor.yaml

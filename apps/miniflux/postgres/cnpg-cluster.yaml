@@ -16,7 +16,7 @@ spec:
       owner: miniflux
 
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 
   resources:
     requests:

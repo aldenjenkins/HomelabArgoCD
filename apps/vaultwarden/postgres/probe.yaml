@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: vaultwarden-postgres-https-30s
+spec:
+  interval: 30s
+  jobName: vaultwarden-postgres-healthz-https
+  module: https_skip_verify_30s
+  prober:
+    path: /probe
+    scheme: http
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+  scrapeTimeout: 30s
+  targets:
+    staticConfig:
+      static:
+      - https://vaultwarden-postgres-healthz.vaultwarden.svc.cluster.local.:8000/healthz
