@@ -1,0 +1,1004 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: nftables
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 1m
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  folderUID: networking-uid
+  json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Exporter health. 1 = scrape/parsing successful, 0 = failure.",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "0": { "text": "DOWN" },
+                    "1": { "text": "UP" }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+          "id": 1,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": ["lastNotNull"],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "value"
+          },
+          "targets": [
+            {
+              "expr": "nftables_up{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "{{instance}}",
+              "refId": "A"
+            }
+          ],
+          "title": "nftables-exporter Up",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Number of rules per chain (as exported).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "nftables_chain_rules{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "{{family}}/{{table}}/{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "nftables Chain Rule Count",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Number of chains per table (as exported).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 4 },
+          "id": 3,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "nftables_table_chains{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "{{family}}/{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "nftables Table Chain Count",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "CPU time (rate) for the exporter process.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "cores",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(process_cpu_seconds_total{job=~\"$job\",instance=~\"$instance\"}[5m])",
+              "legendFormat": "cpu",
+              "refId": "A"
+            }
+          ],
+          "title": "Exporter CPU (rate)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Resident memory of the exporter process.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "rss",
+              "refId": "A"
+            }
+          ],
+          "title": "Exporter Memory (RSS)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Open file descriptors vs max.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 8, "x": 16, "y": 8 },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "process_open_fds{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "open_fds",
+              "refId": "A"
+            },
+            {
+              "expr": "process_max_fds{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "max_fds",
+              "refId": "B"
+            }
+          ],
+          "title": "Exporter File Descriptors",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Network I/O attributed to the exporter process (rate).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 14 },
+          "id": 7,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(process_network_receive_bytes_total{job=~\"$job\",instance=~\"$instance\"}[5m])",
+              "legendFormat": "rx",
+              "refId": "A"
+            },
+            {
+              "expr": "rate(process_network_transmit_bytes_total{job=~\"$job\",instance=~\"$instance\"}[5m])",
+              "legendFormat": "tx",
+              "refId": "B"
+            }
+          ],
+          "title": "Exporter Network Throughput",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Goroutines and OS threads.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 14 },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "go_goroutines{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "goroutines",
+              "refId": "A"
+            },
+            {
+              "expr": "go_threads{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "os_threads",
+              "refId": "B"
+            },
+            {
+              "expr": "go_sched_gomaxprocs_threads{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "gomaxprocs",
+              "refId": "C"
+            }
+          ],
+          "title": "Go Runtime Concurrency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Heap allocation and in-use bytes.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "go_memstats_heap_alloc_bytes{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "heap_alloc",
+              "refId": "A"
+            },
+            {
+              "expr": "go_memstats_heap_inuse_bytes{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "heap_inuse",
+              "refId": "B"
+            },
+            {
+              "expr": "go_memstats_heap_idle_bytes{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "heap_idle",
+              "refId": "C"
+            },
+            {
+              "expr": "go_memstats_heap_released_bytes{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "heap_released",
+              "refId": "D"
+            }
+          ],
+          "title": "Go Heap",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "GC pause duration summary quantiles (from go_gc_duration_seconds).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "min": 0
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "go_gc_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.5\"}",
+              "legendFormat": "gc_pause_p50",
+              "refId": "A"
+            },
+            {
+              "expr": "go_gc_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"0.75\"}",
+              "legendFormat": "gc_pause_p75",
+              "refId": "B"
+            },
+            {
+              "expr": "go_gc_duration_seconds{job=~\"$job\",instance=~\"$instance\",quantile=\"1\"}",
+              "legendFormat": "gc_pause_max",
+              "refId": "C"
+            }
+          ],
+          "title": "GC Pause Duration (quantiles)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Section header for nftables named counter panels.",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+          "id": 100,
+          "title": "Security Events (named counters)",
+          "type": "row",
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Packet drop rate by reason, derived from named counters. Lets you see at a glance whether you are getting martians, invalid-state packets, ICMP floods, or SSH bruteforce attempts.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 20,
+                "stacking": { "mode": "normal", "group": "A" }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+          "id": 101,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max", "mean"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=~\"cnt_.*_drop|cnt_.*_ratelimit\"}[5m])",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Drop Rate by Reason",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Top 10 highest-rate named counters over the selected range. Useful for spotting which rule is the noisiest right now.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "min": 0,
+              "custom": {
+                "align": "auto",
+                "displayMode": "auto"
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+          "id": 102,
+          "options": {
+            "showHeader": true,
+            "footer": {
+              "show": false,
+              "reducer": ["sum"],
+              "countRows": false,
+              "fields": ""
+            }
+          },
+          "pluginVersion": "10.0.0",
+          "targets": [
+            {
+              "expr": "topk(10, rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=~\"cnt_.*\"}[5m]))",
+              "legendFormat": "{{name}}",
+              "refId": "A",
+              "instant": true,
+              "format": "table"
+            }
+          ],
+          "title": "Top 10 Counter Rates (packets/s)",
+          "type": "table",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "job": true,
+                  "__name__": true,
+                  "family": false,
+                  "table": false,
+                  "comment": false
+                },
+                "indexByName": {},
+                "renameByName": {
+                  "Value": "packets/s",
+                  "name": "counter",
+                  "family": "family",
+                  "table": "table",
+                  "comment": "comment"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Live size of the ssh_bruteforce dynamic set. Entries auto-expire after 1h. A climbing number means active probing.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 1 },
+                  { "color": "orange", "value": 5 },
+                  { "color": "red", "value": 10 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 38 },
+          "id": 103,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "center",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": ["lastNotNull"],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "value_and_name"
+          },
+          "targets": [
+            {
+              "expr": "nftables_set_elements{job=~\"$job\",instance=~\"$instance\",name=\"ssh_bruteforce\"}",
+              "legendFormat": "{{instance}}",
+              "refId": "A"
+            }
+          ],
+          "title": "SSH Bruteforce Set Size",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "SSH activity: legitimate accepts, rate-limited (new bruteforce additions), and blocked (already on the bruteforce list).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 15
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "cnt_ssh_accept" },
+                "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "cnt_ssh_ratelimit" },
+                "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }]
+              }
+            ]
+          },
+          "gridPos": { "h": 6, "w": 18, "x": 6, "y": 38 },
+          "id": 104,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=~\"cnt_ssh_.*\"}[5m])",
+              "legendFormat": "{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "SSH Activity (accept vs ratelimit)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "AP and MikroTik attempting to reach WAN. Should be near zero. Non-zero = a device on LAN that should not have internet is trying to.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 0.1 }
+                ]
+              },
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 25,
+                "thresholdsStyle": { "mode": "dashed" }
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 12, "x": 0, "y": 44 },
+          "id": 105,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=\"cnt_ap_mk_block\"}[5m])",
+              "legendFormat": "ap/mikrotik blocked",
+              "refId": "A"
+            }
+          ],
+          "title": "AP/MikroTik WAN Block Attempts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "BGP session accepts (TCP 179 from Talos node IPs). Should be steady-state low. Spikes suggest peers flapping.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "pps",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 15
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 6, "w": 12, "x": 12, "y": 44 },
+          "id": 106,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=\"cnt_bgp_accept\"}[5m])",
+              "legendFormat": "bgp accept",
+              "refId": "A"
+            }
+          ],
+          "title": "BGP Session Accepts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Section header for traffic flow panels derived from named counters.",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 50 },
+          "id": 110,
+          "title": "Traffic Flow (router perspective)",
+          "type": "row",
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "LAN to WAN throughput measured at the forward-chain accept counter. This is router-perspective egress for LAN clients.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 20
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 51 },
+          "id": 111,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max", "mean"],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_bytes{job=~\"$job\",instance=~\"$instance\",name=\"cnt_lan_wan_accept\"}[5m])",
+              "legendFormat": "lan→wan",
+              "refId": "A"
+            }
+          ],
+          "title": "LAN → WAN Throughput",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Intra-LAN throughput to and from MetalLB VIPs (Envoy Gateway). Note: this counter is incremented by both directions of the rule pair, so it is two-way aggregate.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 20
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 51 },
+          "id": 112,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max", "mean"],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_bytes{job=~\"$job\",instance=~\"$instance\",name=\"cnt_metallb_accept\"}[5m])",
+              "legendFormat": "metallb (both directions)",
+              "refId": "A"
+            }
+          ],
+          "title": "MetalLB Intra-LAN Throughput",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Average packet size on LAN→WAN. Sudden drops suggest small-packet floods (SYN scans, amplification). Steady ~500-1200 B is normal mixed traffic.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 10
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 58 },
+          "id": 113,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "mean"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_bytes{job=~\"$job\",instance=~\"$instance\",name=\"cnt_lan_wan_accept\"}[5m]) / clamp_min(rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=\"cnt_lan_wan_accept\"}[5m]), 1)",
+              "legendFormat": "avg bytes/pkt (lan→wan)",
+              "refId": "A"
+            }
+          ],
+          "title": "LAN → WAN Average Packet Size",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Fraction of forwarded traffic that hit the catch-all drop relative to accepts. A rising ratio means more rejected forwarding attempts.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 15
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 0.1 },
+                  { "color": "red", "value": 0.5 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 58 },
+          "id": 114,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max", "mean"],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=\"cnt_fwd_drop\"}[5m]) / clamp_min(sum(rate(nftables_counter_packets{job=~\"$job\",instance=~\"$instance\",name=~\"cnt_(lan_wan|metallb)_accept\"}[5m])), 1)",
+              "legendFormat": "fwd_drop / fwd_accept",
+              "refId": "A"
+            }
+          ],
+          "title": "Forward-Chain Drop Ratio",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Section header for structural / config-drift panels.",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 65 },
+          "id": 120,
+          "title": "Sets & Structural",
+          "type": "row",
+          "collapsed": false,
+          "panels": []
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Element count per nftables set. ssh_bruteforce is the live blocklist; growth = active probing.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "stepBefore",
+                "fillOpacity": 15
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 66 },
+          "id": 121,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "targets": [
+            {
+              "expr": "nftables_set_elements{job=~\"$job\",instance=~\"$instance\"}",
+              "legendFormat": "{{family}}/{{table}}/{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "nftables Set Element Counts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "description": "Number of times the rule count per chain changed in the last hour. Non-zero = ruleset was reloaded. Helpful for spotting unexpected config changes.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "min": 0,
+              "custom": {
+                "drawStyle": "bars",
+                "lineInterpolation": "linear",
+                "fillOpacity": 60
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 66 },
+          "id": 122,
+          "options": {
+            "legend": {
+              "calcs": ["lastNotNull", "max"],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "targets": [
+            {
+              "expr": "changes(nftables_chain_rules{job=~\"$job\",instance=~\"$instance\"}[1h])",
+              "legendFormat": "{{family}}/{{table}}/{{name}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Rule Count Changes per Chain (1h)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["nftables", "exporter", "router"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": false, "text": "Prometheus", "value": "${DS_PROMETHEUS}" },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Datasource",
+            "multi": false,
+            "name": "DS_PROMETHEUS",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": { "selected": true, "text": "nftables-exporter", "value": "nftables-exporter" },
+            "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+            "definition": "label_values(nftables_up, job)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "job",
+            "multi": false,
+            "name": "job",
+            "options": [],
+            "query": {
+              "query": "label_values(nftables_up, job)",
+              "refId": "PromJob"
+            },
+            "refresh": 2,
+            "regex": "",
+            "type": "query"
+          },
+          {
+            "current": { "selected": false, "text": "All", "value": ".*" },
+            "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+            "definition": "label_values(nftables_up{job=~\"$job\"}, instance)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "instance",
+            "multi": true,
+            "name": "instance",
+            "options": [],
+            "query": {
+              "query": "label_values(nftables_up{job=~\"$job\"}, instance)",
+              "refId": "PromInstance"
+            },
+            "refresh": 2,
+            "regex": "",
+            "type": "query"
+          }
+        ]
+      },
+      "time": { "from": "now-15m", "to": "now" },
+      "timepicker": {
+        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+      },
+      "timezone": "browser",
+      "title": "nftables-exporter",
+      "version": 1,
+      "weekStart": ""
+    }
+

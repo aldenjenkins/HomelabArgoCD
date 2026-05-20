@@ -1,0 +1,4 @@
+namespace: nftables
+resources:
+  - namespace.yaml
+  - grafanadashboard.yaml
