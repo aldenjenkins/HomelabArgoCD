@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: memcached
-          image: memcached:1.6.41-alpine
+          image: memcached:1.6.42-alpine
           imagePullPolicy: IfNotPresent
           args:
             - memcached
