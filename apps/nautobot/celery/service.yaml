@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautobot-celery-headless
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: nautobot-celery
+spec:
+  clusterIP: "None"
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: "workermetrics"
+      name: "workermetrics"
+  selector:
+    app.kubernetes.io/name: nautobot
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/component: nautobot-celery

@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nautobot-server
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: "nautobot-server"
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautobot
+      app.kubernetes.io/instance: nautobot
+      app.kubernetes.io/component: nautobot-server
+  endpoints:
+    - port: http
+      interval: 1m
+      scrapeTimeout: 30s

@@ -33,7 +33,7 @@ spec:
     limits:
       memory: "768Mi"
     requests:
-      cpu: "500m"
+      cpu: "50m"
       memory: 512Mi
   serviceAccount: otel-collector
   config:

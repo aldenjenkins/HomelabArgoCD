@@ -1,0 +1,96 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nautobot-init
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: nautobot-init
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nautobot
+        helm.sh/chart: nautobot-3.1.1
+        app.kubernetes.io/instance: nautobot
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "3.0"
+        app.kubernetes.io/component: nautobot-init
+    spec:
+      restartPolicy: "OnFailure"
+      serviceAccountName: nautobot
+
+      securityContext:
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      # initContainers:
+      containers:
+        # This init container will run post_upgrade which initializes/upgrades the DB as well as collects static files
+        - name: "nautobot-init"
+          image: registry.home.alden.ai/me/nautobot:3.1.2-with-bgp
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 999
+            runAsNonRoot: true
+            runAsUser: 999
+          args:
+            - "echo"
+            - "Nautobot Initialization Done"
+          env:
+            - name: "NAUTOBOT_K8S_COMPONENT"
+              value: "nautobot-init"
+            - name: NAUTOBOT_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: "username"
+            - name: NAUTOBOT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: "password"
+            - name: NAUTOBOT_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: "host"
+          envFrom:
+            - configMapRef:
+                name: nautobot-env-configmap
+            - secretRef:
+                name: nautobot-env-secret
+          resources:
+            # limits:
+            #   cpu: 1000m
+            #   memory: 8704M
+            requests:
+              cpu: 300m
+              memory: 1280M
+          volumeMounts:
+            # - name: "nautobot-static"
+            #   mountPath: "/opt/nautobot/static"
+            - name: "git-repos"
+              mountPath: "/opt/nautobot/git"
+            - name: "nautobot-config-files"
+              mountPath: "/opt/nautobot/uwsgi.ini"
+              subPath: "uwsgi.ini"
+            - name: "nautobot-config-files"
+              mountPath: "/opt/nautobot/nautobot_config.py"
+              subPath: "nautobot_config.py"
+      volumes:
+        # - name: "nautobot-static"
+        #   emptyDir: {}
+        - name: "git-repos"
+          emptyDir: {}
+        - name: "nautobot-config-files"
+          configMap:
+            name: nautobot-config-files

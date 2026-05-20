@@ -45,6 +45,7 @@ spec:
               - headlamp.home.alden.ai
               - lldap.home.alden.ai
               - vikunja.home.alden.ai
+              - nautobot.home.alden.ai
         - operation:
             hosts:
               - search.home.alden.ai

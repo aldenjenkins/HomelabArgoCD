@@ -1,0 +1,26 @@
+namespace: nautobot
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - postgres
+  - redis
+  # - init
+  - celery
+  - celery-beat
+  - server
+
+generators:
+  - sopsgenerator.yaml
+
+configMapGenerator:
+  - name: nautobot-env-configmap
+    envs:
+      - files/config.env
+    options:
+      immutable: true
+  - name: nautobot-config-files
+    files:
+      - files/uwsgi.ini
+      - files/nautobot_config.py
+    options:
+      immutable: true

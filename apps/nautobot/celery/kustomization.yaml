@@ -1,0 +1,5 @@
+namespace: nautobot
+resources:
+  - deployment.yaml
+  - service.yaml
+  - servicemonitor.yaml

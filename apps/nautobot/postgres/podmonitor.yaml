@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: nautobot-postgres-18
+  labels:
+    app.kubernetes.io/name: postgresql
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+      cnpg.io/cluster: nautobot-postgres-18
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - nautobot

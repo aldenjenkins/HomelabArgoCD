@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautobot
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: nautobot-server
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: "TCP"
+      port: 443
+      targetPort: "https"
+      name: "https"
+    - protocol: "TCP"
+      port: 80
+      targetPort: "http"
+      name: "http"
+  selector:
+    app.kubernetes.io/name: nautobot
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/component: nautobot-server

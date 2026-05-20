@@ -1,0 +1,35 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: nautobot-postgres-18
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3
+
+  bootstrap:
+    initdb:
+      database: nautobot
+      owner: nautobot
+  storage:
+    size: 5Gi
+    storageClass: local-path
+
+  monitoring:
+    enablePodMonitor: false
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      enabled: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: nautobot-postgres-18-3
+

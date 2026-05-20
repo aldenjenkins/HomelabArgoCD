@@ -97,7 +97,7 @@ spec:
               value: "24"
           resources:
             requests:
-              cpu: 1
+              cpu: 100m
               memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false

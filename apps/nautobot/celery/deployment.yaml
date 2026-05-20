@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautobot-celery
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: nautobot-celery
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautobot
+      app.kubernetes.io/instance: nautobot
+      app.kubernetes.io/component: nautobot-celery
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nautobot
+        helm.sh/chart: nautobot-3.1.1
+        app.kubernetes.io/instance: nautobot
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/version: "3.0"
+        app.kubernetes.io/component: nautobot-celery
+    spec:
+      serviceAccountName: nautobot
+
+      affinity:
+        # podAffinity:
+
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: nautobot
+                    app.kubernetes.io/name: nautobot
+                    app.kubernetes.io/component: nautobot-celery
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        # nodeAffinity:
+
+      securityContext:
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      # initContainers:
+      containers:
+        - name: nautobot-celery
+          tty: true
+          # image: ghcr.io/nautobot/nautobot:3.1.2
+          image: registry.home.alden.ai/me/nautobot:3.1.2-with-bgp
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+            runAsUser: 999
+            runAsNonRoot: true
+          command:
+            - nautobot-server
+            - celery
+            - worker
+            - --loglevel
+            - $(NAUTOBOT_LOG_LEVEL)
+            - --queues
+            - $(CELERY_TASK_QUEUES)
+            - --events
+          env:
+            - name: "NAUTOBOT_K8S_COMPONENT"
+              value: "nautobot-celery"
+            - name: "CELERY_TASK_QUEUES"
+              value: "default"
+            - name: "NAUTOBOT_CELERY_WORKER_PREFETCH_MULTIPLIER"
+              value: "1"
+            - name: "NAUTOBOT_CELERY_WORKER_PROMETHEUS_PORTS"
+              value: "8080"
+            - name: NAUTOBOT_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: username
+            - name: NAUTOBOT_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: password
+            - name: NAUTOBOT_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: nautobot-postgres-18-app
+                  key: host
+            # - name: NAUTOBOT_REDIS_PASSWORD
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: nautobot-redis
+            #       key: redis-password
+          envFrom:
+            - configMapRef:
+                name: nautobot-env-configmap
+            - secretRef:
+                name: nautobot-env-secret
+          resources:
+            limits:
+              cpu: 1000m
+              # memory: 6656M
+            requests:
+              cpu: 400m
+              memory: 1G
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - '[ $(find /tmp/nautobot_celery_worker_heartbeat -mmin -1 | wc -l) -eq 1 ] || false'
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - '[ $(find /tmp/nautobot_celery_worker_ready | wc -l) -eq 1 ] || false'
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          ports:
+            - name: workermetrics
+              containerPort: 8080
+          volumeMounts:
+            - name: "git-repos"
+              mountPath: "/opt/nautobot/git"
+            - name: "nautobot-config-files"
+              mountPath: "/opt/nautobot/nautobot_config.py"
+              subPath: "nautobot_config.py"
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: "git-repos"
+          emptyDir: {}
+        - name: "nautobot-config-files"
+          configMap:
+            name: nautobot-config-files

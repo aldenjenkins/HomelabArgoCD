@@ -1,0 +1,10 @@
+namespace: nautobot
+resources:
+  - objectstore.yaml
+  - cnpg-cluster.yaml
+  - service.yaml
+  - scheduledbackup.yaml
+  - probe.yaml
+  - podmonitor.yaml
+generators:
+  - sopsgenerator.yaml

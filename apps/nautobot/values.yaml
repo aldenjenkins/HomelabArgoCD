@@ -1,0 +1,9 @@
+nautobot:
+  singleInit: true
+  configCM: nautobot-config-py
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true # default
+  prometheusRule:
+    enabled: true

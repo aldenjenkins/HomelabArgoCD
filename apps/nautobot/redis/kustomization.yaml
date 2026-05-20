@@ -1,0 +1,5 @@
+namespace: nautobot
+resources:
+  - redis.yaml
+  # - servicemonitor.yaml
+  - grafanadatasource.yaml

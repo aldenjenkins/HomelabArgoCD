@@ -1,0 +1,19 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: "ServiceMonitor"
+metadata:
+  name: nautobot-celery
+  labels:
+    app.kubernetes.io/name: nautobot
+    helm.sh/chart: nautobot-3.1.1
+    app.kubernetes.io/instance: nautobot
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: nautobot-celery
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautobot
+      app.kubernetes.io/instance: nautobot
+      app.kubernetes.io/component: nautobot-celery
+  endpoints:
+    - port: "workermetrics"
