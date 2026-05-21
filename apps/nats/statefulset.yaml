@@ -45,7 +45,7 @@ spec:
               name: nats-data
       containers:
         - name: nats-jetstream
-          image: nats:2.14.0-alpine
+          image: nats:2.14.1-alpine
           imagePullPolicy: IfNotPresent
           securityContext: &containerSecurity
             allowPrivilegeEscalation: false
