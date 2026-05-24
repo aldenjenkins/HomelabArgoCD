@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: write-servers-json
-          image: busybox:1.37
+          image: busybox:1.38
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
