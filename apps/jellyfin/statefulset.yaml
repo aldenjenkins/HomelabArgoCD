@@ -48,7 +48,7 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
-          image: ghcr.io/jellyfin/jellyfin:10.11.9
+          image: ghcr.io/jellyfin/jellyfin:10.11.10
           imagePullPolicy: IfNotPresent
           resources:
             requests:
