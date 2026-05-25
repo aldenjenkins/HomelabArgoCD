@@ -12,6 +12,11 @@ resources:
   - opentelemetrycollector-selfmetrics.yaml
   # 2026-01-18
   # disabling this for now as i don't think its used anywhere but lets see :)
+  # 2026-05-25
+  # re-enabling again. starting with mailpit as first auto-implementation use.
+  # 2026-05-25 nevermind, go auto instrumentation requires the securityContext
+  # to set "privileged: true" and "runAsUser: 0" which fails the PodAdmissionPolicy
+  # of talos, which I want to keep as the suggested "baseline" for best hardening.
   # - instrumentation.yaml
   - serviceaccount.yaml
   - clusterrole.yaml

@@ -23,6 +23,12 @@ patches:
       - op: add
         path: /spec/template/spec/containers/0/args/-
         value: "--feature-gates=operator.targetallocator.mtls"
+    # - op: add
+    #   path: /spec/template/spec/containers/0/args/-
+    #   value: "--enable-go-instrumentation"
+    # - op: add
+    #   path: /spec/template/spec/containers/0/args/-
+    #   value: "--enable-nginx-instrumentation"
     # kind: Deployment
     # metadata:
     #   labels:

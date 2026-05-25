@@ -305,8 +305,11 @@ spec:
             endpoint: 0.0.0.0:4317
             keepalive:
               server_parameters:
-                max_connection_age: 5s
-                max_connection_age_grace: 5s
+                # 2026-05-25 attempting to increase this in case these current 5s configs are too low and possibly causing many reconnects unnecessarily
+                # max_connection_age: 5s
+                # max_connection_age_grace: 5s
+                max_connection_age: 5m
+                max_connection_age_grace: 30s
           http:
             endpoint: 0.0.0.0:4318
             max_request_body_size: 41943040

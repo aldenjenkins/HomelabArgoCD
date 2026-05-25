@@ -1,0 +1,9 @@
+namespace: mailpit
+resources:
+  - namespace.yaml
+  - persistentvolumeclaim.yaml
+  - deployment.yaml
+  - service.yaml
+  - servicemonitor.yaml
+  - httproute.yaml
+  - probe.yaml

@@ -11,25 +11,55 @@ spec:
     - b3
   sampler:
     type: parentbased_traceidratio
-    argument: "0.25"
-  python:
-    env:
-      # Required if endpoint is set to 4317.
-      # Python autoinstrumentation uses http/proto by default
-      # so data must be sent to 4318 instead of 4317.
-      - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://trace-collector.observability.svc.cluster.local:4318
-  dotnet:
-    env:
-      # Required if endpoint is set to 4317.
-      # Dotnet autoinstrumentation uses http/proto by default
-      # See https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/blob/888e2cd216c77d12e56b54ee91dafbc4e7452a52/docs/config.md#otlp
-      - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://trace-collector.observability.svc.cluster.local:4318
+    # 2026-05-25 changing to 1.0 (100%) so we can let trace-collector
+    # do sampling on its own if desired (that way sampling is done in a single location).
+    # argument: "0.25"
+    argument: "1.0"
+
+  resource:
+    resourceAttributes:
+      k8s.cluster.name: homelab-live
+      # service.name and service.namespace are auto-populated from pod metadata + annotations
+    addK8sUIDAttributes: true
+
+  env:
+    # Global env applied to all language agents.
+    # Split traces vs metrics endpoints using OTEL_EXPORTER_OTLP_*_ENDPOINT.
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: grpc
+    - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      value: http://trace-collector.observability.svc.cluster.local:4317
+    - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      value: http://otlp-collector.observability.svc.cluster.local:4317
+    # - name: OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
+    #   value: http://trace-collector.observability.svc.cluster.local:4317  # placeholder — see note
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_LOGS_EXPORTER
+      value: none  # you have a separate logs agent/gateway; don't double-emit
+  # python:
+    # env:
+    #   # Required if endpoint is set to 4317.
+    #   # Python autoinstrumentation uses http/proto by default
+    #   # so data must be sent to 4318 instead of 4317.
+    #   - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    #     value: http://trace-collector.observability.svc.cluster.local:4318
+  # dotnet:
+    # env:
+    #   # Required if endpoint is set to 4317.
+    #   # Dotnet autoinstrumentation uses http/proto by default
+    #   # See https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/blob/888e2cd216c77d12e56b54ee91dafbc4e7452a52/docs/config.md#otlp
+    #   - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    #     value: http://trace-collector.observability.svc.cluster.local:4318
   go:
-    env:
-      # Required if endpoint is set to 4317.
-      # Go autoinstrumentation uses http/proto by default
-      # so data must be sent to 4318 instead of 4317.
-      - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: http://trace-collector.observability.svc.cluster.local:4318
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.24.0
+    # env:
+    #   # Required if endpoint is set to 4317.
+    #   # Go autoinstrumentation uses http/proto by default
+    #   # so data must be sent to 4318 instead of 4317.
+    #   - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    #     value: http://trace-collector.observability.svc.cluster.local:4318
+  # nginx:
+  #   image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nginx:1.0.3

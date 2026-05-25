@@ -46,6 +46,7 @@ spec:
               - lldap.home.alden.ai
               - vikunja.home.alden.ai
               - nautobot.home.alden.ai
+              - mailpit.home.alden.ai
         - operation:
             hosts:
               - search.home.alden.ai
