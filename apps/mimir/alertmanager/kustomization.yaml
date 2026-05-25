@@ -9,3 +9,10 @@ resources:
 
 generators:
   - sopsgenerator.yaml
+
+configMapGenerator:
+  - name: mimir-alertmanager-fallback-config
+    files:
+      - files/alertmanager_fallback_config.yaml
+    options:
+      immutable: true

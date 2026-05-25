@@ -1,0 +1,96 @@
+global:
+  slack_api_url: ${SLACK_WEBHOOK_URL}
+route:
+  receiver: null_receiver
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers:
+        - alertname =~ "Watchdog|InfoInhibitor"
+      receiver: null_receiver
+      continue: false
+    - matchers:
+        - severity =~ "critical|warning"
+      receiver: slack-notifications
+receivers:
+  - name: null_receiver
+  - name: slack-notifications
+    slack_configs:
+      - send_resolved: true
+        username: "alertmanager"
+        icon_url: "https://avatars3.githubusercontent.com/u/3380462"
+        channel: "#alertmanager"
+        title: |-
+          {{- $icon := "🔔" -}}
+          {{- if eq .Status "firing" -}}
+            {{- if eq .CommonLabels.severity "critical" -}}{{- $icon = "🚨" -}}
+            {{- else if eq .CommonLabels.severity "warning" -}}{{- $icon = "⚠️" -}}
+            {{- else if eq .CommonLabels.severity "info" -}}{{- $icon = "ℹ️" -}}
+            {{- end -}}
+          {{- else -}}{{- $icon = "✅" -}}
+          {{- end -}}
+          {{ $icon }} [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+        title_link: >-
+          {{- $params := "" -}}
+          {{- range .CommonLabels.SortedPairs -}}
+            {{- if eq $params "" -}}
+              {{- $params = printf "%s=\"%s\"" .Name .Value -}}
+            {{- else -}}
+              {{- $params = printf "%s,%s=\"%s\"" $params .Name .Value -}}
+            {{- end -}}
+          {{- end -}}
+          {{ .ExternalURL }}/#/alerts?filter={{ urlquery (printf "{%s}" $params) }}
+        text: |-
+          {{ range .Alerts -}}
+          {{- $ns := .Labels.namespace -}}
+          {{- if not $ns }}{{ $ns = .Labels.k8s_namespace_name }}{{ end -}}
+          {{ if .Annotations.summary }}> {{ .Annotations.summary }}{{ end }}
+          *Severity:* `{{ .Labels.severity }}`{{ if $ns }}  •  *Namespace:* `{{ $ns }}`{{ end }}{{ if .Labels.job }}  •  *Job:* `{{ .Labels.job }}`{{ end }}{{ if .Labels.instance }}  •  *Instance:* `{{ .Labels.instance }}`{{ end }}
+          {{ if .Annotations.description }}
+          {{ .Annotations.description }}
+          {{ end -}}
+          {{ end }}
+        color: '{{ if eq .Status "firing" }}{{ if eq .CommonLabels.severity "critical" }}danger{{ else if eq .CommonLabels.severity "warning" }}warning{{ else }}#439FE0{{ end }}{{ else }}good{{ end }}'
+        actions:
+          - type: button
+            text: "📖 Runbook"
+            url: '{{ (index .Alerts 0).Annotations.runbook_url }}'
+          - type: button
+            text: "📊 Grafana Explore"
+            url: >-
+              {{- $a := index .Alerts 0 -}}
+              {{- $expr := queryFromGeneratorURL $a.GeneratorURL -}}
+              {{- if ne $expr "" -}}
+              {{- /* Find earliest StartsAt across all alerts in the group */ -}}
+              {{- $minStart := $a.StartsAt -}}
+              {{- range .Alerts -}}
+                {{- if .StartsAt.Before $minStart -}}{{- $minStart = .StartsAt -}}{{- end -}}
+              {{- end -}}
+              {{- /* Find latest end time. For firing alerts EndsAt is the future; for resolved it's the actual end. Use the larger of EndsAt or StartsAt to be safe. */ -}}
+              {{- $maxEnd := $a.StartsAt -}}
+              {{- range .Alerts -}}
+                {{- $candidate := .StartsAt -}}
+                {{- if .EndsAt.After $candidate -}}{{- $candidate = .EndsAt -}}{{- end -}}
+                {{- if $candidate.After $maxEnd -}}{{- $maxEnd = $candidate -}}{{- end -}}
+              {{- end -}}
+              {{- /* Pad 15 minutes on each side for context (15min = 900000000000 nanoseconds) */ -}}
+              {{- $from := printf "%d" ($minStart.Add -900000000000).UnixMilli -}}
+              {{- $to := printf "%d" ($maxEnd.Add 900000000000).UnixMilli -}}
+              {{ grafanaExploreURL "https://grafana.home.alden.ai" "prometheus" $from $to $expr }}
+              {{- else -}}
+              {{ $a.GeneratorURL }}
+              {{- end -}}
+          - type: button
+            text: "🔕 Silence 1h"
+            url: >-
+              {{- $params := "" -}}
+              {{- range .CommonLabels.SortedPairs -}}
+                {{- if eq $params "" -}}
+                  {{- $params = printf "%s=\"%s\"" .Name .Value -}}
+                {{- else -}}
+                  {{- $params = printf "%s,%s=\"%s\"" $params .Name .Value -}}
+                {{- end -}}
+              {{- end -}}
+              {{ .ExternalURL }}/#/silences/new?filter={{ urlquery (printf "{%s}" $params) }}

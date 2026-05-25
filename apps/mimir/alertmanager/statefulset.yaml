@@ -57,6 +57,37 @@ spec:
             app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: alertmanager
       terminationGracePeriodSeconds: 900
+      initContainers:
+        - name: render-fallback-config
+          image: alpine:3.19
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              sed "s|\${SLACK_WEBHOOK_URL}|${SLACK_WEBHOOK_URL}|g" \
+                /template/alertmanager_fallback_config.yaml \
+                > /rendered/alertmanager_fallback_config.yaml
+          env:
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mimir-alertmanager-slack-webhook-url
+                  key: slack-webhook-url
+          volumeMounts:
+            - name: alertmanager-fallback-config-template
+              mountPath: /template
+              readOnly: true
+            - name: alertmanager-fallback-config
+              mountPath: /rendered
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
       containers:
         - name: alertmanager
           image: grafana/mimir:3.0.6
@@ -116,7 +147,7 @@ spec:
               path: /ready
               port: http-metrics
               scheme: HTTP
-            initialDelaySeconds: 15
+            initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 20
           resources:
@@ -137,6 +168,10 @@ spec:
           emptyDir: {}
         - name: active-queries
           emptyDir: {}
+        - name: alertmanager-fallback-config-template
+          configMap:
+            name: mimir-alertmanager-fallback-config
         - name: alertmanager-fallback-config
-          secret:
-            secretName: mimir-alertmanager-fallback-config
+          # This is an empty dir because we want to envsubst the slack url in the init container
+          # then pass that rendered file to the main container's expected location
+          emptyDir: {}
