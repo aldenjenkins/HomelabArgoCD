@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reloader-reloader
+spec:
+  template:
+    spec:
+      containers:
+        - name: reloader-reloader
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          args:
+            - "--log-format=json"
+            - "--namespace-selector=\"enable-reloader-operator-watching=true\""
+            - "--reload-strategy=annotations"
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp/
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}

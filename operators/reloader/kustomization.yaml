@@ -1,0 +1,16 @@
+namespace: reloader-operator-system
+resources:
+  - namespace.yaml
+  # renovate: datasource=github-releases depName=stakater/Reloader
+  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.17
+  - service.yaml
+  - servicemonitor.yaml
+  - probe.yaml
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
+patches:
+  - path: patches/patch_deployment.yaml
+  - path: patches/patch_clusterrole.yaml
+    target:
+      kind: ClusterRole
+      name: reloader-reloader-role
