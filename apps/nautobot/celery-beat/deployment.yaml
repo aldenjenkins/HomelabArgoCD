@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "3.0"
     app.kubernetes.io/component: nautobot-celery-beat
+  annotations:
+    secret.reloader.stakater.com/reload: "nautobot-env-secret"
 spec:
   replicas: 1
   revisionHistoryLimit: 3

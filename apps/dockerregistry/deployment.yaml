@@ -4,6 +4,8 @@ metadata:
   name: docker-registry-s3
   labels:
     app: registry-s3
+  annotations:
+    secret.reloader.stakater.com/reload: "registry-env-secret"
 spec:
   replicas: 3
   selector:

@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: convertx
+  annotations:
+    secret.reloader.stakater.com/reload: "convertx-env"
 spec:
   revisionHistoryLimit: 5
   serviceName: convertx

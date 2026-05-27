@@ -12,10 +12,23 @@ spec:
       labels:
         app: adminer
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
       containers:
         - name: adminer
           image: adminer:5.4.2
           imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
           ports:
             - containerPort: 8080
           resources:
@@ -25,3 +38,9 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "200m"
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

@@ -37,49 +37,49 @@ quicklaunch:
 disableUpdateCheck: true # enabled by default
 layout:
   AI:
-    tab: Main
+    # tab: Main
     icon: mdi-chart-bell-curve-cumulative
     header: true
     style: row
     columns: 2
   Development:
-    tab: Main
+    # tab: Main
     icon: mdi-apps
     header: true
     style: row
     columns: 3
   Home:
-    tab: Home
+    # tab: Home
     icon: mdi-home
     header: true
     style: row
     columns: 4
   Media:
-    tab: Media
+    # tab: Media
     icon: mdi-multimedia
     header: true
     style: row
     columns: 3
   Privacy:
-    tab: Cluster
+    # tab: Cluster
     icon: mdi-security
     header: true
     style: row
     columns: 3
   Infrastructure & Monitoring:
-    tab: Cluster
+    # tab: Cluster
     icon: mdi-eye
     header: true
     style: row
     columns: 3
   Other:
-    tab: Cluster
+    # tab: Cluster
     icon: mdi-tools
     header: true
     style: row
     columns: 3
   Documents:
-    tab: Media
+    # tab: Media
     icon: mdi-file-document-multiple
     header: true
     style: row

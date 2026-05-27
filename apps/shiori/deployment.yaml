@@ -4,6 +4,8 @@ metadata:
   name: shiori
   labels:
     app: shiori
+  annotations:
+    secret.reloader.stakater.com/reload: "shiori-env-secret"
 spec:
   replicas: 3
   selector:

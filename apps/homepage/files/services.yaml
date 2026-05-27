@@ -45,10 +45,10 @@
     #     icon: it-tools.png
     #     href: https://it-tools.home.alden.ai
     #     description: IT Utility Tools Collection
-    - Mailpit:
-        icon: mailpit.png
-        href: https://mailpit.home.alden.ai
-        description: Email Testing Server
+    # - Mailpit:
+    #     icon: mailpit.png
+    #     href: https://mailpit.home.alden.ai
+    #     description: Email Testing Server
     - Pairdrop:
         icon: pairdrop.png
         href: https://pairdrop.home.alden.ai
@@ -90,10 +90,10 @@
         icon: frigate.png
         href: https://frigate.home.alden.ai
         description: NVR & Object Detection
-    - Netbox:
-        icon: netbox.png
-        href: https://netbox.home.alden.ai
-        description: Network Management Database
+    # - Netbox:
+    #     icon: netbox.png
+    #     href: https://netbox.home.alden.ai
+    #     description: Network Management Database
     - Eufy Bridge:
         icon: mdi-camera-outline
         href: https://eufy-bridge.home.alden.ai
@@ -119,11 +119,11 @@
         description: LAN WiFi Access Point
         ping: 192.168.123.3
 
-- Database:
-    - Adminer:
-        icon: adminer.svg
-        href: https://adminer.home.alden.ai
-        description: Lightweight DB Client
+# - Database:
+#     - Adminer:
+#         icon: adminer.svg
+#         href: https://adminer.home.alden.ai
+#         description: Lightweight DB Client
 - Other:
     # - Shlink:
     #     icon: shlink.svg
@@ -133,34 +133,34 @@
     #     icon: 2fauth.svg
     #     href: https://2fauth.home.alden.ai
     #     description: 2FA Manager
-    - Vaultwarden:
-        icon: vaultwarden.svg
-        href: https://vaultwarden.home.alden.ai
-        description: Rust-based Password Manager
-    - Vikunja:
-        icon: vikunja.svg
-        href: https://vikunja.home.alden.ai
-        description: Project & Task Management
+    # - Vaultwarden:
+    #     icon: vaultwarden.svg
+    #     href: https://vaultwarden.home.alden.ai
+    #     description: Rust-based Password Manager
+    # - Vikunja:
+    #     icon: vikunja.svg
+    #     href: https://vikunja.home.alden.ai
+    #     description: Project & Task Management
     - Kanboard:
         icon: kanboard.svg
         href: https://kanboard.home.alden.ai
         description: Project & Task Management
-    - Miniflux:
-        icon: miniflux.svg
-        href: https://miniflux.home.alden.ai
-        description: RSS Feed / Newsfeed Browser
-        widget:
-          type: miniflux
-          url: http://miniflux-web.miniflux.svc.cluster.local.:80
-          key: "{{HOMEPAGE_VAR_MINIFLUX_API_KEY}}"
+    # - Miniflux:
+    #     icon: miniflux.svg
+    #     href: https://miniflux.home.alden.ai
+    #     description: RSS Feed / Newsfeed Browser
+    #     widget:
+    #       type: miniflux
+    #       url: http://miniflux-web.miniflux.svc.cluster.local.:80
+    #       key: "{{HOMEPAGE_VAR_MINIFLUX_API_KEY}}"
     # - Excalidraw:
     #     icon: excalidraw.svg
     #     href: https://excalidraw.home.alden.ai
     #     description: Diagram / Visual Builder
-    - Shiori:
-        icon: shiori.svg
-        href: https://shiori.home.alden.ai
-        description: Bookmark Manager
+    # - Shiori:
+    #     icon: shiori.svg
+    #     href: https://shiori.home.alden.ai
+    #     description: Bookmark Manager
 - Media:
     # - Immich:
     #     icon: immich.png
@@ -220,10 +220,10 @@
         href: https://proxitok.home.alden.ai
         description: Private TikTok Frontend
 - Infrastructure & Monitoring:
-    - Grafana:
-        icon: grafana.svg
-        href: https://grafana.home.alden.ai
-        description: Dashboards & Visualization
+    # - Grafana:
+    #     icon: grafana.svg
+    #     href: https://grafana.home.alden.ai
+    #     description: Dashboards & Visualization
     - Mimir:
         icon: grafana.svg
         href: https://grafana.home.alden.ai/explore?datasource%22%3A%22prometheus%22
@@ -252,10 +252,10 @@
     #     icon: authelia.svg
     #     href: https://auth.home.alden.ai
     #     description: Forward Proxy Auth
-    - Container Registry:
-        icon: docker.svg
-        href: https://registry.home.alden.ai
-        description: Container Image Registry
+    # - Container Registry:
+    #     icon: docker.svg
+    #     href: https://registry.home.alden.ai
+    #     description: Container Image Registry
     - Redis Metrics:
         icon: redis.svg
         href: https://grafana.home.alden.ai/a/redis-app/

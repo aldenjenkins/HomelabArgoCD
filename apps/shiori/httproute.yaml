@@ -2,6 +2,15 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: shiori-httproute
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: Shiori
+    gethomepage.dev/href: "https://shiori.home.alden.ai"
+    gethomepage.dev/description: Bookmark Manager
+    gethomepage.dev/icon: shiori.svg
+    gethomepage.dev/app: shiori # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: app=shiori
 spec:
   parentRefs:
   - name: default-https-gateway

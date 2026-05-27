@@ -6,11 +6,13 @@ metadata:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/group: Home
     gethomepage.dev/name: Nautobot
-    gethomepage.dev/href: "https://vikunja.home.alden.ai"
+    gethomepage.dev/href: "https://nautobot.home.alden.ai"
     gethomepage.dev/description: Datacenter Infra Mapping
-    gethomepage.dev/icon: nautobot.svg
+    gethomepage.dev/icon: netbox.svg
     gethomepage.dev/app: nautobot # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
-    gethomepage.dev/pod-selector: app.kubernetes.io/name=nautobot
+    gethomepage.dev/pod-selector: >-
+      app.kubernetes.io/name=nautobot,
+      app.kubernetes.io/component=nautobot-server
 spec:
   parentRefs:
   - name: default-https-gateway

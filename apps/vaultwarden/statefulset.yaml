@@ -5,6 +5,8 @@ metadata:
   labels:
     app.kubernetes.io/name: vaultwarden
     app.kubernetes.io/component: vaultwarden
+  annotations:
+    secret.reloader.stakater.com/reload: "vaultwarden-secrets"
 spec:
   serviceName: vaultwarden
   replicas: 1
