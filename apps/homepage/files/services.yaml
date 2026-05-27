@@ -16,10 +16,10 @@
         icon: paperless-ai.png
         href: https://paperless-ai.home.alden.ai
         description: AI Document Tagging
-    - Bento PDF:
-        icon: bentopdf.svg
-        href: https://pdf.home.alden.ai
-        description: PDF Management Tools
+    # - Bento PDF:
+    #     icon: bentopdf.svg
+    #     href: https://pdf.home.alden.ai
+    #     description: PDF Management Tools
 - Development:
     - Argo CD:
         icon: argo-cd.svg
