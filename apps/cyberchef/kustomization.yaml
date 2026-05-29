@@ -1,0 +1,8 @@
+namespace: cyberchef
+resources:
+  - namespace.yaml
+  - service.yaml
+  - deployment.yaml
+  - httproute.yaml
+  - probe.yaml
+  - ciliumnetworkpolicy.yaml

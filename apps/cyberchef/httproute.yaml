@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: cyberchef
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: Other
+    gethomepage.dev/name: Cyberchef
+    gethomepage.dev/href: "https://cyberchef.home.alden.ai"
+    gethomepage.dev/description: "Useful Security Tools UI"
+    gethomepage.dev/icon: cyberchef.svg
+    gethomepage.dev/app: cyberchef # optional, may be needed if app.kubernetes.io/name != ingress metadata.name
+    gethomepage.dev/pod-selector: app.kubernetes.io/name=cyberchef
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: default-https-gateway
+      namespace: istio-system
+  hostnames:
+    - cyberchef.home.alden.ai
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: cyberchef
+          port: 8080
+          weight: 1
