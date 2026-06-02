@@ -58,7 +58,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: store-gateway
-          image: grafana/mimir:3.0.6
+          image: grafana/mimir:3.1.0
           imagePullPolicy: IfNotPresent
           args:
             - -target=store-gateway
