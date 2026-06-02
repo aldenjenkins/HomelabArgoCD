@@ -1,7 +1,7 @@
 namespace: longhorn-system
 resources:
   # renovate: datasource=github-releases depName=longhorn/longhorn
-  - https://github.com/longhorn/longhorn/releases/download/v1.11.2/longhorn.yaml
+  - https://github.com/longhorn/longhorn/releases/download/v1.12.0/longhorn.yaml
   - dashboards
   - httproute.yaml
   - storageclass.yaml
