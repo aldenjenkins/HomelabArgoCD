@@ -47,7 +47,6 @@ spec:
         - args:
             - -target=distributor
             - -config.file=/conf/tempo.yaml
-            - -mem-ballast-size-mbs=1024
           image: docker.io/grafana/tempo:3.0.0
           imagePullPolicy: IfNotPresent
           name: distributor

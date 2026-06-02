@@ -1,0 +1,7 @@
+namespace: tempo
+resources:
+  - poddisruptionbudget.yaml
+  - service.yaml
+  - statefulset.yaml
+  - serviceaccount.yaml
+  - servicemonitor.yaml

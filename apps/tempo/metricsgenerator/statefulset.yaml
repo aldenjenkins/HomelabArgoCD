@@ -44,23 +44,22 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       enableServiceLinks: false
-      
+
       initContainers:
         []
       containers:
         - args:
             - -target=metrics-generator
             - -config.file=/conf/tempo.yaml
-            - -mem-ballast-size-mbs=512
           image: docker.io/grafana/tempo:3.0.0
           imagePullPolicy: IfNotPresent
           name: metrics-generator
           ports:
-            - name: "grpc"
+            - name: grpc
               containerPort: 9095
-            - name: "http-memberlist"
-              containerPort: 7946
-            - name: "http-metrics"
+            - name: http-memberlist
+              containerPort: 7956
+            - name: http-metrics
               containerPort: 3200
           env:
             - name: GOMEMLIMIT

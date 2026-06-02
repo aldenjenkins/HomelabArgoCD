@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-live-store
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: live-store
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: 3200
+      targetPort: http-metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: live-store
+  ipFamilies: [IPv4]
+  ipFamilyPolicy: SingleStack
+

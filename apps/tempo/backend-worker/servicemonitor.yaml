@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tempo-backend-worker
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+    app.kubernetes.io/component: backend-worker
+    app.kubernetes.io/part-of: memberlist
+spec:
+  namespaceSelector:
+    matchNames:
+    - tempo
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/component: backend-worker
+    matchExpressions:
+      - key: prometheus.io/service-monitor
+        operator: NotIn
+        values:
+          - "false"
+  endpoints:
+    - port: http-metrics
+      relabelings:
+        - action: replace
+          sourceLabels: [job]
+          replacement: "tempo/backend-worker"
+          targetLabel: job
+      scheme: http

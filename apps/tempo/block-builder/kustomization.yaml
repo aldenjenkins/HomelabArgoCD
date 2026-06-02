@@ -1,0 +1,4 @@
+namespace: tempo
+resources:
+  - service.yaml
+  - statefulset.yaml

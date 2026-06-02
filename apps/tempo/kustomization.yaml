@@ -2,13 +2,18 @@ namespace: tempo
 resources:
   - namespace.yaml
   - serviceaccount.yaml
+  - kafka
   - gateway
   - gossipring
   - memcached
   - metricsgenerator
-  - ingester
+  - block-builder
+  - live-store
+  - backend-worker
+  - backend-scheduler
+  # - ingester
   - distributor
-  - compactor
+  # - compactor
   - querier
   - query-frontend
   - grafanadatasource.yaml

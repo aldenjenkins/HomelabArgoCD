@@ -16,27 +16,27 @@ cache:
         - parquet-footer
         - bloom
         - frontend-search
-# compactor:
-#   compaction:
-#     # block_retention: 240h
-#     # compacted_block_retention: 1h
-#     # block_retention: 12h  # How long to keep blocks. Default is 14 days, this demo system is short-lived.
-#     block_retention: 168h  # How long to keep blocks. Default is 14 days, this demo system is short-lived. 168h = 7 days
-#     compacted_block_retention: 1h   # Must be longer than blocklist_poll (30m) to avoid stale references
-#     # compaction_cycle: 30s
-#     compaction_cycle: 10m
-#     compaction_window: 1h  # Blocks in this time window will be compacted together.
-#     # max_block_bytes: 107374182400
-#     max_block_bytes: 107374182400
-#     max_compaction_objects: 6000000
-#     max_time_per_tenant: 5m
-#     retention_concurrency: 10
-#     v2_in_buffer_bytes: 5242880
-#     v2_out_buffer_bytes: 20971520
-#     v2_prefetch_traces_count: 1000
-#   ring:
-#     kvstore:
-#       store: memberlist
+compactor:
+  compaction:
+    # block_retention: 240h
+    # compacted_block_retention: 1h
+    # block_retention: 12h  # How long to keep blocks. Default is 14 days, this demo system is short-lived.
+    block_retention: 168h  # How long to keep blocks. Default is 14 days, this demo system is short-lived. 168h = 7 days
+    compacted_block_retention: 1h   # Must be longer than blocklist_poll (30m) to avoid stale references
+    # compaction_cycle: 30s
+    compaction_cycle: 10m
+    compaction_window: 1h  # Blocks in this time window will be compacted together.
+    # max_block_bytes: 107374182400
+    max_block_bytes: 107374182400
+    max_compaction_objects: 6000000
+    max_time_per_tenant: 5m
+    retention_concurrency: 10
+    v2_in_buffer_bytes: 5242880
+    v2_out_buffer_bytes: 20971520
+    v2_prefetch_traces_count: 1000
+  ring:
+    kvstore:
+      store: memberlist
 distributor:
   receivers:
     otlp:
@@ -48,45 +48,14 @@ distributor:
   ring:
     kvstore:
       store: memberlist
-# ingester:
-#   lifecycler:
-#     ring:
-#       kvstore:
-#         store: memberlist
-#       replication_factor: 3
-#       zone_awareness_enabled: false
-#     tokens_file_path: /var/tempo/tokens.json
-ingest:
-  kafka:
-    address: tempo-kafka.tempo.svc.cluster.local.:9092
-    auto_create_topic_default_partitions: 100
-    auto_create_topic_enabled: true
-    topic: tempo-traces
-block_builder:
-  consume_cycle_duration: 30s
-  partitions_per_instance: 1
-live_store:
-  readiness_target_lag: 5s
-  # Lowered from the 30m default so this demo doesn't block for a long time
-  # when the live-store starts against an empty Kafka topic (it has no record
-  # to use as a high-water mark, so it always waits the full max_wait). Real
-  # deployments can usually leave the default in place.
-  readiness_max_wait: 30s
-  ring:
-    kvstore:
-      store: memberlist
-backend_scheduler:
-  provider:
-    compaction:
-      compaction:
-        block_retention: 1h
-backend_worker:
-  backend_scheduler_addr: tempo-backend-scheduler:9095
-  compaction:
-    block_retention: 1h
-  ring:
-    kvstore:
-      store: memberlist
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: memberlist
+      replication_factor: 3
+      zone_awareness_enabled: false
+    tokens_file_path: /var/tempo/tokens.json
 memberlist:
   abort_if_cluster_join_fails: false
   bind_addr: []
@@ -167,9 +136,9 @@ memberlist:
 #   traces_storage:
 #     path: /var/tempo/traces
 metrics_generator:
-  processor: {}
-    # local_blocks:
-    #   flush_to_storage: true
+  processor:
+    local_blocks:
+      flush_to_storage: true
   ring:
     kvstore:
       store: memberlist
@@ -178,13 +147,11 @@ metrics_generator:
 multitenancy_enabled: false
 overrides:
   defaults:
-    compaction:
-      compaction_disabled: true
     ingestion:
       max_traces_per_user: 0
       rate_limit_bytes: 75000000
     metrics_generator:
-      processors: []
+      processors: [local-blocks]
     # metrics_generator:
     #   processor:
     #     service_graphs:
