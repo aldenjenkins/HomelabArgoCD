@@ -48,6 +48,7 @@ spec:
               - nautobot.home.alden.ai
               - mailpit.home.alden.ai
               - cyberchef.home.alden.ai
+              - backstage.home.alden.ai
         - operation:
             hosts:
               - search.home.alden.ai
