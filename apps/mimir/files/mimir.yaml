@@ -154,11 +154,12 @@ frontend_worker:
   query_scheduler_grpc_client_config:
     max_recv_msg_size: *max_recv_msg_size
     max_send_msg_size: *max_send_msg_size
+  # 2026-06-05 this option is now removed in 3.1.0 per https://github.com/grafana/mimir/pull/14114/changes
   # (experimental) Enables streaming of responses from querier to query-frontend
   # for response types that support it (currently only `active_series` responses
   # do).
   # CLI flag: -querier.response-streaming-enabled
-  response_streaming_enabled: true # default false
+  # response_streaming_enabled: true # default false
 
 # Query scheduler - enables query queuing and fair scheduling
 query_scheduler:
