@@ -11,7 +11,7 @@ spec:
     limits:
       memory: 2Gi
     requests:
-      cpu: 500m
+      cpu: 50m
       memory: 1Gi
   replicas: 1
   # autoscaler:

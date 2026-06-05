@@ -103,7 +103,7 @@ spec:
                 name: nautobot-env-secret
           resources:
             limits:
-              cpu: 2000m
+              cpu: 1000m
             requests:
               cpu: 5m
               memory: 256M

@@ -39,6 +39,8 @@ spec:
             - labelSelector:
                 matchLabels:
                   app.kubernetes.io/component: kafka
+                  app.kubernetes.io/name: mimir
+                  app.kubernetes.io/instance: mimir
               topologyKey: kubernetes.io/hostname
       containers:
         - name: kafka

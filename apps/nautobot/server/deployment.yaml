@@ -163,7 +163,7 @@ spec:
             # cpu: 1000m
             # memory: 8704M
             requests:
-              cpu: 300m
+              cpu: 100m
               memory: 1280M
           livenessProbe:
             # exec:

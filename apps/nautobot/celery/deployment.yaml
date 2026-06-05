@@ -111,11 +111,11 @@ spec:
             - secretRef:
                 name: nautobot-env-secret
           resources:
-            limits:
-              cpu: 1000m
+            # limits:
+            #   cpu: 1000m
               # memory: 6656M
             requests:
-              cpu: 400m
+              cpu: 40m
               memory: 1G
           livenessProbe:
             exec:

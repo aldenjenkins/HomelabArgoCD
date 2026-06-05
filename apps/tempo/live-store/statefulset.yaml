@@ -51,6 +51,8 @@ spec:
             - containerPort: 3200
               name: http-metrics
               protocol: TCP
+            - name: grpc
+              containerPort: 9095
           readinessProbe:
             httpGet:
               path: /ready
@@ -110,5 +112,5 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 20Gi
         storageClassName: local-path
