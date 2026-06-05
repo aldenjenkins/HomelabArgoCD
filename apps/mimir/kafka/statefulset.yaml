@@ -32,7 +32,7 @@ spec:
         runAsUser: 1001
         seccompProfile:
           type: RuntimeDefault
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 60
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -94,7 +94,35 @@ spec:
             - name: KAFKA_MIN_INSYNC_REPLICAS
               value: "2"
             - name: KAFKA_LOG_RETENTION_HOURS
-              value: "24"
+              # 2026-06-05 reducing log retention length if log is corrupted
+              # value: "24"
+              value: "14"
+            # # Larger batches for throughput (Mimir writes in bulk)
+            # - name: KAFKA_LOG_FLUSH_INTERVAL_MESSAGES
+            #   value: "10000"
+            # - name: KAFKA_LOG_FLUSH_INTERVAL_MS
+            #   value: "1000"
+            #
+            # Segment size — smaller segments = faster retention cleanup
+            - name: KAFKA_LOG_SEGMENT_BYTES
+              value: "536870912"  # 512MB instead of default 1GB
+
+            # Increase socket buffers for throughput
+            - name: KAFKA_SOCKET_SEND_BUFFER_BYTES
+              value: "1048576"
+            - name: KAFKA_SOCKET_RECEIVE_BUFFER_BYTES
+              value: "1048576"
+            - name: KAFKA_SOCKET_REQUEST_MAX_BYTES
+              value: "104857600"  # 100MB
+            - name: KAFKA_REPLICA_FETCH_MAX_BYTES
+              value: "10485760"  # 10MB, helps with bursty replication
+            - name: KAFKA_REPLICA_LAG_TIME_MAX_MS
+              value: "30000"  # how long before a replica is dropped from ISR
+            - name: KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE
+              value: "false"  # never elect an out-of-sync replica as leader, prevents data loss
+            - name: KAFKA_LOG_RETENTION_BYTES
+              value: "524288000"  # 500MB per partition
+
           resources:
             requests:
               cpu: 100m
@@ -139,4 +167,4 @@ spec:
         storageClassName: local-path
         resources:
           requests:
-            storage: "5Gi"
+            storage: "20Gi"
