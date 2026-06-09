@@ -1,7 +1,7 @@
 namespace: keda
 resources:
   # renovate: datasource=github-releases depName=kedacore/keda
-  - github.com/kedacore/keda/config/default?ref=v2.20.0
+  - github.com/kedacore/keda/config/default?ref=v2.20.1
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "-1"
