@@ -5,6 +5,9 @@ resources:
 - https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.0.0/strimzi-cluster-operator-1.0.0.yaml
 - networkpolicy.yaml
 - clusterrolebinding.yaml
+- podmonitor.yaml
+- dashboards
+- kube-state-metrics
 
 patches:
   - path: patches/cluster_role_binding.yaml

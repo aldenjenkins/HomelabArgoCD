@@ -157,8 +157,8 @@ spec:
             key: namespace
           - action: delete
             key: pod
-          - action: delete
-            key: container
+          # - action: delete
+          #   key: container
         include:
           match_type: regexp
           metric_names: ^container_.+

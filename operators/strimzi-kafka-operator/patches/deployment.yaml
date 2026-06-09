@@ -18,11 +18,11 @@ spec:
     metadata:
       labels:
         <<: *labels
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/scheme: http
-        prometheus.io/port: "8080"
-        prometheus.io/path: /metrics
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/scheme: http
+      #   prometheus.io/port: "8080"
+      #   prometheus.io/path: /metrics
     spec:
       dnsConfig:
         options:

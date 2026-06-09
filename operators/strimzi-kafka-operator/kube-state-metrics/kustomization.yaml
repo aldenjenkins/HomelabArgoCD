@@ -1,0 +1,10 @@
+namespace: strimzi-cluster-operator-system
+resources:
+  - ksm.yaml
+  - prometheusrule.yaml
+configMapGenerator:
+  - name: strimzi-kube-state-metrics-config
+    files:
+      - files/config.yaml
+    options:
+      immutable: true

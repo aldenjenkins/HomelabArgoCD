@@ -1,0 +1,116 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-cruise-control
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-cruise-control.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka-bridge
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka-bridge.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka-connect
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka-connect.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka-exporter
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka-exporter.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka-mirror-maker-2
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka-mirror-maker-2.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka-oauth
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka-oauth.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kafka
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kafka.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-kraft
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-kraft.json"
+  folderUID: strimzi-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: strimzi-operators
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  resyncPeriod: 5m
+  url: "https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/heads/main/examples/metrics/grafana-dashboards/strimzi-operators.json"
+  folderUID: strimzi-uid
