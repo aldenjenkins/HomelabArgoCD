@@ -37,7 +37,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: backend-scheduler
-          image: docker.io/grafana/tempo:3.0.0
+          image: docker.io/grafana/tempo:3.0.2
           imagePullPolicy: IfNotPresent
           args:
             - -target=backend-scheduler
