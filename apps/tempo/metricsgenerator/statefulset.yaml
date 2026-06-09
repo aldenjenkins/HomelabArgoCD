@@ -51,7 +51,7 @@ spec:
         - args:
             - -target=metrics-generator
             - -config.file=/conf/tempo.yaml
-          image: docker.io/grafana/tempo:3.0.0
+          image: docker.io/grafana/tempo:3.0.2
           imagePullPolicy: IfNotPresent
           name: metrics-generator
           ports:
