@@ -9,7 +9,7 @@ metadata:
   name: tempo-live-store
 spec:
   podManagementPolicy: Parallel
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: tempo

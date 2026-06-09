@@ -85,10 +85,13 @@ ingester:
 ingest_storage:
   enabled: true
   kafka:
-    address: mimir-kafka.mimir.svc.cluster.local.:9092
-    auto_create_topic_default_partitions: 100
-    auto_create_topic_enabled: true
+    # 2026-06-07 switching to strimzi-kafka-operator
+    # address: mimir-kafka.mimir.svc.cluster.local.:9092
+    # auto_create_topic_default_partitions: 100
+    # auto_create_topic_enabled: true
+    address: kafka-kafka-bootstrap.kafka.svc.cluster.local.:9092
     topic: mimir-ingest
+    auto_create_topic_enabled: false
 
 # Querier configuration
 querier:

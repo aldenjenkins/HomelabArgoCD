@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-operator-egress
+spec:
+  podSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  policyTypes:
+    - Egress
+  egress:
+    - {} # Allow all egress - operator needs kube-apiserver + kafka namespaces
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-metrics-stats-scrape
+spec:
+  # podSelector: {}
+  podSelector:
+    matchLabels:
+      strimzi.io/kind: cluster-operator
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          # podSelector:
+          #   matchLabels:
+          #     app.kubernetes.io/name: prometheus
+          #     app.kubernetes.io/component: ""
+      ports:
+        - protocol: TCP
+          port: 8080

@@ -58,10 +58,10 @@ distributor:
 #     tokens_file_path: /var/tempo/tokens.json
 ingest:
   kafka:
-    address: tempo-kafka.tempo.svc.cluster.local.:9092
-    auto_create_topic_default_partitions: 100
-    auto_create_topic_enabled: true
-    topic: tempo-traces
+    address: kafka-kafka-bootstrap.kafka.svc.cluster.local.:9092
+    # auto_create_topic_default_partitions: 100
+    # auto_create_topic_enabled: true
+    topic: tempo-ingest
 block_builder:
   consume_cycle_duration: 30s
   partitions_per_instance: 1

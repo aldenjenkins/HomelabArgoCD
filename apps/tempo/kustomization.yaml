@@ -2,7 +2,7 @@ namespace: tempo
 resources:
   - namespace.yaml
   - serviceaccount.yaml
-  - kafka
+  # - kafka
   - gateway
   - gossipring
   - memcached

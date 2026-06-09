@@ -11,7 +11,7 @@ spec:
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: tempo

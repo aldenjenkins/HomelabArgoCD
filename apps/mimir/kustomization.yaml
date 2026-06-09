@@ -3,7 +3,7 @@ resources:
   - namespace.yaml
   - gossip-ring-service.yaml
   - memcached
-  - kafka
+  # - kafka
   - distributor
   - ingester
   - querier
