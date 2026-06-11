@@ -367,7 +367,7 @@ spec:
         check_interval: 1s
         limit_percentage: 90
         spike_limit_percentage: 10
-      metricstransform/add_standard_labels:
+      metrics_transform/add_standard_labels:
         transforms:
           - action: update
             include: .+
@@ -392,7 +392,7 @@ spec:
       #   k8s_node_name, k8s_container_name, k8s_deployment_name, k8s_namespace_name, namespaceName,
       #   job, service_name, destination_app, destination_version, destination_cluster,
       #   destination_principal, source_cluster, source_principal
-      metricstransform/aggregate_istio:
+      metrics_transform/aggregate_istio:
         transforms:
           # istio_requests_total
           - include: istio_requests_total
@@ -842,14 +842,14 @@ spec:
             # - transform/standardize_ksm_attributes
             - attributes/kube_state_metrics
             - attributes/cadvisor
-            - metricstransform/add_standard_labels
+            - metrics_transform/add_standard_labels
             # - resource/set_known_attributes
             - batch
             - groupbyattrs
             - transform/set_match_resource_attributes
             - k8s_attributes
             - transform/label_metrics
-            - metricstransform/aggregate_istio  # Aggregate istio metrics before sending to Thanos
+            - metrics_transform/aggregate_istio  # Aggregate istio metrics before sending to Thanos
             - transform/normalize_service_name
             - transform/cleanup_empty_labels
             # - filter/drop_observability_ksm

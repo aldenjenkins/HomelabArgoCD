@@ -103,7 +103,7 @@ spec:
         include:
           match_type: regexp
           metric_names: ^kube_.+
-      metricstransform/add_standard_labels:
+      metrics_transform/add_standard_labels:
         transforms:
           - action: update
             include: .+
@@ -525,7 +525,7 @@ spec:
           processors:
             - memory_limiter
             - attributes/kube_state_metrics
-            - metricstransform/add_standard_labels
+            - metrics_transform/add_standard_labels
             - resource/set_known_attributes
             - filter/drop_metrics
             - filter/kube_state_metrics

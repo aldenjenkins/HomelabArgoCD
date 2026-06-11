@@ -151,7 +151,7 @@ spec:
         check_interval: 1s
         limit_percentage: 90
         spike_limit_percentage: 10
-      metricstransform/add_standard_labels:
+      metrics_transform/add_standard_labels:
         transforms:
           - action: update
             include: .+
@@ -171,7 +171,7 @@ spec:
           - context: datapoint
             statements:
               - set(attributes["node"], "${env:K8S_NODE_NAME}")
-      metricstransform/rename_cpu_metrics:
+      metrics_transform/rename_cpu_metrics:
         transforms:
           - action: update
             include: container.cpu.usage
@@ -510,7 +510,7 @@ spec:
             # - debug
           processors:
             - memory_limiter
-            - metricstransform/add_standard_labels
+            - metrics_transform/add_standard_labels
             - transform/add_node_label
             ############
             # - resource/set_known_attributes
@@ -528,7 +528,7 @@ spec:
             # - transform/label_metrics
             # - transform/cleanup
             # ############################
-            # - metricstransform/rename_cpu_metrics
+            # - metrics_transform/rename_cpu_metrics
           receivers:
             # - kubeletstats
             - prometheus/kubelet-and-node-exporter

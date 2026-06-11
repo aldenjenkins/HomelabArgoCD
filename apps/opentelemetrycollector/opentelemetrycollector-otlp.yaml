@@ -212,7 +212,7 @@ spec:
         check_interval: 1s
         limit_percentage: 90
         spike_limit_percentage: 10
-      metricstransform/add_standard_labels:
+      metrics_transform/add_standard_labels:
         transforms:
           - action: update
             include: .+
@@ -326,7 +326,7 @@ spec:
           - memory_limiter
           - resource/set_known_attributes
           - resource/drop_attributes
-          - metricstransform/add_standard_labels
+          - metrics_transform/add_standard_labels
           - resource/service-instance
           - batch
           - transform/set_match_resource_attributes
