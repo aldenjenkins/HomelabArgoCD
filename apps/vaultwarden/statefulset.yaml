@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       initContainers:
         - name: wait-cluster
-          image: "alpine:3.23"
+          image: "alpine:3.24"
           imagePullPolicy: IfNotPresent
 
           resources:
