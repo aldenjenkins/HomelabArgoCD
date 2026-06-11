@@ -53,6 +53,8 @@ spec:
     enabled: true
     serviceAccount: otel-collector-targetallocator
     filterStrategy: relabel-config  # must be explicitly set for the target allocator to use the relabel_configs below
+    mtls:
+      enabled: true
     # Enable discovery of a subset of prometheus CRDs: servicemonitors, podmonitors. ScrapeConfig is not supported at this time.
     prometheusCR:
       enabled: true
