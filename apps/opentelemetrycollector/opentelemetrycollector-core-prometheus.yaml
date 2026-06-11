@@ -77,7 +77,7 @@ spec:
     # Also see https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors
     exporters:
       # # Thanos Receive - existing metrics backend
-      # prometheusremotewrite/thanos:
+      # prometheus_remote_write/thanos:
       #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
       #   add_metric_suffixes: false
       #   tls:
@@ -91,7 +91,7 @@ spec:
       #   timeout: 10s
 
       # Mimir Distributor - testing new metrics backend
-      prometheusremotewrite/mimir:
+      prometheus_remote_write/mimir:
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
         # 2026-05-04 add_metric_suffixes is deprecated, use translation_strategy UnderscoreEscapingWithoutSuffixes instead.
         # add_metric_suffixes: false
@@ -119,7 +119,7 @@ spec:
       #   sending_queue:
       #     num_consumers: 50
       #   timeout: 10s
-      # prometheusremotewrite/keda:
+      # prometheus_remote_write/keda:
       #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
       #   tls:
       #     insecure: true
@@ -554,7 +554,7 @@ spec:
           - context: resource
             statements:
               - delete_key(resource.attributes, "server.port") where resource.attributes["server.port"] == ""
-              # Convert mimir-component to mimir/component for prometheusremotewrite job label
+              # Convert mimir-component to mimir/component for prometheus_remote_write job label
               - replace_pattern(resource.attributes["service.name"], "^mimir-(.+)$$", "mimir/$$1")
               - replace_pattern(resource.attributes["service.name"], "^tempo-(.+)$$", "tempo/$$1")
               - replace_pattern(resource.attributes["service.name"], "^loki-(.+)$$", "loki/$$1")
@@ -858,11 +858,11 @@ spec:
           exporters:
             # - forward/keda
             # - otlphttp/prometheus
-            # - prometheusremotewrite/thanos
-            - prometheusremotewrite/mimir
+            # - prometheus_remote_write/thanos
+            - prometheus_remote_write/mimir
         # metrics/keda:
         #   exporters:
-        #     - prometheusremotewrite/keda
+        #     - prometheus_remote_write/keda
         #   processors:
         #     - filter/keda_metrics
         #     - batch

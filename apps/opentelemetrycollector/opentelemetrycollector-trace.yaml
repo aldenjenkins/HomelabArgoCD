@@ -89,7 +89,7 @@ spec:
         # # `trace.servicegraph` metric namespace.
         # metrics_flush_interval: 60s
         # # Defines which exporter the processor will write metrics to.
-        # metrics_exporter: prometheusremotewrite
+        # metrics_exporter: prometheus_remote_write
         # dimensions:
         #   - http.method
         # latency_histogram_buckets:

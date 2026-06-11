@@ -36,7 +36,7 @@ spec:
         verbosity: detailed
 
       # # Exporter for sending Prometheus data to Mimir.
-      # prometheusremotewrite/thanos:
+      # prometheus_remote_write/thanos:
       #   # Don't add suffixes to the metrics. We've already renamed the `traces.spanmetrics.calls` metric to
       #   # `traces.spanmetrics.calls.total`, and we don't want to add the `_milliseconds` suffix to the
       #   # `traces.spanmetrics.latency` metric.
@@ -48,7 +48,7 @@ spec:
       #   tls:
       #     insecure: true
 
-      prometheusremotewrite/mimir:
+      prometheus_remote_write/mimir:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
         # add_metric_suffixes: false
@@ -64,7 +64,7 @@ spec:
         max_batch_request_parallelism: 50
         timeout: 10s
 
-      # prometheusremotewrite/keda:
+      # prometheus_remote_write/keda:
       #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
       #   max_batch_size_bytes: 3000000
       #   remote_write_queue:
@@ -337,11 +337,11 @@ spec:
           - transform/cleanup_empty_labels
           exporters:
           # - forward/keda
-          # - prometheusremotewrite/thanos
-          - prometheusremotewrite/mimir
+          # - prometheus_remote_write/thanos
+          - prometheus_remote_write/mimir
         # metrics/keda:
         #   exporters:
-        #     - prometheusremotewrite/keda
+        #     - prometheus_remote_write/keda
         #   processors:
         #     - filter/keda_metrics
         #     - batch

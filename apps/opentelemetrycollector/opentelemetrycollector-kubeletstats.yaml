@@ -45,7 +45,7 @@ spec:
       #   sending_queue:
       #     num_consumers: 50
       #   timeout: 10s
-      # prometheusremotewrite/thanos:
+      # prometheus_remote_write/thanos:
       #   # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
       #   endpoint: http://thanos-receive.thanos.svc.cluster.local:19291/api/v1/receive
       #   # 2026-05-04 deprecate, use below instead
@@ -61,7 +61,7 @@ spec:
       #     queue_size: 1000
       #   timeout: 10s
       #   max_batch_request_parallelism: 50
-      prometheusremotewrite/mimir:
+      prometheus_remote_write/mimir:
         # endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
         endpoint: http://mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
         # 2026-05-04 deprecate, use below instead
@@ -505,8 +505,8 @@ spec:
         metrics:
           exporters:
             # - otlphttp/prometheus
-            # - prometheusremotewrite/thanos
-            - prometheusremotewrite/mimir
+            # - prometheus_remote_write/thanos
+            - prometheus_remote_write/mimir
             # - debug
           processors:
             - memory_limiter
