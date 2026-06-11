@@ -59,7 +59,7 @@ spec:
       terminationGracePeriodSeconds: 900
       initContainers:
         - name: render-fallback-config
-          image: alpine:3.23
+          image: alpine:3.24
           command:
             - sh
             - -c
