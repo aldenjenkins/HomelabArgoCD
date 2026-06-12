@@ -209,7 +209,9 @@ query_frontend:
     duration_slo: 0s
     interval: 5m
     max_duration: 3h
-    query_backend_after: 30m
+    # 2026-06-12 tempo 3.0 new default is 15m compared to old 30m default
+    # query_backend_after: 30m
+    query_backend_after: 15m
     target_bytes_per_job: 104857600
     throughput_bytes_slo: 0
   search:
