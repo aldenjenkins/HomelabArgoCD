@@ -19,7 +19,7 @@ spec:
   # updateStrategy:
   #   type: OnDelete
   updateStrategy:
-    type: rollingUpdate
+    type: RollingUpdate
     rollingUpdate:
       partition: 0
   template:
