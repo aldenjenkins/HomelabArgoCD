@@ -12,6 +12,7 @@ spec:
     access: proxy
     # url: http://tempo.tempo.svc:3100
     url: http://tempo-gateway.tempo.svc.cluster.local:80
+    # url: http://tempo-gateway.tempo.svc.cluster.local:4317
     # url: http://tempo-query-frontend.tempo.svc:9095
     # url: http://tempo-query-frontend.tempo.svc:3200
     isDefault: false
@@ -38,8 +39,8 @@ spec:
         type: 'Tag'
         tag: 'http.path'
       streamingEnabled:
-        search: false
-        metrics: false
+        search: true
+        metrics: true
       # streamingEnabled:
       #   search: true
       #   metrics: true

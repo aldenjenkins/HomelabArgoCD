@@ -283,6 +283,14 @@ spec:
           enabled: false
           max_elapsed_time: 30s
 
+      otlp_grpc/tempo:
+        endpoint: http://tempo-gateway.tempo.svc.cluster.local:4317
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 30s
+
     extensions:
       health_check:
         endpoint: 0.0.0.0:13133
@@ -315,7 +323,9 @@ spec:
             # - probabilistic_sampler
             - batch
           exporters:
-            - otlp_http/tempo
+            # 2026-06-12 trying to use grpc instead of otlphttp
+            # - otlp_http/tempo
+            - otlp_grpc/tempo
 
         # Define the metrics pipeline.
         # metrics:

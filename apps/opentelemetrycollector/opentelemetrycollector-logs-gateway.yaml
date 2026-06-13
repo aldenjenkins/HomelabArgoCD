@@ -368,10 +368,21 @@ spec:
         log_statements:
           - context: log
             statements:
-              - set(attributes["trace_id"], body["traceID"]) where IsMap(body)
-              - set(attributes["trace_id"], body["trace_id"]) where IsMap(body)
-              - set(attributes["trace_id"], body["trace.id"]) where IsMap(body)
-              - set(attributes["trace_id"], body["traceId"]) where IsMap(body)
+              # - set(attributes["trace_id"], body["traceID"]) where IsMap(body)
+              # - set(attributes["trace_id"], body["trace_id"]) where IsMap(body)
+              # - set(attributes["trace_id"], body["trace.id"]) where IsMap(body)
+              # - set(attributes["trace_id"], body["traceId"]) where IsMap(body)
+              # # 2026-06-12 also converting traceID to trace_id for non-json logs
+              # - set(attributes["trace_id"], ExtractPatterns(body, "traceID=(?P<trace_id>[a-f0-9]+)")["trace_id"]) where IsString(body) and IsMatch(body, "traceID=")
+              #
+              # JSON bodies — after parse, keys are in attributes
+              - set(trace_id.string, attributes["traceId"]) where attributes["traceId"] != nil
+              - set(trace_id.string, attributes["trace_id"]) where attributes["trace_id"] != nil
+              - set(trace_id.string, attributes["traceID"]) where attributes["traceID"] != nil
+              # logfmt string bodies — extract from raw string
+              - merge_maps(attributes, ExtractPatterns(body, "traceID=(?P<trace_id>[a-fA-F0-9]+)"), "insert") where IsString(body) and IsMatch(body, "traceID=")
+              # promote the extracted attribute to the OTLP field
+              - set(trace_id.string, attributes["trace_id"]) where attributes["trace_id"] != nil
       transform/add_homelab_attributes:
         log_statements:
           - context: log
