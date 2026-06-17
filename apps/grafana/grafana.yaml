@@ -5,7 +5,7 @@ metadata:
     dashboards: grafana
   name: grafana
 spec:
-  version: 13.1.0-24541505453 # renovate: docker=docker.io/grafana/grafana
+  version: 13.1.0-25893932881 # renovate: docker=docker.io/grafana/grafana
   service:
     metadata:
       labels:
