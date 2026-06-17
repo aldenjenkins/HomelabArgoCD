@@ -79,11 +79,44 @@ backend_scheduler:
   provider:
     compaction:
       compaction:
-        block_retention: 1h
+        # 2026-06-16 using tempo-distributed v3 helm chart values
+        # block_retention: 1h
+        block_retention: 48h
+        compacted_block_retention: 1h
+        compaction_cycle: 30s
+        compaction_window: 1h
+        max_block_bytes: 107374182400
+        max_compaction_objects: 6000000
+        max_time_per_tenant: 5m
+        retention_concurrency: 10
+      max_compaction_level: 0
+      max_input_blocks: 4
+      max_jobs_per_tenant: 1000
+      min_cycle_interval: 30s
+      min_input_blocks: 2
+    retention:
+      interval: 1h
+  work:
+    dead_job_timeout: 24h
+    prune_age: 1h
 backend_worker:
   backend_scheduler_addr: tempo-backend-scheduler:9095
+  backoff:
+    max_period: 1m
+    max_retries: 0
+    min_period: 100ms
   compaction:
-    block_retention: 1h
+    # 2026-06-16 using tempo-distributed v3 helm chart values
+    # block_retention: 1h
+    block_retention: 48h
+    compacted_block_retention: 1h
+    compaction_cycle: 30s
+    compaction_window: 1h
+    max_block_bytes: 107374182400
+    max_compaction_objects: 6000000
+    max_time_per_tenant: 5m
+    retention_concurrency: 10
+  finish_on_shutdown_timeout: 30s
   ring:
     kvstore:
       store: memberlist
