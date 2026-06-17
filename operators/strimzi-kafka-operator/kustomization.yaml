@@ -2,7 +2,7 @@ namespace: strimzi-cluster-operator-system
 resources:
 - namespace.yaml
   # renovate: datasource=github-releases depName=strimzi/strimzi-kafka-operator
-- https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.0.0/strimzi-cluster-operator-1.0.0.yaml
+- https://github.com/strimzi/strimzi-kafka-operator/releases/download/1.0.1/strimzi-cluster-operator-1.0.1.yaml
 - networkpolicy.yaml
 - clusterrolebinding.yaml
 - podmonitor.yaml
