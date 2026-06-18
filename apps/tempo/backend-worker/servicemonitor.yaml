@@ -28,4 +28,7 @@ spec:
           sourceLabels: [job]
           replacement: "tempo/backend-worker"
           targetLabel: job
+        - action: replace
+          replacement: "homelab-live"
+          targetLabel: cluster
       scheme: http

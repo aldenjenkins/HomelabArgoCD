@@ -28,5 +28,8 @@ spec:
           sourceLabels: [job]
           replacement: "tempo/block-builder"
           targetLabel: job
+        - action: replace
+          replacement: "homelab-live"
+          targetLabel: cluster
       scheme: http
 
