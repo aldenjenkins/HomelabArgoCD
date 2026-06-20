@@ -62,7 +62,7 @@ spec:
               readOnly: false
       containers:
         - name: shlink-web-client
-          image: ghcr.io/shlinkio/shlink-web-client:4.7.1
+          image: ghcr.io/shlinkio/shlink-web-client:4.8.0
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
