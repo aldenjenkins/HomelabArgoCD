@@ -10,7 +10,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 100%
-  image: otel/opentelemetry-collector-contrib:0.154.0
+  image: otel/opentelemetry-collector-contrib:0.155.0
   imagePullPolicy: IfNotPresent
   resources:
     limits:
