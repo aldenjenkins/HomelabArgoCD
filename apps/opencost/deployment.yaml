@@ -43,7 +43,7 @@ spec:
         kubernetes.io/os: linux
       initContainers:
         - name: copy-nginx-conf
-          image: ghcr.io/opencost/opencost-ui:1.120.3
+          image: ghcr.io/opencost/opencost-ui:1.120.4
           command: ['sh', '-c', 'cp /etc/nginx/conf.d/default.nginx.conf.template /nginx-conf-shared/']
           securityContext:  # <-- ADDED SECURITY CONTEXT
             allowPrivilegeEscalation: false
@@ -58,7 +58,7 @@ spec:
               name: nginx-conf-dir
       containers:
         - name: opencost
-          image: ghcr.io/opencost/opencost:1.120.3
+          image: ghcr.io/opencost/opencost:1.120.4
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false  # Prevents containers from becoming root
@@ -151,7 +151,7 @@ spec:
               subPath: default.json
               readOnly: true
         - name: opencost-ui
-          image: ghcr.io/opencost/opencost-ui:1.120.3
+          image: ghcr.io/opencost/opencost-ui:1.120.4
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
