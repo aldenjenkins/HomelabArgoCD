@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bentopdf
-          image: ghcr.io/alam00000/bentopdf:2.8.5
+          image: ghcr.io/alam00000/bentopdf:2.8.6
           imagePullPolicy: IfNotPresent
           resources:
             limits:
