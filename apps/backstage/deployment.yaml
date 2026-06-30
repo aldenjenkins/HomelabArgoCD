@@ -1,0 +1,132 @@
+# Backstage Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  labels:
+    app.kubernetes.io/name: backstage
+    app.kubernetes.io/component: frontend
+  annotations:
+    secret.reloader.stakater.com/reload: "backstage-env-secret"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backstage
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backstage
+        app.kubernetes.io/component: frontend
+    spec:
+      automountServiceAccountToken: true
+      serviceAccountName: backstage
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000
+      containers:
+        - name: backstage
+          # Using Roadie's community Backstage image
+          image: registry.home.alden.ai/me/backstage:1.0.4
+          imagePullPolicy: IfNotPresent
+          command: ["node"]
+          args: ["packages/backend", "--config", "app-config.yaml"]
+          ports:
+            - name: http
+              containerPort: 7007
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: backstage-env-secret
+          env:
+            - name: NODE_ENV
+              value: production  # This is already defined in the Dockerfile, but this lets us override if we want.
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: backstage-postgres-18-app
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: backstage-postgres-18-app
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: backstage-postgres-18-app
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: backstage-postgres-18-app
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          # Health checks enabled for Backstage application
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Volume mounts
+          volumeMounts:
+            - name: backstage-config-files
+              mountPath: /app/app-config.yaml
+              subPath: app-config.yaml
+              readOnly: true
+            - name: backstage-config-files
+              # mountPath: /etc/backstage/catalog/catalog-info.yaml
+              mountPath: /app/catalog-info.yaml
+              subPath: catalog-info.yaml
+              readOnly: true
+              # - name: techdocs-config
+              #   mountPath: /app/mkdocs.yml
+              #   subPath: mkdocs.yml
+              #   readOnly: true
+              # - name: techdocs-config
+              #   mountPath: /app/docs/index.md
+              #   subPath: index.md
+              #   readOnly: true
+          # Security context (permissive for initial setup)
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+      # Volumes
+      volumes:
+        - name: backstage-config-files
+          configMap:
+            name: backstage-config-files
+            defaultMode: 0644
+            # - name: rdp-catalog
+            #   configMap:
+            #     name: rdp-catalog
+            #     defaultMode: 0644
+            # - name: techdocs-config
+            #   configMap:
+            #     name: backstage-techdocs-config
+            #     defaultMode: 0644

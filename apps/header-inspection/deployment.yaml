@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: header-display
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: header-display
@@ -12,10 +12,23 @@ spec:
       labels:
         app: header-display
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
       - name: header-display
         image: mendhak/http-https-echo:41
         imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
         ports:
         - containerPort: 8080
           name: http

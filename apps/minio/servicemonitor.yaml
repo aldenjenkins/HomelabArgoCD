@@ -32,6 +32,37 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  name: minio-nas-bucket
+  labels:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/instance: minio-api
+    app.kubernetes.io/component: api
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: minio
+      app.kubernetes.io/instance: minio-api
+      app.kubernetes.io/component: api
+  endpoints:
+    - port: api
+      path: /minio/v2/metrics/bucket
+      scheme: http
+      interval: 30s
+      scrapeTimeout: 10s
+      bearerTokenSecret:
+        key: token
+        name: minio-prometheus-token
+      relabelings:
+        - action: replace
+          replacement: 192.168.123.170:9000
+          targetLabel: server
+  namespaceSelector:
+    matchNames:
+      - minio
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
   name: minio
   labels:
     app.kubernetes.io/name: minio
@@ -44,6 +75,32 @@ spec:
   endpoints:
     - port: http
       path: /minio/v2/metrics/cluster
+      scheme: http
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - action: replace
+          replacement: minio.minio.svc.cluster.local:9000
+          targetLabel: server
+  namespaceSelector:
+    matchNames:
+      - minio
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: minio-bucket
+  labels:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: minio
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: minio
+      app.kubernetes.io/component: minio
+  endpoints:
+    - port: http
+      path: /minio/v2/metrics/bucket
       scheme: http
       interval: 30s
       scrapeTimeout: 10s

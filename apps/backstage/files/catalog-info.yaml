@@ -1,0 +1,30 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: alden
+  namespace: default
+spec:
+  profile:
+    displayName: Alden
+    # email: test@test.com
+  memberOf:
+    - homelab-admins
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: homelab-admins
+  namespace: default
+spec:
+  type: team
+  profile:
+    displayName: Homelab Admins
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: homelab
+  namespace: default
+spec:
+  owner: homelab-admins

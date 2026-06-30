@@ -1,0 +1,11 @@
+namespace: backstage
+resources:
+  - objectstore.yaml
+  - cnpg-cluster.yaml
+  - service.yaml
+  - scheduledbackup.yaml
+  - probe.yaml
+  - podmonitor.yaml
+  - grafanadatasource.yaml
+generators:
+  - sopsgenerator.yaml

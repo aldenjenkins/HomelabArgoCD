@@ -212,7 +212,8 @@ multitenancy_enabled: false
 overrides:
   defaults:
     compaction:
-      compaction_disabled: true
+      # enable backend-workers to do compaction by setting this false
+      compaction_disabled: false
     ingestion:
       max_traces_per_user: 0
       rate_limit_bytes: 75000000

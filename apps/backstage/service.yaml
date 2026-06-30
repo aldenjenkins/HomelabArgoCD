@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+  labels:
+    app.kubernetes.io/name: backstage
+spec:
+  selector:
+    app.kubernetes.io/name: backstage
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+  type: ClusterIP

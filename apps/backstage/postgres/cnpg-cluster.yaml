@@ -1,0 +1,38 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: backstage-postgres-18
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4
+
+  bootstrap:
+    initdb:
+      database: backstage
+      owner: backstage
+  storage:
+    size: 5Gi
+    storageClass: local-path
+
+  managed:
+    roles:
+      - name: backstage
+        superuser: true
+        login: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      enabled: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: backstage-postgres-18-4
+

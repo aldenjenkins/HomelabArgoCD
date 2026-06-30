@@ -1,0 +1,20 @@
+namespace: backstage
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - postgres
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+  # - probe.yaml
+generators:
+  - sopsgenerator.yaml
+configMapGenerator:
+  - name: backstage-config-files
+    files:
+      - files/catalog-info.yaml
+      - files/app-config.yaml
+    options:
+      immutable: true

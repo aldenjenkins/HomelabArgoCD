@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: backstage-postgres-https-30s
+spec:
+  interval: 30s
+  jobName: backstage-postgres-healthz-https
+  module: https_skip_verify_30s
+  prober:
+    path: /probe
+    scheme: http
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+  scrapeTimeout: 30s
+  targets:
+    staticConfig:
+      static:
+      - https://backstage-postgres-healthz.backstage.svc.cluster.local.:8000/healthz
