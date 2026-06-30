@@ -38,7 +38,7 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          image: grafana/loki:3.7.2
+          image: grafana/loki:3.7.3
           imagePullPolicy: IfNotPresent
           args:
             - -target=query-scheduler
