@@ -19,6 +19,9 @@ spec:
       - name: backstage
         superuser: true
         login: true
+        connectionLimit: -1
+        ensure: present
+        inherit: true
 
   resources:
     requests:
