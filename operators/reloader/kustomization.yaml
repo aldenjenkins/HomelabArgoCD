@@ -2,7 +2,7 @@ namespace: reloader-operator-system
 resources:
   - namespace.yaml
   # renovate: datasource=github-releases depName=stakater/Reloader
-  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.17
+  - github.com/stakater/Reloader/deployments/kubernetes?ref=v1.4.19
   - service.yaml
   - servicemonitor.yaml
   - probe.yaml
