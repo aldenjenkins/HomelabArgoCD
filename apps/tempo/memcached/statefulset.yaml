@@ -39,11 +39,11 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       enableServiceLinks: false
-      
+
       initContainers:
         []
       containers:
-        - image: docker.io/memcached:1.6.42-alpine
+        - image: memcached:1.6.42-alpine
           imagePullPolicy: IfNotPresent
           name: memcached
           args:
@@ -97,7 +97,7 @@ spec:
               app.kubernetes.io/name: tempo
               app.kubernetes.io/instance: tempo
               app.kubernetes.io/component: memcached
-        
+
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -116,6 +116,6 @@ spec:
                     app.kubernetes.io/instance: tempo
                     app.kubernetes.io/component: memcached
                 topologyKey: topology.kubernetes.io/zone
-        
+
   updateStrategy:
     type: RollingUpdate
