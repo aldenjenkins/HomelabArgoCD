@@ -86,7 +86,7 @@ spec:
           envFrom:
             - secretRef:
                 name: immich-env
-          image: ghcr.io/immich-app/immich-server:v2.7.5
+          image: ghcr.io/immich-app/immich-server:v3.0.1
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
