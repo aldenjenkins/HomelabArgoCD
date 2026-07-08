@@ -40,14 +40,13 @@ spec:
           type: RuntimeDefault
       enableServiceLinks: false
 
-      initContainers:
-        []
+      initContainers: []
       containers:
         - image: memcached:1.6.42-alpine
           imagePullPolicy: IfNotPresent
           name: memcached
           args:
-            - -m 131072
+            - -m 3584  # ~3.5 GiB, leaves ~1.5Gi headroom under the 5Gi limit
             - -c 4096
             - -t 8
           ports:
@@ -81,7 +80,7 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
-              - ALL
+                - ALL
             readOnlyRootFilesystem: true
             runAsGroup: 1000
             runAsNonRoot: true
