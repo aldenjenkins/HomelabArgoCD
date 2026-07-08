@@ -90,6 +90,7 @@ spec:
             notPaths:
               - /alden/nvim.git*
               - /alden/modular-backup-framework.git*
+              - /alden/goharmonies/raw/branch/main/schemas/*
         # 2026-05-13 removing this because now argocd uses oidc
         # - operation:
         #     hosts:
