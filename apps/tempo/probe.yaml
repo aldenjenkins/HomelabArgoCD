@@ -13,11 +13,14 @@ spec:
     staticConfig:
       static:
         - http://tempo-distributor.tempo.svc.cluster.local.:3200/ready
-        - http://tempo-compactor.tempo.svc.cluster.local.:3200/ready
-        - http://tempo-ingester.tempo.svc.cluster.local.:3200/ready
         - http://tempo-gateway.tempo.svc.cluster.local.:80
         - http://tempo-querier.tempo.svc.cluster.local.:3200/ready
         - http://tempo-query-frontend.tempo.svc.cluster.local.:3200/ready
+        - http://tempo-backend-worker.tempo.svc.cluster.local.:3200/ready
+        - http://tempo-backend-scheduler.tempo.svc.cluster.local.:3200/ready
+        - http://tempo-block-builder.tempo.svc.cluster.local.:3200/ready
+        - http://tempo-live-store.tempo.svc.cluster.local.:3200/ready
+        - http://tempo-metrics-generator.tempo.svc.cluster.local.:3200/ready
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
