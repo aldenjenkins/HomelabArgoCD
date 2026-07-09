@@ -6,9 +6,11 @@ spec:
   kafka:
     # mimir requires max 4.1 for now
     # https://github.com/grafana/mimir/issues/15319#issuecomment-4520960023
-    version: 4.1.0
+    # version: 4.1.0
+    # 2026-07-09 the above seems to be fixed, so trying newer version
+    version: 4.3.0
     # KRaft metadata version
-    metadataVersion: "4.1"
+    metadataVersion: "4.3"
     # Enable JMX Prometheus Exporter for metrics
     metricsConfig:
       type: jmxPrometheusExporter

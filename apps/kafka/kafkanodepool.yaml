@@ -15,6 +15,20 @@ spec:
     - id: 0
       type: persistent-claim
       size: 100Gi
-      class: longhorn
+      class: longhorn-kafka
       deleteClaim: true
       kraftMetadata: shared
+  template:
+    pod:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  strimzi.io/pool-name: dual-role
+              topologyKey: kubernetes.io/hostname
+    persistentVolumeClaim:
+      metadata:
+        labels:
+          recurring-job.longhorn.io/source: "enabled"
+          recurring-job-group.longhorn.io/kafka-trim: "enabled"
