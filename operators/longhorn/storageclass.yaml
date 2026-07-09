@@ -20,13 +20,10 @@ kind: StorageClass
 metadata:
   name: longhorn-kafka
 provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
 parameters:
   numberOfReplicas: "1"
   dataLocality: strict-local
   staleReplicaTimeout: "30"
-  recurringJobSelector: '[
-    {
-    "name":"skipbackup",
-    "isGroup":true
-    }
-    ]'
+  unmapMarkSnapChainRemoved: "enabled"
