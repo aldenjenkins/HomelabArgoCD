@@ -42,7 +42,7 @@ spec:
 
       initContainers: []
       containers:
-        - image: memcached:1.6.44-alpine
+        - image: memcached:1.6.45-alpine
           imagePullPolicy: IfNotPresent
           name: memcached
           args:
