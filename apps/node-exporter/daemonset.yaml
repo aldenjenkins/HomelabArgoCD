@@ -37,7 +37,7 @@ spec:
             - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|tmpfs)$
             - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15}|cilium.*|lxc.*|dummy.*|lo|tun.*)$
             - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15}|cilium.*|lxc.*|dummy.*|lo|tun.*)$
-          image: quay.io/prometheus/node-exporter:v1.11.1
+          image: quay.io/prometheus/node-exporter:v1.12.1
           name: node-exporter
           resources:
             limits:
