@@ -6,7 +6,7 @@ spec:
   # replicas: 2
   replicas: 2
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:0.156.0
+  image: otel/opentelemetry-collector-contrib:0.158.0
   imagePullPolicy: IfNotPresent
   podSecurityContext:
     fsGroup: 999
