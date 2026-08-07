@@ -38,7 +38,7 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
-          image: grafana/loki:3.7.3
+          image: grafana/loki:3.7.6
           imagePullPolicy: IfNotPresent
           args:
             - -target=pattern-ingester
