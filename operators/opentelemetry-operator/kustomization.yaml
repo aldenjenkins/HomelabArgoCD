@@ -1,6 +1,6 @@
 resources:
   # renovate: datasource=github-releases depName=open-telemetry/opentelemetry-operator
-  - https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.154.0/opentelemetry-operator.yaml
+  - https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.157.0/opentelemetry-operator.yaml
   - servicemonitor.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
