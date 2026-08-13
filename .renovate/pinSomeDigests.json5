@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["quay.io/redlib/redlib"],
+      "digest": {
+        "enabled": true
+      },
+      "pinDigests": true
+    }
+  ]
+}
