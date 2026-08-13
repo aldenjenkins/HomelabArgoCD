@@ -30,7 +30,7 @@ spec:
         - args:
             - -config.file=/conf/tempo.yaml
             - -target=block-builder
-          image: docker.io/grafana/tempo:3.0.2
+          image: docker.io/grafana/tempo:3.0.3
           imagePullPolicy: IfNotPresent
           name: block-builder
           securityContext:
