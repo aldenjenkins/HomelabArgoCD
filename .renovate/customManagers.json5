@@ -38,17 +38,34 @@
     },
     {
       "customType": "regex",
-      "description": "Process GitHub download dependencies in YAML files",
+      "description": "Process github.com/<owner>/<repo>/releases/download/<version>/<asset> dependencies in YAML files. Handles both plain asset names (e.g. crd.yaml) and asset names that repeat the version (e.g. cnpg-1.29.0.yaml, as used by cloudnative-pg's kustomize-compatible release manifests).",
       "fileMatch": ["\\.ya?ml(\\.j2)?$"],
       "matchStrings": [
         // https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.2/crd.yaml
-        "https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
+        // https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v1.29.0/cnpg-1.29.0.yaml
+        "https:\\/\\/github\\.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<vPrefix>v)?(?<currentValue>[0-9][0-9.]*)\\/((?<assetPrefix>[A-Za-z][\\w.]*)-[0-9][0-9.]*\\.(?<assetExt>ya?ml|yml|json)|(?<assetFile>\\S+))"
+      ],
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver",
+      // Strip the optional leading "v" from release tags so currentValue/newValue
+      // stay in the same bare "1.29.0" form used for both path and filename.
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      // Rebuild the whole URL. The path segment always gets the (optional) "v"
+      // prefix back; the filename only gets a version substituted in if the
+      // original filename had one (assetPrefix set) — otherwise it's left as-is.
+      "autoReplaceStringTemplate": "https://github.com/{{{depName}}}/releases/download/{{{vPrefix}}}{{{newValue}}}/{{#if assetPrefix}}{{{assetPrefix}}}-{{{newValue}}}.{{{assetExt}}}{{else}}{{{assetFile}}}{{/if}}"
+    },
+    {
+      "customType": "regex",
+      "description": "Process raw.githubusercontent.com/<owner>/<repo>/<version>/<path> dependencies in YAML files",
+      "fileMatch": ["\\.ya?ml(\\.j2)?$"],
+      "matchStrings": [
         // https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.11/docs/snippets/dashboard.json
         "https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+"
       ],
-      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^(?<version>.*)${{/if}}"
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^(?<version>.*)$"
     }
   ]
 }
