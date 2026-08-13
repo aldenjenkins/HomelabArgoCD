@@ -2,7 +2,7 @@ namespace: argocd
 resources:
   - namespace.yaml
   # renovate: datasource=github-releases packageName=argoproj/argo-cd
-  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.4.5/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.1/manifests/install.yaml
   # - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
 patches:
   - path: patch_notification_secret.yaml
