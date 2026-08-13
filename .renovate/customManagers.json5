@@ -14,10 +14,16 @@
         // version: 1.15.1
         // # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
         // KUBERNETES_VERSION=v1.31.1
-        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( repository=(?<registryUrl>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)",
-        // # renovate: datasource=docker depName=ghcr.io/prometheus-operator/prometheus-operator
-        // https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.80.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
-        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n.+/(?<currentValue>(v|\\d)[^/]+)"
+        //
+        // Note: this manager is intentionally scoped to KEY: value / KEY=value style
+        // fields only. The old second matchString here (comment + "any line with a
+        // /version/ path segment") was never domain-scoped, so it also matched
+        // github.com/releases/download and raw.githubusercontent.com URLs that the
+        // dedicated managers below already extract on their own — producing a
+        // duplicate dependency entry for the same depName. Do not re-add a generic
+        // "comment + URL" matchString here; put URL-shape matchers in their own
+        // domain-scoped manager instead.
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( repository=(?<registryUrl>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)"
       ],
       "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}"
     },
