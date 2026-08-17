@@ -102,7 +102,11 @@
         icon: syncthing.png
         href: https://syncthing.home.alden.ai
         description: NAS Syncthing
-        siteMonitor: http://192.168.123.170:8384/rest/noauth/health
+        siteMonitor: https://192.168.123.170:8384/rest/noauth/health
+        widget:
+          type: syncthing
+          url: https://192.168.123.170:8384
+          key: "{{HOMEPAGE_VAR_SYNCTHING_API_KEY}}"
 - Network:
     # - Librespeed:
     #     icon: librespeed.svg

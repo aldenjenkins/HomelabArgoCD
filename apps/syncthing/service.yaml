@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/instance: syncthing-nas-web
     app.kubernetes.io/component: web
 spec:
-  clusterIP: None
   ports:
     - port: 8384
       targetPort: 8384
       name: web
+      appProtocol: http

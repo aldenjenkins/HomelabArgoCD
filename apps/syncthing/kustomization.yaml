@@ -5,6 +5,7 @@ resources:
   - grafanadashboard.yaml
   - service.yaml
   - httproute.yaml
+  - destinationrule.yaml
 
 generators:
   - sopsgenerator.yaml

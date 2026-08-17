@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: syncthing-nas-tls
+spec:
+  host: syncthing-nas.syncthing.svc.cluster.local
+  trafficPolicy:
+    portLevelSettings:
+      - port:
+          number: 8384
+        tls:
+          mode: SIMPLE
+          insecureSkipVerify: true
