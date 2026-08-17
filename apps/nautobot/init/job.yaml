@@ -4,7 +4,7 @@ metadata:
   name: nautobot-init
   labels:
     app.kubernetes.io/name: nautobot
-    helm.sh/chart: nautobot-3.1.1
+    helm.sh/chart: nautobot-3.2.3
     app.kubernetes.io/instance: nautobot
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/version: "3.0"
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: nautobot
-        helm.sh/chart: nautobot-3.1.1
+        helm.sh/chart: nautobot-3.2.3
         app.kubernetes.io/instance: nautobot
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/version: "3.0"
@@ -31,7 +31,7 @@ spec:
       containers:
         # This init container will run post_upgrade which initializes/upgrades the DB as well as collects static files
         - name: "nautobot-init"
-          image: registry.home.alden.ai/me/nautobot:3.1.2-with-bgp
+          image: registry.home.alden.ai/me/nautobot:3.2.3-bgp1
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false

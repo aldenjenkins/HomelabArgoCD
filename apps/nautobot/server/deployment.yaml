@@ -114,7 +114,7 @@ spec:
       containers:
         - name: nautobot
           tty: true
-          image: registry.home.alden.ai/me/nautobot:3.1.2-with-bgp
+          image: registry.home.alden.ai/me/nautobot:3.2.3-bgp1
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
