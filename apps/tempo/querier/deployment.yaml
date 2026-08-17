@@ -51,7 +51,7 @@ spec:
         - args:
             - -target=querier
             - -config.file=/conf/tempo.yaml
-          image: docker.io/grafana/tempo:3.0.2
+          image: docker.io/grafana/tempo:3.0.3
           imagePullPolicy: IfNotPresent
           name: querier
           ports:
