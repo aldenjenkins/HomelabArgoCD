@@ -30,3 +30,19 @@ spec:
       datasourceName: "prometheus"
   url: "https://grafana.com/api/dashboards/22784/revisions/5/download"
   folderUID: opentelemetry-uid
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: opentelemetry-apm
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "grafana"
+  allowCrossNamespaceImport: true
+  resyncPeriod: 30s
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "prometheus"
+  url: "https://grafana.com/api/dashboards/19419/revisions/6/download"
+  folderUID: opentelemetry-uid
