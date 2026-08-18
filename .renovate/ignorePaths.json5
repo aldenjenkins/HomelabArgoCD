@@ -11,7 +11,8 @@
         "registry.home.alden.ai/me/convertx",
         "registry.home.alden.ai/me/redlib",
         "registry.home.alden.ai/me/nautobot",
-        "registry.home.alden.ai/me/backstage"
+        "registry.home.alden.ai/me/backstage",
+        "registry.opencode.de/open-code/oci/base"
       ],
       "enabled": false
     }
