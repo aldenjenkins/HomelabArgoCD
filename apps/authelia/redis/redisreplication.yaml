@@ -16,7 +16,7 @@ spec:
 
   # Kubernetes Configuration
   kubernetesConfig:
-    image: quay.io/opstree/redis:v8.6.2
+    image: quay.io/opstree/redis:v8.10.1
     imagePullPolicy: IfNotPresent
     redisSecret:
       name: authelia-redis-secret
