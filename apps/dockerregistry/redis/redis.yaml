@@ -14,7 +14,7 @@ spec:
     imagePullPolicy: "IfNotPresent"
   redisExporter:
     enabled: true
-    image: "quay.io/opstree/redis-exporter:v1.84.0"
+    image: "quay.io/opstree/redis-exporter:v1.89.0"
     imagePullPolicy: "IfNotPresent"
   redisConfig:
     dynamicConfig:
