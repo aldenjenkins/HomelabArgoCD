@@ -9,6 +9,7 @@ resources:
   - recurringjob.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+  - networkpolicy.yaml
 
 generators:
   - sopsgenerator.yaml

@@ -77,6 +77,8 @@ spec:
           queue_size: 1000
         timeout: 10s
         max_batch_request_parallelism: 50
+        # 2026-08-22 trying to get rid of these annoying, seemingly non-useful otel_scope_version and otel_scope_name labels on all metrics
+        disable_scope_info: true
     extensions:
       pprof: {}
       health_check:

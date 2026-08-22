@@ -41,8 +41,18 @@ receivers:
               {{- $params = printf "%s,%s=\"%s\"" $params .Name .Value -}}
             {{- end -}}
           {{- end -}}
-          {{ .ExternalURL }}/#/alerts?filter={{ urlquery (printf "{%s}" $params) }}
+          https://grafana.home.alden.ai/alerting/groups?queryString={{ urlquery (printf "{%s}" $params) }}
         text: |-
+          {{- $icon := "🔔" -}}
+          {{- if eq .Status "firing" -}}
+            {{- if eq .CommonLabels.severity "critical" -}}{{- $icon = "🚨" -}}
+            {{- else if eq .CommonLabels.severity "warning" -}}{{- $icon = "⚠️" -}}
+            {{- else if eq .CommonLabels.severity "info" -}}{{- $icon = "ℹ️" -}}
+            {{- end -}}
+          {{- else -}}{{- $icon = "✅" -}}
+          {{- end }}
+          {{ $icon }} [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+
           {{ range .Alerts -}}
           {{- $ns := .Labels.namespace -}}
           {{- if not $ns }}{{ $ns = .Labels.k8s_namespace_name }}{{ end -}}
@@ -87,10 +97,6 @@ receivers:
             url: >-
               {{- $params := "" -}}
               {{- range .CommonLabels.SortedPairs -}}
-                {{- if eq $params "" -}}
-                  {{- $params = printf "%s=\"%s\"" .Name .Value -}}
-                {{- else -}}
-                  {{- $params = printf "%s,%s=\"%s\"" $params .Name .Value -}}
-                {{- end -}}
+                {{- $params = printf "%s&matcher=%s=%s" $params .Name .Value -}}
               {{- end -}}
-              {{ .ExternalURL }}/#/silences/new?filter={{ urlquery (printf "{%s}" $params) }}
+              https://grafana.home.alden.ai/alerting/silence/new?alertmanager=mimir-alertmanager{{ $params }}

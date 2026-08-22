@@ -63,6 +63,8 @@ spec:
           queue_size: 1000
         max_batch_request_parallelism: 50
         timeout: 10s
+        # 2026-08-22 trying to get rid of these annoying, seemingly non-useful otel_scope_version and otel_scope_name labels on all metrics
+        disable_scope_info: true
 
       # prometheus_remote_write/keda:
       #   endpoint: http://prometheus-k8s.prometheus.svc.cluster.local:9090/api/v1/write
