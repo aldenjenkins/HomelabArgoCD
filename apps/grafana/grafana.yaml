@@ -14,9 +14,9 @@ spec:
     spec:
       replicas: 3
       template:
-        # metadata:
-        #   labels:
-        #     sidecar.istio.io/inject: "true"
+        metadata:
+          labels:
+            app.kubernetes.io/name: grafana
         spec:
           securityContext:
             fsGroup: &gid 472
@@ -78,6 +78,8 @@ spec:
                       name: grafana-postgres-18-app
                 - name: GF_DATABASE_HOST
                   value: grafana-postgres-18-rw.grafana.svc.cluster.local.:5432
+                - name: GF_INSTALL_PLUGINS
+                  value: "http://192.168.123.170:9000/grafana-plugins/nais-apm-app-0.23.0.zip;nais-apm-app"
               readinessProbe:
                 failureThreshold: 3
               # volumeMounts:
@@ -148,7 +150,7 @@ spec:
       name: grafana
       log_queries: "false"
     plugins:
-      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,redis-explorer,pierosavi-imageit-panel,grafana-clock-panel"
+      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,redis-explorer,pierosavi-imageit-panel,grafana-clock-panel,nais-apm-app"
       preinstall: "redis-app,redis-datasource,redis-explorer"
     tracing.opentelemetry.otlp:
       address: "trace-collector.observability.svc.cluster.local:4317"

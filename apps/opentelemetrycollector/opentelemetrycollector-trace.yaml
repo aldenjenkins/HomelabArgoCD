@@ -59,6 +59,15 @@ spec:
           - name: http.route
           - name: http.status_code
           - name: service.version
+          # 2026-08-22 adding new dimensions for better nais apm insights https://github.com/nais/grafana-apm-app/blob/main/docs/metrics-reference.md#opentelemetry-collector-setup
+          - name: db.system
+          - name: db.operation
+          - name: messaging.system
+          - name: messaging.operation
+          - name: rpc.system
+          - name: rpc.service
+          - name: rpc.method
+          - name: peer.service
 
         # Ensure exemplars are enabled and sent to the metrics store.
         exemplars:
@@ -109,6 +118,11 @@ spec:
         # Service nodes/edges will be generated for any attribute defined.
         virtual_node_peer_attributes:
           - db.name
+          - peer.service
+          - db.system
+        dimensions:
+          - db.system
+          - messaging.system
 
       # exceptions:
       #   dimensions:

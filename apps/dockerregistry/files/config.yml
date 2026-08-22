@@ -1,7 +1,7 @@
 version: 0.1
 log:
   fields:
-    service: registry
+    service: docker-registry-s3
   level: info
   formatter: json
 storage:
