@@ -1,7 +1,7 @@
 namespace: grafana-operator-system
 resources:
   # renovate: datasource=github-releases depName=grafana/grafana-operator
-  - https://github.com/grafana/grafana-operator/releases/download/v5.24.0/kustomize-cluster_scoped.yaml
+  - https://github.com/grafana/grafana-operator/releases/download/v5.25.0/kustomize-cluster_scoped.yaml
   - servicemonitor.yaml
   - grafanadashboard.yaml
 patches:
