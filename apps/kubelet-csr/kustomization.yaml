@@ -1,2 +1,2 @@
 resources:
-  - "https://github.com/alex1989hu/kubelet-serving-cert-approver/deploy/standalone?ref=v0.11.0"
+  - "https://github.com/alex1989hu/kubelet-serving-cert-approver/deploy/standalone?ref=v0.12.0"
