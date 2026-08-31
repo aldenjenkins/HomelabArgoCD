@@ -174,7 +174,7 @@ query_scheduler:
 
 # Ruler configuration
 ruler:
-  external_url: https://mimir.home.alden.ai/alertmanager
+  external_url: https://mimir-redirect.home.alden.ai
   enable_api: true
   query_frontend:
     address: dns:///mimir-query-frontend.mimir.svc.cluster.local.:9095
