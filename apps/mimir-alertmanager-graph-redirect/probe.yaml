@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+    name: mimir-alertmanager-redirect-http-60s
+spec:
+    jobName: mimir-alertmanager-redirect-http-60s
+    interval: 60s
+    scrapeTimeout: 60s
+    module: http_2xx_60s
+    prober:
+        url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+    targets:
+        staticConfig:
+            static:
+                - http://mimir-alertmanager-graph-redirect.mimir-alertmanager-graph-redirect.svc.cluster.local./healthz

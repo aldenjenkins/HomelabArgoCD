@@ -1,0 +1,13 @@
+namespace: mimir-alertmanager-graph-redirect
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - httproute.yaml
+  - probe.yaml
+  - service.yaml
+configMapGenerator:
+  - name: mimir-redirect
+    envs:
+      - files/envs.env
+    options:
+      immutable: true
