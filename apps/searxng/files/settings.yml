@@ -68,6 +68,10 @@ general:
 #   - name: braveapi
 #     disabled: true
 #     inactive: true
+engines:
+  - name: duckduckgo
+    network:
+      impersonate: "firefox"
 
 search:
   safe_search: 2
