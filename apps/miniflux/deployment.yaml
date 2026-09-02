@@ -34,7 +34,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: wait-for-requirements
-          image: curlimages/curl:8.21.0
+          image: curlimages/curl:8.22.0
           imagePullPolicy: IfNotPresent
           command:
             - "sh"
