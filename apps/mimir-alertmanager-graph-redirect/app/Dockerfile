@@ -1,21 +1,22 @@
-FROM python:3.14.7-alpine3.24 AS base
+# ---- Build stage ----
+FROM golang:1.27.1-alpine3.24 AS builder
+WORKDIR /workspace
 
-WORKDIR /app
+# Copy the Go Modules manifests
+COPY go.mod ./
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the Go source
+COPY main.go ./
 
-COPY app.py .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o mimir-redirect .
 
-# Alpine uses adduser/addgroup (busybox), not useradd
-RUN addgroup -g 10001 appuser \
-    && adduser -D -H -u 10001 -G appuser appuser
-
-USER 10001
+# ---- Final stage: distroless static, no shell, no libc, no interpreter ----
+# Use distroless as minimal base image to package the manager binary
+# Refer to https://github.com/GoogleContainerTools/distroless for more details
+FROM gcr.io/distroless/static:nonroot AS base
+WORKDIR /
+COPY --from=builder /workspace/mimir-redirect .
+USER 65532:65532
 EXPOSE 8080
-ENV LOG_LEVEL=INFO
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2).status==200 else 1)"
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--access-logfile", "-", "app:app"]
+ENTRYPOINT ["/mimir-redirect"]

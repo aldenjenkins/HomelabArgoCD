@@ -1,0 +1,44 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mimir-alertmanager-redirect-ingress
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: mimir-alertmanager-graph-redirect
+  ingress:
+    # Allow web requests from only istio-system's main ingress gateway
+    - fromEndpoints:
+        - matchLabels:
+            gateway.istio.io/managed: istio.io-gateway-controller
+            gateway.networking.k8s.io/gateway-class-name: istio
+            gateway.networking.k8s.io/gateway-name: default-https-gateway
+            io.kubernetes.pod.namespace: istio-system
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Blackbox exporter
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: blackbox-exporter
+            io.kubernetes.pod.namespace: blackbox-exporter
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: "TCP"
+    # Core prometheus collector scrape replication pod's exporter container metrics
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: opentelemetry-collector
+            app.kubernetes.io/instance: observability.core-prometheus
+            app.kubernetes.io/managed-by: opentelemetry-operator
+            app.kubernetes.io/name: core-prometheus-collector
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "9121"
+              protocol: "TCP"
+
+  egress:
+    - {} # This empty list puts the pod into "Default Deny" mode

@@ -5,6 +5,7 @@ resources:
   - httproute.yaml
   - probe.yaml
   - service.yaml
+  - ciliumnetworkpolicy.yaml
 configMapGenerator:
   - name: mimir-redirect
     envs:
