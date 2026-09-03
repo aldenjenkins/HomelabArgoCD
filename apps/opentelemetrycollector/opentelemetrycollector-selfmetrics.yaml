@@ -5,7 +5,7 @@ metadata:
 spec:
   serviceAccount: otel-collector
   mode: statefulset
-  image: otel/opentelemetry-collector-contrib:0.159.0
+  image: otel/opentelemetry-collector-contrib:0.160.0
   imagePullPolicy: IfNotPresent
   resources:
     limits:
