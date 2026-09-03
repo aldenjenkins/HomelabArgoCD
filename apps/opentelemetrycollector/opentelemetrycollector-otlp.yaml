@@ -17,7 +17,7 @@ spec:
       cpu: "1"
       memory: 512Mi
   serviceAccount: otel-collector
-  image: otel/opentelemetry-collector-contrib:0.159.0
+  image: otel/opentelemetry-collector-contrib:0.160.0
   imagePullPolicy: IfNotPresent
   config:
     # Define connectors which connect two pipelines, acting as both exporter and receiver.

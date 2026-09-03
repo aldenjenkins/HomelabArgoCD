@@ -20,7 +20,7 @@ spec:
           - 568
       containers:
         - name: 2fauth
-          image: 2fauth/2fauth:8.0.1
+          image: 2fauth/2fauth:8.0.2
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
