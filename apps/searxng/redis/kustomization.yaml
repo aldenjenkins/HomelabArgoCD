@@ -3,3 +3,4 @@ resources:
   - redis.yaml
   - grafanadatasource.yaml
   - servicemonitor.yaml
+  - probe.yaml

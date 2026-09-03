@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: searxng-tcp-30s
+spec:
+  jobName: searxng-tcp-30s
+  interval: 30s
+  scrapeTimeout: 30s
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+  targets:
+    staticConfig:
+      static:
+        - searxng-redis.searxng.svc.cluster.local.:6379
