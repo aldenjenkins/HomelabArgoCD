@@ -1,6 +1,8 @@
 # ---- Build stage ----
 FROM golang:1.27.1-alpine3.24 AS builder
 
+ARG MAINVERSION=2.2.0
+
 WORKDIR /workspace
 # Copy the Go Modules manifests
 COPY go.mod go.mod
@@ -12,7 +14,7 @@ RUN go mod download
 # Copy the Go source
 COPY main.go ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o mimir-redirect .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X main.version=${MAINVERSION}" -o mimir-redirect .
 
 # ---- Final stage: distroless static, no shell, no libc, no interpreter ----
 # Use distroless as minimal base image to package the manager binary

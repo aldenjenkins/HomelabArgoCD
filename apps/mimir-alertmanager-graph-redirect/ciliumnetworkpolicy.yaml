@@ -41,4 +41,30 @@ spec:
               protocol: "TCP"
 
   egress:
-    - {} # This empty list puts the pod into "Default Deny" mode
+    # - {} # This empty list puts the pod into "Default Deny" mode
+    # DNS resolution -- required to resolve trace-collector.observability.svc.cluster.local
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # OTLP/HTTP traces to trace-collector in observability
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: opentelemetry-collector
+            app.kubernetes.io/instance: observability.trace
+            app.kubernetes.io/managed-by: opentelemetry-operator
+            app.kubernetes.io/name: trace-collector
+            io.kubernetes.pod.namespace: observability
+      toPorts:
+        - ports:
+            - port: "4318"
+              protocol: TCP

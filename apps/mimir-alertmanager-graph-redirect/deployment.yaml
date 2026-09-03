@@ -16,11 +16,16 @@ spec:
     spec:
       containers:
         - name: mimir-redirect
-          image: registry.home.alden.ai/me/mimir-alertmanager-graph-redirect:2.1.0
+          image: registry.home.alden.ai/me/mimir-alertmanager-graph-redirect:2.2.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8080
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318
+            - name: OTEL_TRACES_SAMPLER
+              value: always_on
           envFrom:
             - configMapRef:
                 name: mimir-redirect
