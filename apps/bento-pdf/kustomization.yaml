@@ -5,3 +5,4 @@ resources:
   - deployment.yaml
   - httproute.yaml
   - ciliumnetworkpolicy.yaml
+  - probe.yaml
