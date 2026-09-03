@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -139,12 +143,47 @@ func graphHandler(cfg Config, log *slog.Logger) http.HandlerFunc {
 	}
 }
 
+// statusRecorder wraps a ResponseWriter so the access-log middleware can
+// see the status code a handler actually wrote -- http.ResponseWriter
+// doesn't expose that after the fact otherwise.
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRecorder) WriteHeader(status int) {
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
+}
+
+// accessLog is the Go equivalent of gunicorn's --access-logfile: net/http
+// doesn't log requests on its own, so without this middleware only the
+// handful of explicit log.Info calls inside handlers ever show up, and
+// most requests (successful healthz checks, 400s, index hits) produce no
+// log output at all.
+func accessLog(log *slog.Logger, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
+
+		next.ServeHTTP(rec, r)
+
+		log.Info("request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"query", r.URL.RawQuery,
+			"status", rec.status,
+			"duration_ms", time.Since(start).Milliseconds(),
+			"remote_addr", r.RemoteAddr,
+			"user_agent", r.UserAgent(),
+		)
+	})
+}
+
 func newLogger() *slog.Logger {
 	level := slog.LevelInfo
-	if err := level.UnmarshalText([]byte(os.Getenv("LOG_LEVEL"))); err == nil {
-		// parsed successfully, level is already set
-	}
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
+	_ = level.UnmarshalText([]byte(os.Getenv("LOG_LEVEL")))
+	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})
 	return slog.New(handler)
 }
 
@@ -163,17 +202,31 @@ func main() {
 	mux.HandleFunc("GET /alertmanager/graph", graphHandler(cfg, log))
 	mux.HandleFunc("GET /", indexHandler)
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	srv := &http.Server{
 		Addr:         ":8080",
-		Handler:      mux,
+		Handler:      accessLog(log, mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Info("starting server", "addr", srv.Addr)
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Error("server error", "err", err)
-		os.Exit(1)
+	go func() {
+		log.Info("starting server", "addr", srv.Addr)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Error("server error", "err", err)
+			os.Exit(1)
+		}
+	}()
+
+	<-ctx.Done()
+	log.Info("shutdown signal received, draining connections")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Error("error during server shutdown", "err", err)
 	}
 }

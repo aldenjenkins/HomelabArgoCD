@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mimir-redirect
-          image: registry.home.alden.ai/me/mimir-alertmanager-graph-redirect:2.0.0
+          image: registry.home.alden.ai/me/mimir-alertmanager-graph-redirect:2.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
