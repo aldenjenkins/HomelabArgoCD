@@ -8,6 +8,7 @@ resources:
   - httproute.yaml
   - service.yaml
   - destinationrule.yaml
+  - probe.yaml
 
 generators:
   - sopsgenerator.yaml
