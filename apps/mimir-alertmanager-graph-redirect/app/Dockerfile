@@ -1,19 +1,18 @@
-FROM python:3.14-slim AS base
+FROM python:3.14.7-alpine3.24 AS base
 
 WORKDIR /app
 
-# Install deps first for better layer caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
 
-# Run as non-root
-RUN useradd --create-home --uid 10001 appuser
+# Alpine uses adduser/addgroup (busybox), not useradd
+RUN addgroup -g 10001 appuser \
+    && adduser -D -H -u 10001 -G appuser appuser
+
 USER 10001
-
 EXPOSE 8080
-
 ENV LOG_LEVEL=INFO
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
