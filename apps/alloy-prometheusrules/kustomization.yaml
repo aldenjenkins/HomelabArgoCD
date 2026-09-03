@@ -5,6 +5,8 @@ resources:
   - deployment.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
+  - service.yaml
+  - probe.yaml
 configMapGenerator:
   - name: alloy-config
     files:

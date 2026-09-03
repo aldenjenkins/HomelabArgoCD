@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+    name: alloy-prometheusrules-http-60s
+spec:
+    jobName: alloy-prometheusrules-http-60s
+    interval: 60s
+    scrapeTimeout: 60s
+    module: http_2xx_60s
+    prober:
+        url: blackbox-exporter.blackbox-exporter.svc.cluster.local.:19115
+    targets:
+        staticConfig:
+            static:
+              - http://alloy-prometheusrules.alloy-prometheusrules.svc.cluster.local.:12345/-/healthy
