@@ -2,3 +2,4 @@ namespace: shlink
 resources:
   - deployment.yaml
   - service.yaml
+  - probe.yaml
