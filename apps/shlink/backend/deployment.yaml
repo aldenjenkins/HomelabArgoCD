@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: shlink
-          image: ghcr.io/shlinkio/shlink:5.1.5
+          image: ghcr.io/shlinkio/shlink:5.1.6
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
