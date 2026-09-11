@@ -1,6 +1,6 @@
 resources:
   # renovate: datasource=github-releases depName=cert-manager/cert-manager
-  - https://github.com/cert-manager/cert-manager/releases/download/v1.21.1/cert-manager.yaml
+  - https://github.com/cert-manager/cert-manager/releases/download/v1.21.2/cert-manager.yaml
   # - servicemonitor.yaml
   - grafanafolder.yaml
   - grafanadashboard.yaml
