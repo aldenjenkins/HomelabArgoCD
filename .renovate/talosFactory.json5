@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      // File pattern targets the `talos/` directory convention used by
+      // home-operations/cluster-template and similar layouts. Override
+      // `managerFilePatterns` if your Talos configs live elsewhere.
+      "description": "Process Talos Factory installer images and topf talosVersion",
+      "customType": "regex",
+      "managerFilePatterns": ["/talos\\/.*\\.ya?ml(?:\\.j2)?$/"],
+      "matchStrings": [
+        "factory\\.talos\\.dev\\/[^/]+\\/[^:]+:(?<currentValue>v\\S+)",
+        // topf.yaml `talosVersion:` (bare or v-prefixed; topf trims the leading v)
+        "talosVersion:\\s*[\"']?(?<currentValue>v?[0-9][^\"'\\s]*)"
+      ],
+      "datasourceTemplate": "custom.talos-factory",
+      "versioningTemplate": "semver",
+      "depNameTemplate": "siderolabs/talos"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Ignore factory.talos.dev images matched by generic managers; the custom manager above owns them",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["/^factory\\.talos\\.dev\\//"],
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["custom.talos-factory"],
+      "semanticCommitScope": "container",
+      "commitMessageTopic": "{{depName}}"
+    }
+  ],
+  "customDatasources": {
+    "talos-factory": {
+      "defaultRegistryUrlTemplate": "https://factory.talos.dev/versions",
+      "format": "json",
+      "transformTemplates": ['{"releases": [$.{"version": $}]}']
+    }
+  }
+}
