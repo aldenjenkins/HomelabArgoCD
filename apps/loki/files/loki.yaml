@@ -84,6 +84,8 @@ distributor:
       - "k8s.job.name"
       - "k8s.namespace.name"
       - "k8s.node.name"
+      # 2026-09-13 adding k8s.pod.name label so that we can search by pod name in loki
+      - "k8s.pod.name"
       - "k8s.replicaset.name"
       - "k8s.statefulset.name"
       - "service.name"
