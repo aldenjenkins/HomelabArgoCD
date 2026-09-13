@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: test-cilium-gateway
+  namespace: cilium
+  annotations:
+    io.cilium/lb-ipam-ips: "10.10.10.50"   # pinning to a spare test IP in 10.10.10.0/24
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: "10.10.10.50"
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.test.alden.ai"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: test-cilium-home-cert-tls

@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: authelia-ext-authz
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: header-inspection
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: forgejo
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: librespeed
+  to:
+    - group: ""
+      kind: Service
+      name: authelia

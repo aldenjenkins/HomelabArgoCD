@@ -32,7 +32,14 @@ enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true
 envoy:
-  enabled: false
+  # Gateway API needs the L7 proxy. Run Envoy as its own DaemonSet rather than
+  # embedded in the agent (the 1.20 default for fresh installs) so that Envoy
+  # config churn from HTTPRoutes doesn't restart cilium-agent.
+  enabled: true
+  rollOutPods: true
+  prometheus:
+    serviceMonitor:
+      enabled: true
 hubble:
   enabled: false
   relay:
@@ -109,3 +116,6 @@ gatewayAPI:
   enabled: true
   enableAlpn: true
   enableAppProtocol: true
+  # 2026-09-06 setup cilium envoy ingresses within cilium agents as a first attempt while switching from istio ingress gateways.
+  gatewayClass:
+    create: "true"

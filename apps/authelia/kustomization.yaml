@@ -10,6 +10,7 @@ resources:
   - grafanafolder.yaml
   - grafanadashboard.yaml
   - probe.yaml
+  - referencegrant.yaml
 generators:
   - sopsgenerator.yaml
 configMapGenerator:
