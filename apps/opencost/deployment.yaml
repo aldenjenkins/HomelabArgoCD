@@ -58,7 +58,7 @@ spec:
               name: nginx-conf-dir
       containers:
         - name: opencost
-          image: ghcr.io/opencost/opencost:1.121.2
+          image: ghcr.io/opencost/opencost:1.121.3
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false  # Prevents containers from becoming root
