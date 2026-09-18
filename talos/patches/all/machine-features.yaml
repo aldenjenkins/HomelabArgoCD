@@ -1,0 +1,7 @@
+---
+machine:
+  features:
+    # 2026-09-15 these two seems deprecated as of latest talos version 1.14.0 but might have deprecated before that.
+    # rbac: true
+    # apidCheckExtKeyUsage: true
+    diskQuotaSupport: true # Enable XFS project quota support for EPHEMERAL partition and user disks.

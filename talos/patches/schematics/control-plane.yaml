@@ -1,0 +1,9 @@
+customization:
+  extraKernelArgs:
+    - talos.platform=metal
+    - cpufreq.default_governor=performance
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools
+      - siderolabs/util-linux-tools

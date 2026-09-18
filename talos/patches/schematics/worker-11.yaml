@@ -1,0 +1,12 @@
+customization:
+  extraKernelArgs:
+    - talos.platform=metal
+    - cpufreq.default_governor=performance
+    # 2026-04-06 trying guc=3 even though guc=2 didnt work on control-plane-01.
+    - i915.enable_guc=3
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/i915
+      - siderolabs/intel-ucode
+      - siderolabs/iscsi-tools
+      - siderolabs/util-linux-tools

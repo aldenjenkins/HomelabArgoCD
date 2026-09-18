@@ -1,0 +1,196 @@
+# https://postfinance.github.io/topf/main/configuration/
+---
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.14.1
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.36.4
+
+clusterName: homelab-live
+clusterEndpoint: https://192.168.123.50:6443
+
+secretsPath: secrets.sops.yaml
+
+patchesDir: patches
+
+nodes:
+  ### CONTROL PLANE NODES SECTION (First in list so that "talhelp gencommand upgrade" will attempt upgrading control plane nodes first) ###
+  - host: control-plane-01
+    ip: 192.168.123.141
+    role: control-plane
+    schematicId: '@patches/schematics/control-plane.yaml'
+    data:
+      macAddr: 88:ae:dd:74:ad:d1
+      installDiskPath: /dev/nvme1n1
+      longhornDiskSelector: '!system_disk'
+      longhornDiskMinSize: 1000GiB
+      longhornDiskMaxSize: 1000GiB
+      localPathDiskSelector: '!system_disk'
+      localPathDiskMinSize: 2500GiB
+      localPathDiskMaxSize: 2500GiB
+  - host: control-plane-02
+    ip: 192.168.123.142
+    role: control-plane
+    schematicId: '@patches/schematics/control-plane.yaml'
+    data:
+      macAddr: 88:ae:dd:60:7c:ac
+      installDiskPath: /dev/nvme0n1
+      ephemeralMaxSize: 500GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMinSize: 1000GiB
+      longhornDiskMaxSize: 1000GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 2000GiB
+      localPathDiskMaxSize: 2000GiB
+  - host: control-plane-03
+    ip: 192.168.123.143
+    role: control-plane
+    schematicId: '@patches/schematics/control-plane.yaml'
+    data:
+      macAddr: 88:ae:dd:61:0f:20
+      installDiskPath: /dev/nvme0n1
+      ephemeralMaxSize: 500GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMinSize: 1000GiB
+      longhornDiskMaxSize: 1000GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 2000GiB
+      localPathDiskMaxSize: 2000GiB
+  ### END CONTROL PLANE SECTION ###
+  ### WORKER NODES SECTION ###
+  # 2026-06-14 disabling worker-01 since it has some expected disk I/O corruption
+  # (probably the sata power+data cable just needs to be replaced)
+  # - hostname: worker-01
+  #   ipAddress: 192.168.123.101
+  #   installDisk: /dev/sda
+  #   controlPlane: false
+  #   networkInterfaces:
+  #     - deviceSelector:
+  #         hardwareAddr: "f4:4d:30:64:8c:9f"
+  #       addresses:
+  #         - 192.168.123.101/24
+  #       routes:
+  #         - network: 0.0.0.0/0
+  #           gateway: 192.168.123.1
+  #       dhcp: false
+  #   nameservers:
+  #     - 192.168.123.171
+  #   volumes:
+  #     - name: EPHEMERAL
+  #       provisioning:
+  #         maxSize: 250GiB
+  #   userVolumes:
+  #     - name: longhorn
+  #       provisioning:
+  #         diskSelector:
+  #           match: system_disk
+  #         maxSize: 250GiB
+  #     - name: local-path-provisioner
+  #       provisioning:
+  #         diskSelector:
+  #           match: system_disk
+  #         grow: true
+  #         minSize: 150GiB
+  - host: worker-02
+    ip: 192.168.123.102
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:8d:f9
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-03
+    ip: 192.168.123.103
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:7b:b6
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-04
+    ip: 192.168.123.104
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:7c:60
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-05
+    ip: 192.168.123.105
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:8e:5d
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-08
+    ip: 192.168.123.108
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:63:a3:23
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-09
+    ip: 192.168.123.109
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:b6:6a
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-10
+    ip: 192.168.123.110
+    role: worker
+    schematicId: '@patches/schematics/worker.yaml'
+    data:
+      macAddr: f4:4d:30:64:80:55
+      installDiskPath: /dev/sda
+      ephemeralMaxSize: 250GiB
+      longhornDiskSelector: 'system_disk'
+      longhornDiskMaxSize: 250GiB
+      localPathDiskSelector: 'system_disk'
+      localPathDiskMinSize: 150GiB
+      localPathGrow: true
+  - host: worker-11
+    ip: 192.168.123.111
+    role: worker
+    schematicId: '@patches/schematics/worker-11.yaml'
+    data:
+      macAddr: 88:ae:dd:74:ac:aa
+      installDiskPath: /dev/nvme1n1
+      longhornDiskSelector: '!system_disk'
+      longhornDiskMinSize: 1000GiB
+      longhornDiskMaxSize: 1000GiB
+      localPathDiskSelector: '!system_disk'
+      localPathDiskMinSize: 2500GiB
+      localPathDiskMaxSize: 2500GiB

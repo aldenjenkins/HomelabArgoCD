@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
-# Sync talhelper-generated machine configs to PXE directories on the NAS,
+# Sync topf-generated machine configs to PXE directories on the NAS,
 # and download the matching Talos boot assets (vmlinuz-amd64, initramfs-amd64.xz)
 # to the NAS, overwriting whatever is currently there.
 #
-# Maps hostname -> MAC address from talconfig.yaml, then rsyncs each
-# clusterconfig/<cluster>-<hostname>.yaml to homeserver:/mnt/data/share/pxe/configs/<mac>/node.yaml
+# Maps hostname -> MAC address from topf.yaml, then rsyncs each
+# output/<host>.yaml to homeserver:/mnt/data/share/pxe/configs/<mac>/node.yaml
 set -euo pipefail
 
 # --- config ----------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TALCONFIG="${TALCONFIG:-$SCRIPT_DIR/talconfig.yaml}"
-TALENV="${TALENV:-$SCRIPT_DIR/talenv.yaml}"
-CLUSTERCONFIG_DIR="${CLUSTERCONFIG_DIR:-$SCRIPT_DIR/clusterconfig}"
+TOPF_CONFIG="${TOPF_CONFIG:-$SCRIPT_DIR/topf.yaml}"
+OUTPUT_DIR="${OUTPUT_DIR:-$SCRIPT_DIR/output}"
 NAS_HOST="${NAS_HOST:-homeserver}"
 NAS_BASE="${NAS_BASE:-/mnt/data/share/pxe/configs}"
 NAS_ASSETS_DIR="${NAS_ASSETS_DIR:-/mnt/data/share/pxe/boot/talos-assets}"
@@ -30,33 +29,34 @@ for bin in yq rsync ssh curl; do
   command -v "$bin" >/dev/null || { echo "missing dependency: $bin" >&2; exit 1; }
 done
 
-# --- read cluster name from talconfig ---------------------------------------
-CLUSTER_NAME="$(yq -r '.clusterName' "$TALCONFIG")"
-if [[ -z "$CLUSTER_NAME" || "$CLUSTER_NAME" == "null" ]]; then
-  echo "could not read .clusterName from $TALCONFIG" >&2
+if [[ ! -f "$TOPF_CONFIG" ]]; then
+  echo "topf config not found: $TOPF_CONFIG" >&2
   exit 1
 fi
 
-# --- read talos version from talenv ----------------------------------------
-if [[ ! -f "$TALENV" ]]; then
-  echo "talenv.yaml not found: $TALENV" >&2
+# --- read cluster name from topf.yaml (for logging only) -------------------
+CLUSTER_NAME="$(yq -r '.clusterName' "$TOPF_CONFIG")"
+if [[ -z "$CLUSTER_NAME" || "$CLUSTER_NAME" == "null" ]]; then
+  echo "could not read .clusterName from $TOPF_CONFIG" >&2
   exit 1
 fi
-TALOS_VERSION_RAW="$(yq -r '.talosVersion' "$TALENV")"
+
+# --- read talos version from topf.yaml --------------------------------------
+TALOS_VERSION_RAW="$(yq -r '.talosVersion' "$TOPF_CONFIG")"
 if [[ -z "$TALOS_VERSION_RAW" || "$TALOS_VERSION_RAW" == "null" ]]; then
-  echo "could not read .talosVersion from $TALENV" >&2
+  echo "could not read .talosVersion from $TOPF_CONFIG" >&2
   exit 1
 fi
 # Normalise to always have a leading "v"
 TALOS_VERSION="v${TALOS_VERSION_RAW#v}"
 
-# yq emits "<hostname>\t<mac>" per node. We take the first interface's MAC.
+# yq emits "<host>\t<macAddr>" per node.
 mapfile -t NODE_LINES < <(
   yq -r '
     .nodes[]
-    | [.hostname, (.networkInterfaces[0].deviceSelector.hardwareAddr // "")]
+    | [.host, (.data.macAddr // "")]
     | @tsv
-  ' "$TALCONFIG"
+  ' "$TOPF_CONFIG"
 )
 
 # --- sync boot assets -------------------------------------------------------
@@ -95,12 +95,12 @@ ok=0; missing=0; failed=0
 for line in "${NODE_LINES[@]}"; do
   hostname="${line%$'\t'*}"
   mac="${line#*$'\t'}"
-  src="$CLUSTERCONFIG_DIR/${CLUSTER_NAME}-${hostname}.yaml"
+  src="$OUTPUT_DIR/${hostname}.yaml"
   dest_dir="$NAS_BASE/$mac"
   dest="$dest_dir/node.yaml"
 
   if [[ -z "$mac" ]]; then
-    echo "✗ $hostname: no MAC in talconfig, skipping" >&2
+    echo "✗ $hostname: no macAddr in topf.yaml, skipping" >&2
     ((missing++)) || true
     continue
   fi

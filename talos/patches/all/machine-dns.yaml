@@ -1,0 +1,14 @@
+apiVersion: v1alpha1
+kind: ResolverConfig
+# Configuration for host DNS resolver.
+hostDNS:
+  enabled: true # Enable host DNS caching resolver.
+  forwardKubeDNSToHost: true # Use the host DNS resolver as upstream for Kubernetes CoreDNS pods.
+  resolveMemberNames: true # Resolve member hostnames using the host DNS resolver.
+# A list of nameservers (DNS servers) to use for resolving domain names.
+nameservers:
+  - address: 192.168.123.171
+    protocol: Do53 # default protocol (unencrypted)
+# Configuration for search domains (in /etc/resolv.conf).
+searchDomains:
+  disableDefault: true # Disable default search domain configuration from hostname FQDN.
