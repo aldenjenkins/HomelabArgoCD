@@ -3,7 +3,7 @@ resources:
   - namespace.yaml
   # - github.com/external-secrets/external-secrets/config/crds/bases?ref=HEAD
   # renovate: datasource=github-releases depName=external-secrets/external-secrets
-  - https://github.com/external-secrets/external-secrets/releases/download/v2.10.0/external-secrets.yaml
+  - https://github.com/external-secrets/external-secrets/releases/download/v2.11.0/external-secrets.yaml
   - webhook-pki.yaml
   - servicemonitor.yaml
   - metrics-service.yaml
