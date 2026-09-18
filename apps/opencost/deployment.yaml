@@ -43,7 +43,7 @@ spec:
         kubernetes.io/os: linux
       initContainers:
         - name: copy-nginx-conf
-          image: ghcr.io/opencost/opencost-ui:1.121.2
+          image: ghcr.io/opencost/opencost-ui:1.121.3
           command: ['sh', '-c', 'cp /etc/nginx/conf.d/default.nginx.conf.template /nginx-conf-shared/']
           securityContext:  # <-- ADDED SECURITY CONTEXT
             allowPrivilegeEscalation: false
@@ -151,7 +151,7 @@ spec:
               subPath: default.json
               readOnly: true
         - name: opencost-ui
-          image: ghcr.io/opencost/opencost-ui:1.121.2
+          image: ghcr.io/opencost/opencost-ui:1.121.3
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
