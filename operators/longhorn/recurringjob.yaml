@@ -20,16 +20,17 @@ spec:
   #         operator: NotIn
   #         values:
   #           - longhorn-local
----
-apiVersion: longhorn.io/v1beta2
-kind: RecurringJob
-metadata:
-  name: kafka-trim
-spec:
-  name: kafka-trim
-  task: filesystem-trim
-  groups:
-    - kafka-trim
-  cron: "0 * * * *"     # hourly
-  retain: 0
-  concurrency: 1
+# 2026-09-22 removing kafka trim job since kafka nodepools now use local-path instead of longhorn
+# ---
+# apiVersion: longhorn.io/v1beta2
+# kind: RecurringJob
+# metadata:
+#   name: kafka-trim
+# spec:
+#   name: kafka-trim
+#   task: filesystem-trim
+#   groups:
+#     - kafka-trim
+#   cron: "0 * * * *"     # hourly
+#   retain: 0
+#   concurrency: 1
