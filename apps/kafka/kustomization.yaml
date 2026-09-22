@@ -6,3 +6,4 @@ resources:
   - kafka.yaml
   - kafkatopic.yaml
   - podmonitor.yaml
+  - networkpolicy.yaml
