@@ -1,23 +1,31 @@
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
-  name: dual-role
+  name: controller
   labels:
     strimzi.io/cluster: kafka
 spec:
-  replicas: 3               # 3 dual-role nodes for a small HA cluster
+  replicas: 3
   roles:
-  - controller
-  - broker
+    - controller
   storage:
     type: jbod
     volumes:
-    - id: 0
-      type: persistent-claim
-      size: 100Gi
-      class: longhorn-kafka
-      deleteClaim: true
-      kraftMetadata: shared
+      - id: 0
+        type: persistent-claim
+        size: 10Gi  # not enforced by local-path, just FYI
+        class: local-path
+        deleteClaim: false
+        kraftMetadata: shared
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+  jvmOptions:
+    -Xms: 512m
+    -Xmx: 512m
   template:
     pod:
       affinity:
@@ -25,10 +33,57 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  strimzi.io/pool-name: dual-role
+                  strimzi.io/pool-name: controller
               topologyKey: kubernetes.io/hostname
-    persistentVolumeClaim:
-      metadata:
-        labels:
-          recurring-job.longhorn.io/source: "enabled"
-          recurring-job-group.longhorn.io/kafka-trim: "enabled"
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    strimzi.io/pool-name: broker
+                topologyKey: kubernetes.io/hostname
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: broker
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  replicas: 3
+  roles:
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 100Gi  # not enforced by local-path, just FYI
+        class: local-path
+        deleteClaim: false
+        kraftMetadata: shared
+  resources:
+    requests:
+      memory: 4Gi
+      cpu: 500m
+    limits:
+      memory: 4Gi
+  jvmOptions:
+    -Xms: 2g
+    -Xmx: 2g
+  template:
+    pod:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  strimzi.io/pool-name: broker
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    strimzi.io/pool-name: controller
+                topologyKey: kubernetes.io/hostname
