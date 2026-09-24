@@ -7,6 +7,7 @@ resources:
   - distributor
   - ingester
   - querier
+  - cardinality
   - query-frontend
   - query-scheduler
   - compactor
