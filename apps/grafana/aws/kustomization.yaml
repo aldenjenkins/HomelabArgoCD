@@ -7,5 +7,6 @@ resources:
   - s3
   - billing
   - ec2
+  - ses
 generators:
   - sopsgenerator.yaml
