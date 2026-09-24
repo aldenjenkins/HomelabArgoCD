@@ -150,8 +150,8 @@ spec:
       name: grafana
       log_queries: "false"
     plugins:
-      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,redis-explorer,pierosavi-imageit-panel,grafana-clock-panel,nais-apm-app"
-      preinstall: "redis-app,redis-datasource,redis-explorer"
+      allow_loading_unsigned_plugins: "grafana-piechart-panel,redis-app,redis-datasource,redis-explorer-app,pierosavi-imageit-panel,grafana-clock-panel,nais-apm-app"
+      preinstall: "redis-app,redis-datasource,redis-explorer-app,marcusolsson-json-datasource,marcusolsson-treemap-panel"
     tracing.opentelemetry.otlp:
       address: "trace-collector.observability.svc.cluster.local:4317"
     users:
