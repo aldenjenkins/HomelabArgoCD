@@ -67,22 +67,6 @@ spec:
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: loki-mikrotik-dashboard-mktxp-folder
-spec:
-  allowCrossNamespaceImport: true
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
-  resyncPeriod: 10m
-  datasources:
-    - inputName: "DS_LOKI"
-      datasourceName: "loki"
-  url: "https://grafana.com/api/dashboards/17139/revisions/5/download"
-  folderUID: mikrotik-uid
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDashboard
-metadata:
   name: loki-istio-dashboard
 spec:
   allowCrossNamespaceImport: true
