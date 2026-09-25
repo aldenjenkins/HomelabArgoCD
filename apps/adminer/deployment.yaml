@@ -21,7 +21,7 @@ spec:
         fsGroup: 101
       containers:
         - name: adminer
-          image: adminer:6.1.0
+          image: adminer:6.1.1
           imagePullPolicy: IfNotPresent
           securityContext:
             capabilities:
