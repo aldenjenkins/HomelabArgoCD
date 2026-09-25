@@ -1,6 +1,6 @@
 resources:
   # renovate: datasource=github-releases depName=dc-tec/openbao-operator
-  - github.com/dc-tec/openbao-operator/config/overlays/single-tenant?ref=0.5.0
+  - github.com/dc-tec/openbao-operator/config/overlays/single-tenant?ref=0.5.1
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
