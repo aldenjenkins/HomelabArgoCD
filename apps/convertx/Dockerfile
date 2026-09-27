@@ -1,4 +1,4 @@
-FROM ghcr.io/c4illin/convertx:v0.18.0
+FROM ghcr.io/c4illin/convertx:v0.19.0
 USER root
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
