@@ -1,0 +1,14 @@
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: glinet-ap
+  labels:
+    kubernetes.io/service-name: glinet-ap
+addressType: IPv4
+ports:
+  - name: metrics
+    port: 9100
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 192.168.123.3

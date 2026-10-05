@@ -5,6 +5,8 @@ metadata:
 spec:
   args:
     feature-gates: connector.spanmetrics.includeCollectorInstanceID
+  nodeSelector:
+    kubernetes.io/hostname: worker-11
   autoscaler:
     maxReplicas: 3
     minReplicas: 1

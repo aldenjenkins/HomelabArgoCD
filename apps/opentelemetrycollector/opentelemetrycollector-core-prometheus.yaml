@@ -328,7 +328,8 @@ spec:
             - IsMatch(name, "^machine_.+$")
             # Drop high-cardinality Longhorn histograms (url label causes cardinality explosion)
             - IsMatch(name, "^longhorn_rest_client_.+")
-            - IsMatch(name, "^node_.+$") and not (name == "node_memory_MemTotal_bytes" or name == "node_memory_MemFree_bytes" or name == "node_memory_MemAvailable_bytes")
+            # - IsMatch(name, "^node_.+$") and not (name == "node_memory_MemTotal_bytes" or name == "node_memory_MemFree_bytes" or name == "node_memory_MemAvailable_bytes")
+            - IsMatch(name, "^node_.+$") and resource.attributes["service.name"] != "glinet-ap" and not (name == "node_memory_MemTotal_bytes" or name == "node_memory_MemFree_bytes" or name == "node_memory_MemAvailable_bytes")
       groupbyattrs:
         keys:
           - k8s_pod_name

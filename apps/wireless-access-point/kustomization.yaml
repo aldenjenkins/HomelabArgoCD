@@ -1,0 +1,7 @@
+namespace: wireless-access-point
+resources:
+  - namespace.yaml
+  - grafanadashboard.yaml
+  - service.yaml
+  - endpointslice.yaml
+  - servicemonitor.yaml
