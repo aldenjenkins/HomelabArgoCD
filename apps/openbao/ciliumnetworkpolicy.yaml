@@ -1,0 +1,55 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bao-egress
+  namespace: openbao
+spec:
+  endpointSelector:
+    matchLabels:
+      openbao.org/cluster: bao
+  egress:
+    # Kubernetes API (raft auto-join)
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    # DNS, visible to Cilium so the FQDN rule below works
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    # AWS KMS (unseal)
+    - toFQDNs:
+        - matchName: kms.us-east-1.amazonaws.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Authelia, reached through the Istio gateway (OIDC login)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: istio-system
+            gateway.networking.k8s.io/gateway-name: default-https-gateway
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Plugin download from GitHub Container Registry
+    - toFQDNs:
+        - matchName: ghcr.io
+        - matchName: pkg-containers.githubusercontent.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

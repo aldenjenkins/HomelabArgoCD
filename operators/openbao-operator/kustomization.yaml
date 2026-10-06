@@ -8,6 +8,3 @@ images:
 - name: example.com/openbao-operator
   newName: ghcr.io/dc-tec/openbao-operator
   newTag: 0.5.1
-- name: ghcr.io/dc-tec/openbao-init
-  newName: ghcr.io/dc-tec/openbao-init
-  newTag: 0.5.1

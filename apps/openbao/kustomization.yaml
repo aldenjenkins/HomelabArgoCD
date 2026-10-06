@@ -1,0 +1,10 @@
+namespace: openbao
+resources:
+  - namespace.yaml
+  - openbaocluster.yaml
+  - ciliumnetworkpolicy.yaml
+  - issuer.yaml
+  - certificate.yaml
+  - clusterrolebinding.yaml
+generators:
+  - sopsgenerator.yaml

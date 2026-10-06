@@ -1,0 +1,78 @@
+apiVersion: openbao.org/v1alpha1
+kind: OpenBaoCluster
+metadata:
+  name: bao
+spec:
+  version: 2.7.1
+  replicas: 3
+  profile: Hardened
+  configuration:
+    # Structured logging for better log aggregation
+    logging:
+      format: json
+    ui: true
+    plugin:
+      autoDownload: true
+      autoRegister: true
+      downloadBehavior: fail
+  plugins:
+    - type: kms
+      name: awskms
+      image: ghcr.io/openbao/openbao-plugin-kms-aws:v0.1.0@sha256:fe9fb94872048c9474156c044ea8852bb5c2e968fc9304a3725e4d434b488541
+  initContainer:
+    image: ghcr.io/dc-tec/openbao-init:0.5.1
+  tls:
+    enabled: true
+    mode: External # required for Hardened profile
+  storage:
+    size: 10Gi
+    storageClassName: local-path
+  deletionPolicy: DeleteAll
+  gateway:
+    enabled: true
+    listenerName: https
+    hostname: openbao.home.alden.ai
+    gatewayRef:
+      name: default-https-gateway
+      namespace: istio-system
+  network:
+    trustedIngressPeers:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: istio-system
+        podSelector:
+          matchLabels:
+            gateway.networking.k8s.io/gateway-name: default-https-gateway
+  unseal:
+    type: awskms
+    awskms:
+      region: us-east-1
+      kmsKeyID: alias/openbao
+    credentialsSecretRef:
+      name: aws-kms-credentials
+  selfInit:
+    enabled: true
+    oidc:
+      enabled: true
+    requests:
+      - name: create-admin-policy
+        operation: update
+        path: sys/policies/acl/admin
+        policy:
+          policy: |
+            path "*" {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+      # These two are only required for init, then after setting up oidc, remove them and reapply
+      # - name: enable-userpass
+      #   operation: update
+      #   path: sys/auth/userpass
+      #   authMethod:
+      #     type: userpass
+      # - name: create-bootstrap-user
+      #   operation: update
+      #   path: auth/userpass/users/bootstrap
+      #   data:
+      #     password: "<some-temp-password>"
+      #     token_policies:
+      #       - admin

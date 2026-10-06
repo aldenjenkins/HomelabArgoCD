@@ -1,0 +1,30 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bao-ca
+spec:
+  isCA: true
+  commonName: bao-ca
+  secretName: bao-tls-ca
+  duration: 87600h
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bao-server
+spec:
+  secretName: bao-tls-server
+  dnsNames:
+    - openbao-cluster-bao.local
+    - bao.openbao.svc
+    - "*.bao.openbao.svc"
+    - "openbao.home.alden.ai"
+  issuerRef:
+    name: bao-ca
+    kind: Issuer

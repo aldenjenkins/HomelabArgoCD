@@ -263,6 +263,19 @@ identity_providers:
         access_token_signed_response_alg: 'none'
         userinfo_signed_response_alg: 'none'
         token_endpoint_auth_method: 'none'
+      - client_id: 'openbao'
+        client_name: 'OpenBao'
+        client_secret: '{{ fileContent "/secrets/oidc-client-openbao" }}'
+        public: false
+        authorization_policy: 'one_factor'
+        redirect_uris:
+          - 'https://openbao.home.alden.ai/ui/vault/auth/oidc/oidc/callback'
+          - 'http://localhost:8250/oidc/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
 totp:
   disable: false
   issuer: Authelia
