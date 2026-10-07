@@ -282,8 +282,8 @@ spec:
             # Use RAM for temporary storage - completely avoids disk I/O
             - mountPath: /tmp
               name: tmp
-            - mountPath: /.minio
-              name: minio-config
+            - mountPath: /logs
+              name: logs
       volumes:
         # Use tmpfs (RAM) for temporary files
         # This completely eliminates disk I/O competition with etcd
@@ -291,10 +291,9 @@ spec:
           emptyDir:
             medium: Memory  # <-- This uses RAM instead of disk
             sizeLimit: 6Gi  # Adjust based on your workload
-        - name: minio-config
+        - name: logs
           emptyDir:
-            medium: Memory
-            sizeLimit: 100Mi
+            sizeLimit: 1Gi
   volumeClaimTemplates:
     - metadata:
         name: data
