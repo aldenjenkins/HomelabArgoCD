@@ -33,8 +33,8 @@ limits:
   # CLI flag: -ingester.out-of-order-time-window
   out_of_order_time_window: 30m # default = 0s
   # Ruler limits
-  ruler_max_rules_per_rule_group: 50
-  ruler_max_rule_groups_per_tenant: 100
+  ruler_max_rules_per_rule_group: 100
+  ruler_max_rule_groups_per_tenant: 200
   # Limit queries to 500 days. You can override this on a per-tenant basis.
   max_total_query_length: 90d
   # Adjust max query parallelism to 16x sharding, without sharding we can run 15d queries fully in parallel.
