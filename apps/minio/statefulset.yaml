@@ -239,11 +239,15 @@ spec:
             - name: RUSTFS_SECRET_KEY
               value: miniominio
             - name: RUSTFS_OBS_METRIC_ENDPOINT
-              value: http://otlp-collector.observability.svc.cluster.local:4318/v1//metrics
+              value: http://otlp-collector.observability.svc.cluster.local:4318/v1/metrics
             - name: RUSTFS_OBS_TRACE_ENDPOINT
               value: http://trace-collector.observability.svc.cluster.local:4318/v1/traces
             - name: RUSTFS_OBS_LOGS_EXPORT_ENABLED
               value: "false"
+            - name: RUSTFS_OBS_LOG_DIRECTORY
+              value: ""
+            - name: RUSTFS_OBS_LOGGER_LEVEL
+              value: info
             # - name: MINIO_ROOT_USER
             #   value: minio
             # - name: MINIO_ROOT_PASSWORD
