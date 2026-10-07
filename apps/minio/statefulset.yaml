@@ -242,6 +242,8 @@ spec:
               value: http://otlp-collector.observability.svc.cluster.local:4318/v1//metrics
             - name: RUSTFS_OBS_TRACE_ENDPOINT
               value: http://trace-collector.observability.svc.cluster.local:4318/v1/traces
+            - name: RUSTFS_OBS_LOGS_EXPORT_ENABLED
+              value: "false"
             # - name: MINIO_ROOT_USER
             #   value: minio
             # - name: MINIO_ROOT_PASSWORD
