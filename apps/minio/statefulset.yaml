@@ -238,8 +238,10 @@ spec:
               value: minio
             - name: RUSTFS_SECRET_KEY
               value: miniominio
-            - name: RUSTFS_OBS_LOG_DIRECTORY
-              value: /logs
+            - name: RUSTFS_OBS_METRIC_ENDPOINT
+              value: http://otlp-collector.observability.svc.cluster.local:4318/v1//metrics
+            - name: RUSTFS_OBS_TRACE_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318/v1/traces
             # - name: MINIO_ROOT_USER
             #   value: minio
             # - name: MINIO_ROOT_PASSWORD
@@ -282,8 +284,6 @@ spec:
             # Use RAM for temporary storage - completely avoids disk I/O
             - mountPath: /tmp
               name: tmp
-            - mountPath: /logs
-              name: logs
       volumes:
         # Use tmpfs (RAM) for temporary files
         # This completely eliminates disk I/O competition with etcd
@@ -291,9 +291,6 @@ spec:
           emptyDir:
             medium: Memory  # <-- This uses RAM instead of disk
             sizeLimit: 6Gi  # Adjust based on your workload
-        - name: logs
-          emptyDir:
-            sizeLimit: 1Gi
   volumeClaimTemplates:
     - metadata:
         name: data
