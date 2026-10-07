@@ -248,6 +248,8 @@ spec:
               value: ""
             - name: RUSTFS_OBS_LOGGER_LEVEL
               value: warn
+            - name: RUSTFS_OBS_LOG_STDOUT_ENABLED
+              value: "true"
             - name: RUSTFS_OBS_ENVIRONMENT
               value: production
             # - name: MINIO_ROOT_USER
