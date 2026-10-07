@@ -33,7 +33,7 @@ spec:
             - --config.file=/etc/blackbox_exporter/config.yml
             - --web.listen-address=:19115
           # image: quay.io/prometheus/blackbox-exporter:v0.25.0
-          image: quay.io/prometheus/blackbox-exporter:v0.28.0
+          image: quay.io/prometheus/blackbox-exporter:v0.29.0
           imagePullPolicy: IfNotPresent
           name: blackbox-exporter
           ports:
