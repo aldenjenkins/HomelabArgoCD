@@ -20,7 +20,7 @@ spec:
       name: awskms
       image: ghcr.io/openbao/openbao-plugin-kms-aws:v0.1.0@sha256:fe9fb94872048c9474156c044ea8852bb5c2e968fc9304a3725e4d434b488541
   initContainer:
-    image: ghcr.io/dc-tec/openbao-init:0.5.1
+    image: ghcr.io/dc-tec/openbao-init:0.5.2
   tls:
     enabled: true
     mode: External # required for Hardened profile
