@@ -12,13 +12,15 @@ k scale -n nautobot deploy/nautobot deploy/nautobot-celery deploy/nautobot-celer
 k delete job -n nautobot nautobot-init
 ```
 
-2. Comment the server/celery/celery-beat in kustomization.yaml and uncomment the `init` line
+2. update the tag in server/celery/celery-beat/init pod manifests
 
-3. run kdiff and kapply if the only change is the new init job
+3. Comment the server/celery/celery-beat in kustomization.yaml and uncomment the `init` line
 
-4. watch `k logs -n nautobot job/nautobot-init -f`
+4. run kdiff and kapply if the only change is the new init job
 
-5. run
+5. watch `k logs -n nautobot job/nautobot-init -f`
+
+6. run:
 
 ```
 k delete job -n nautobot nautobot-init
@@ -26,8 +28,6 @@ k delete job -n nautobot nautobot-init
 
 6. comment init again and uncomment the server/celery/celery-beat
 
-7. update the tag in server/celery/celery-beat
-
 8. rerun kdiff and kapply
 
-Done@
+Done

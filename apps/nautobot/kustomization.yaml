@@ -4,7 +4,9 @@ resources:
   - serviceaccount.yaml
   - postgres
   - redis
+  # Comment for runtime, uncomment for init job
   # - init
+  # Uncomment for real runtime, comment for init job
   - celery
   - celery-beat
   - server

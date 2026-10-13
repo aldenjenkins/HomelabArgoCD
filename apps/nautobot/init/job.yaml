@@ -31,7 +31,7 @@ spec:
       containers:
         # This init container will run post_upgrade which initializes/upgrades the DB as well as collects static files
         - name: "nautobot-init"
-          image: registry.home.alden.ai/me/nautobot:3.2.5-bgp1
+          image: registry.home.alden.ai/me/nautobot:3.2.7-bgp1
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
