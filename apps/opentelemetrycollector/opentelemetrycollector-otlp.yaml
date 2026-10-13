@@ -61,6 +61,10 @@ spec:
           enabled: true
           # num_consumers: 50
           queue_size: 1000
+        # Replaces the now-deprecated "resource_to_telemetry_conversion"
+        resource_constant_labels:
+          included:
+            - "rustfs.cluster.id"
         max_batch_request_parallelism: 50
         timeout: 10s
         # 2026-08-22 trying to get rid of these annoying, seemingly non-useful otel_scope_version and otel_scope_name labels on all metrics
