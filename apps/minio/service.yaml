@@ -42,6 +42,9 @@ spec:
     - port: 9000
       name: http
       protocol: TCP
+    - port: 9001
+      name: console
+      protocol: TCP
   selector:
     app.kubernetes.io/name: minio # Selects the pods created by the StatefulSet
     app.kubernetes.io/component: minio # Selects the pods created by the StatefulSet

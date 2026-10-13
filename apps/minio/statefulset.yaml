@@ -160,11 +160,6 @@ spec:
       app.kubernetes.io/component: minio
   template:
     metadata:
-      # annotations:
-      #   # Cilium bandwidth limits - prevent Minio from saturating the 2.5Gbps link
-      #   # Leave headroom for etcd, API server, and other control plane traffic
-      #   kubernetes.io/ingress-bandwidth: "1500M"  # 1.5 Gbps ingress
-      #   kubernetes.io/egress-bandwidth: "1500M"   # 1.5 Gbps egress
       labels:
         <<: *labels
     spec:
@@ -206,24 +201,6 @@ spec:
           image: rustfs/rustfs:1.0.1
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/rustfs"]
-          # args:
-          #   # - server
-          #   # # This string defines the entire cluster layout for all 3 pods (0, 1, 2).
-          #   # # Each pod needs to see the definition of the full erasure set.
-          #   # # {0...2} expands to minio-0, minio-1, minio-2.
-          #   # # {1...4} expands the paths /disk1, /disk2, /disk3, /disk4.
-          #   # - "http://minio-{0...2}.minio.minio.svc.cluster.local/var/minio/disk{1...4}"
-          #   # Single volume is better for local-path storage (all volumes are on same physical disk anyway)
-          #   - server
-          #   - /var/minio/data
-          #   # --- CRITICAL CHANGE FOR HA ---
-          #   # This tells each MinIO instance to form a distributed
-          #   # set with all other pods in the StatefulSet.
-          #   # The pattern is: http://<pod-name>.<service-name>.<namespace>.svc.cluster.local/<data-dir>
-          #   # - http://minio-0.minio.minio.svc.cluster.local/var/minio
-          #   # - http://minio-1.minio.minio.svc.cluster.local/var/minio
-          #   # - http://minio-2.minio.minio.svc.cluster.local/var/minio
-          #   # - http://minio-3.minio.minio.svc.cluster.local/var/minio
           env:
             - name: RUSTFS_VOLUMES
               value: /var/minio/data
@@ -247,25 +224,14 @@ spec:
             - name: RUSTFS_OBS_LOG_DIRECTORY
               value: ""
             - name: RUSTFS_OBS_LOGGER_LEVEL
-              value: warn
+              # value: warn
+              value: info
             - name: RUSTFS_OBS_LOG_STDOUT_ENABLED
-              value: "true"
+              value: "false"
             - name: RUSTFS_OBS_ENVIRONMENT
               value: production
-            # - name: MINIO_ROOT_USER
-            #   value: minio
-            # - name: MINIO_ROOT_PASSWORD
-            #   value: miniominio
-            # - name: MINIO_PROMETHEUS_AUTH_TYPE
-            #   value: public
-            # # Connection and concurrency limits to prevent overwhelming the node
-            # - name: MINIO_API_REQUESTS_MAX
-            #   value: "100"  # Max concurrent API requests (default unlimited)
-            # - name: MINIO_API_REQUESTS_DEADLINE
-            #   value: "30s"  # Request timeout
-            # # Healing/scanner bandwidth limit (for background operations)
-            # - name: MINIO_HEAL_DISK_SLEEP
-            #   value: "1s"  # Slow down disk healing to reduce I/O pressure
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: rustfs.cluster.id=homelab-live
           resources:
             limits:
               memory: 3Gi
