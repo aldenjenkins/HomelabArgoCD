@@ -6,7 +6,8 @@ resources:
   - gateway
   - gossipring
   - memcached
-  - metricsgenerator
+  # 2026-10-13 removing as unnecessary given we have trace collecting creating metrics
+  # - metricsgenerator
   - block-builder
   - live-store
   - backend-worker
