@@ -45,6 +45,27 @@ spec:
           type: RuntimeDefault
       enableServiceLinks: false
 
+      affinity:
+        # Only schedule on these two nodes
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - control-plane-01
+                      - worker-11
+        # Never put both replicas on the same node
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tempo
+                  app.kubernetes.io/instance: tempo
+                  app.kubernetes.io/component: metrics-generator
+              topologyKey: kubernetes.io/hostname
+
       initContainers:
         []
       containers:
