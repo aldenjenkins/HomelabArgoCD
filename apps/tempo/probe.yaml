@@ -20,7 +20,6 @@ spec:
         - http://tempo-backend-scheduler.tempo.svc.cluster.local.:3200/ready
         - http://tempo-block-builder.tempo.svc.cluster.local.:3200/ready
         - http://tempo-live-store.tempo.svc.cluster.local.:3200/ready
-        - http://tempo-metrics-generator.tempo.svc.cluster.local.:3200/ready
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
