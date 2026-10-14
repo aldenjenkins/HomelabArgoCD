@@ -2,8 +2,10 @@ namespace: miniflux
 resources:
   - namespace.yaml
   - postgres
+  - dashboards
   - deployment.yaml
   - service.yaml
+  - servicemonitor.yaml
   - httproute.yaml
   - probe.yaml
 

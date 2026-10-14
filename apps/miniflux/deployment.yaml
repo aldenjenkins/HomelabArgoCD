@@ -73,6 +73,8 @@ spec:
                 secretKeyRef:
                   key: uri
                   name: miniflux-postgres-18-app
+            - name: METRICS_COLLECTOR
+              value: "1"
           ports:
             - containerPort: 8080
               name: http

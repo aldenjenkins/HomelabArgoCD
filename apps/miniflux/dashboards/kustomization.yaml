@@ -1,0 +1,4 @@
+namespace: miniflux
+resources:
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
