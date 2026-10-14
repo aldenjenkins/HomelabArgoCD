@@ -1361,8 +1361,8 @@ spec:
           {
             "allowCustomValue": false,
             "current": {
-              "text": "cluster",
-              "value": "cluster"
+              "text": "k8s_cluster_name",
+              "value": "k8s_cluster_name"
             },
             "description": "Label Key that uniquely identifies the Kubernetes cluster where the metrics are coming from.\nThis is needed to support multi-cluster use-cases.",
             "hide": 2,
@@ -1370,11 +1370,11 @@ spec:
             "options": [
               {
                 "selected": true,
-                "text": "cluster",
-                "value": "cluster"
+                "text": "k8s_cluster_name",
+                "value": "k8s_cluster_name"
               }
             ],
-            "query": "cluster",
+            "query": "k8s_cluster_name",
             "type": "custom"
           },
           {
