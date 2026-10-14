@@ -75,6 +75,8 @@ spec:
                   name: miniflux-postgres-18-app
             - name: METRICS_COLLECTOR
               value: "1"
+            - name: METRICS_ALLOWED_NETWORKS
+              value: "10.244.0.0/16"
           ports:
             - containerPort: 8080
               name: http
