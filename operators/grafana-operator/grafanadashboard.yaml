@@ -12,4 +12,7 @@ spec:
   datasources:
     - inputName: DS_PROMETHEUS
       datasourceName: prometheus
-  url: https://grafana.com/api/dashboards/22785/revisions/2/download 
+  url: https://grafana.com/api/dashboards/22785/revisions/2/download
+  variables:
+    - name: k8sClusterLabelKey
+      value: k8s_cluster_name
