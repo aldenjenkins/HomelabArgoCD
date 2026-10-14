@@ -84,6 +84,16 @@ spec:
               name: tempo-backend-worker-store
       terminationGracePeriodSeconds: 30
       affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - control-plane-01
+                      - control-plane-02
+                      - worker-11
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
