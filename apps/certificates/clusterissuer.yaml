@@ -16,12 +16,11 @@ spec:
                 cloudflare:
                     email: ENC[AES256_GCM,data:BQBB4S6s/kXjc6whdxePIh6Lb4Jh8g+WrAIs,iv:lKFrjSlr/Vq/KPFpx2qPC22I2OFWEaDZeG0KhHvujDo=,tag:g7aSH3FfBJpOYD1YCiWvIQ==,type:str]
                     apiTokenSecretRef:
-                        name: ENC[AES256_GCM,data:UW9noLVdHxN8YgfMRwkAWn2H,iv:DF0bUSZfA3G4/8jXpYbGMnhK3tILICe3xkdGN5bcdD0=,tag:0WG/+HTIm1nNU4fIjapSjQ==,type:str]
+                        name: ENC[AES256_GCM,data:L6t8LoIeHLD8EaamZIe5guQ/Ricms5N5Si0=,iv:FKwmeJR5PGTrIqlGotS5mAD1x+aFxvO4bpNIZe8esRU=,tag:A5Db1jFl99BlCnuEM8ccmQ==,type:str]
                         key: ENC[AES256_GCM,data:fXBkkVNJ4v87cGdjcZE=,iv:PPzBx+XuWiwP8E7hztORusf4neHM/HwZCatwgWyY3N4=,tag:OwKB9ZNBEDKvu2++DpfuPw==,type:str]
 sops:
     age:
-        - recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
-          enc: |
+        - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
             YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBkSllZblFvTjR5dzFKQzd5
             WDA5UlhhdWY1eDY5ZGM2dlRiYnE3QzZEZ0U0CnN3RmNkQU9mZllpR2pNa2R2SlFq
@@ -29,7 +28,8 @@ sops:
             NlB4WFlYTFdiYlpUMEY0R2xlamNlQlkKZsrcvPFCFHkMsZEZQyPpppY8anRy3jPB
             KAt12enzzA38evBH93emXowimjrY2kA6QR47gtP7oPJaXQ3/wyP0nw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-06-19T01:18:11Z"
-    mac: ENC[AES256_GCM,data:DzTdsfdd5RggMdpEH3ZnEwFTORXJndUZZwYDL+6RrMaPCHN34au03BfJ8vtJcs2RTkU8MBBMmzDmPnbWCBBeX6nmEA8D+TGMQ5pqdK6S+hPqK/82r7VxfhhXdrAAiI2YREofO/aawWoOB9c92HR0XqUtGAJIMU3FSHWDGqSr0i8=,iv:NO9Mk8GGtYKHzt190ubncC65nSD2Ttxqq83CUeVXgVc=,tag:afmS++1AMBhX6Z9ZSTgiqA==,type:str]
+          recipient: age15x8mqr8j40rtzeg98wa536jt85276crszk7qcrprndveq4049esq6padka
+    lastmodified: "2026-10-16T20:45:01Z"
+    mac: ENC[AES256_GCM,data:x+vaV39fezfR9GqxDDUetF5UK+fWodyUo+p0Xyaoa2/ZiIkfjJxcuIfvKHGAT4tJejVaQXT8yEG/H0zKk7JI6e8hBYuhN2ImQ0XaK9mUQbjn+nMYV3/EXcabeGbT/u2xXk/8UpqAikgS7XalSEo49uOIw3PicDuMnsbJw8plU8k=,iv:xCA9r7uWn73c03jYWyPsuJ3RBW22lb5OApnNL7Eavhs=,tag:1AUjv8flaLnsuyWGT24qQQ==,type:str]
     unencrypted_regex: ^(apiVersion|metadata|kind|type)$
-    version: 3.10.2
+    version: 3.13.3
