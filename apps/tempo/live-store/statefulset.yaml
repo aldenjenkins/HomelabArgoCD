@@ -47,6 +47,9 @@ spec:
             - -target=live-store
           image: docker.io/grafana/tempo:3.1.0
           imagePullPolicy: IfNotPresent
+          env:
+            - name: GOMEMLIMIT
+              value: "1800MiB"
           name: live-store
           ports:
             - containerPort: 7956
