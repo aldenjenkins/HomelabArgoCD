@@ -215,23 +215,23 @@ spec:
               value: minio
             - name: RUSTFS_SECRET_KEY
               value: miniominio
-            # - name: RUSTFS_OBS_ENDPOINT
-            #   value: http://otlp-collector.observability.svc.cluster.local:4318
-            # - name: RUSTFS_OBS_TRACE_ENDPOINT
-            #   value: http://trace-collector.observability.svc.cluster.local:4318/v1/traces
-            # - name: RUSTFS_OBS_LOGS_EXPORT_ENABLED
-            #   value: "false"
-            # - name: RUSTFS_OBS_LOG_DIRECTORY
-            #   value: ""
-            # - name: RUSTFS_OBS_LOGGER_LEVEL
-            #   # value: warn
-            #   value: info
-            # - name: RUSTFS_OBS_LOG_STDOUT_ENABLED
-            #   value: "false"
-            # - name: RUSTFS_OBS_ENVIRONMENT
-            #   value: production
-            # - name: OTEL_RESOURCE_ATTRIBUTES
-            #   value: rustfs.cluster.id=homelab-live
+            - name: RUSTFS_OBS_ENDPOINT
+              value: http://otlp-collector.observability.svc.cluster.local:4318
+            - name: RUSTFS_OBS_TRACE_ENDPOINT
+              value: http://trace-collector.observability.svc.cluster.local:4318/v1/traces
+            - name: RUSTFS_OBS_LOGS_EXPORT_ENABLED
+              value: "false"
+            - name: RUSTFS_OBS_LOG_DIRECTORY
+              value: ""
+            - name: RUSTFS_OBS_LOGGER_LEVEL
+              # value: warn
+              value: info
+            - name: RUSTFS_OBS_LOG_STDOUT_ENABLED
+              value: "true"
+            - name: RUSTFS_OBS_ENVIRONMENT
+              value: production
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: rustfs.cluster.id=homelab-live
           resources:
             limits:
               memory: 3Gi
@@ -264,9 +264,9 @@ spec:
         # Use tmpfs (RAM) for temporary files
         # This completely eliminates disk I/O competition with etcd
         - name: tmp
-          emptyDir:
-            medium: Memory  # <-- This uses RAM instead of disk
-            sizeLimit: 6Gi  # Adjust based on your workload
+          emptyDir: {}
+            # medium: Memory  # <-- This uses RAM instead of disk
+            # sizeLimit: 6Gi  # Adjust based on your workload
   volumeClaimTemplates:
     - metadata:
         name: data
