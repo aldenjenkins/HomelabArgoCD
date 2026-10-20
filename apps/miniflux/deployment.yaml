@@ -60,7 +60,7 @@ spec:
                 - ALL
       containers:
         - name: miniflux
-          image: "docker.io/miniflux/miniflux:2.3.3-distroless"
+          image: "docker.io/miniflux/miniflux:2.3.4-distroless"
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
