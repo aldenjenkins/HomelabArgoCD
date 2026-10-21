@@ -7,4 +7,4 @@ kind: Kustomization
 images:
 - name: example.com/openbao-operator
   newName: ghcr.io/kubebao/openbao-operator
-  newTag: 0.5.2
+  newTag: 0.5.3
