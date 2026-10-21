@@ -24,8 +24,8 @@ server:
       #   implementation: AuthRequest
       ext-authz:
         implementation: ExtAuthz
-      # forward-auth:
-      #   implementation: ForwardAuth
+        # forward-auth:
+        #   implementation: ForwardAuth
 log:
   level: debug
   format: json
@@ -276,6 +276,25 @@ identity_providers:
           - 'profile'
           - 'email'
           - 'groups'
+      - client_id: 'tDbxz14~Vkuis6LxEcy4qGZ.qIPpIAzZUZ9rhygov~MMR5Ky3R_8Xw8Vv93GddSt'
+        client_name: 'HomeBox'
+        client_secret: '{{ fileContent "/secrets/oidc-client-homebox" }}'
+        public: false
+        authorization_policy: 'one_factor'
+        require_pkce: true
+        pkce_challenge_method: 'S256'
+        redirect_uris:
+          - 'https://homebox.home.alden.ai/api/v1/users/login/oidc/callback'
+        scopes:
+          - 'openid'
+          - 'profile'
+          - 'email'
+          - 'groups'
+        response_types:
+          - 'code'
+        grant_types:
+          - 'authorization_code'
+        token_endpoint_auth_method: 'client_secret_basic'
 totp:
   disable: false
   issuer: Authelia
