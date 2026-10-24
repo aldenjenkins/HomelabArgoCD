@@ -234,7 +234,7 @@ spec:
               value: rustfs.cluster.id=homelab-live
           resources:
             limits:
-              memory: 3Gi
+              memory: 8Gi
             requests:
               cpu: "200m"
               memory: 1Gi
