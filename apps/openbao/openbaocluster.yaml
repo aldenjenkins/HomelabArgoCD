@@ -3,7 +3,7 @@ kind: OpenBaoCluster
 metadata:
   name: bao
 spec:
-  version: 2.7.1
+  version: 2.7.2
   replicas: 3
   profile: Hardened
   configuration:
