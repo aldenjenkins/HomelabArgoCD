@@ -7,5 +7,6 @@ data:
   policy.csv: |
     g, alden, role:admin
     g, readonly, role:readonly
+    g, argocd-admins, role:admin
   policy.default: role:readonly
   scopes: '[groups, email]'
