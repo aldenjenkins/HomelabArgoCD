@@ -20,7 +20,7 @@ spec:
         runAsGroup: 1000
       containers:
       - name: header-display
-        image: mendhak/http-https-echo:42
+        image: mendhak/http-https-echo:43
         imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
