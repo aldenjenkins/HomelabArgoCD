@@ -3,7 +3,7 @@ kind: HTTPRoute
 metadata:
   name: headlamp-httproute
   annotations:
-    gethomepage.dev/enabled: "true"
+    gethomepage.dev/enabled: "false"
     gethomepage.dev/group: Development
     gethomepage.dev/name: Headlamp
     gethomepage.dev/href: "https://headlamp.home.alden.ai"
