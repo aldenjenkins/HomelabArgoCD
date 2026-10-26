@@ -224,13 +224,14 @@ identity_providers:
         client_secret: '{{ fileContent "/secrets/oidc-client-argocd" }}'
         public: false
         authorization_policy: 'one_factor'
-        require_pkce: false
-        pkce_challenge_method: ''
+        require_pkce: true
+        pkce_challenge_method: 'S256'
         redirect_uris:
           - 'https://argocd.home.alden.ai/auth/callback'
         scopes:
           - 'openid'
           - 'email'
+          - 'profile'
           - 'groups'
         response_types:
           - 'code'

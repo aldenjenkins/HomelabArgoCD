@@ -26,9 +26,11 @@ data:
     cliClientID: argocd-cli
     requestedScopes:
       - openid
+      - profile
       - email
       - groups
     enableUserInfoGroups: true
+    enablePKCEAuthentication: true
     userInfoPath: /api/oidc/userinfo
   url: https://argocd.home.alden.ai
   resource.customizations.health.grafana.integreatly.org_GrafanaFolder: |
