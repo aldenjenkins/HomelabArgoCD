@@ -25,4 +25,4 @@ patches:
               - name: manager
                 env:
                 - name: OPERATOR_VERSION
-                  value: 0.6.1
+                  value: 0.6.0
