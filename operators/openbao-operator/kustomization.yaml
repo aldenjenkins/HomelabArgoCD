@@ -1,6 +1,7 @@
 resources:
   # renovate: datasource=github-releases depName=kubebao/openbao-operator
   - github.com/kubebao/openbao-operator/config/overlays/single-tenant?ref=0.6.0
+  # - https://github.com/kubebao/openbao-operator/releases/download/0.6.0/install.yaml
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -8,3 +9,20 @@ images:
 - name: example.com/openbao-operator
   newName: ghcr.io/kubebao/openbao-operator
   newTag: 0.6.0
+patches:
+  - target:
+      kind: Deployment
+      name: openbao-operator-controller
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: openbao-operator-controller
+      spec:
+        template:
+          spec:
+            containers:
+              - name: manager
+                env:
+                - name: OPERATOR_VERSION
+                  value: 0.6.1
