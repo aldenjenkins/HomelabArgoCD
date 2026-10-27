@@ -18,7 +18,7 @@ spec:
   plugins:
     - type: kms
       name: awskms
-      image: ghcr.io/openbao/openbao-plugin-kms-aws:v0.1.0@sha256:fe9fb94872048c9474156c044ea8852bb5c2e968fc9304a3725e4d434b488541
+      image: ghcr.io/openbao/openbao-plugin-kms-aws:v0.1.1@sha256:24a0a1294385a34224848d0d6ff2c9287f9c9b0ded1de953cc539dc76ced160c
   initContainer:
     image: ghcr.io/kubebao/openbao-init:0.6.0
   tls:
