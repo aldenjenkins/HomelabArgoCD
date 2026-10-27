@@ -1,0 +1,36 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: homebox-postgres-18
+  namespace: homebox
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6
+
+  storage:
+    size: 20Gi
+    storageClass: local-path
+
+  bootstrap:
+    initdb:
+      database: homebox
+      owner: homebox
+
+  monitoring:
+    enablePodMonitor: false
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      enabled: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: homebox-postgres-18-6

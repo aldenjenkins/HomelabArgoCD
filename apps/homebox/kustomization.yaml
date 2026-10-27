@@ -1,0 +1,9 @@
+namespace: homebox
+resources:
+  - namespace.yaml
+  - postgres
+  - service.yaml
+  - deployment.yaml
+  - httproute.yaml
+generators:
+  - sopsgenerator.yaml

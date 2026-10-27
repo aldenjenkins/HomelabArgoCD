@@ -1,0 +1,12 @@
+namespace: homebox
+resources:
+  - objectstore.yaml
+  - cnpg-cluster.yaml
+  - database.yaml
+  - service.yaml
+  - scheduledbackup.yaml
+  - grafanadatasource.yaml
+  - podmonitor.yaml
+  - probe.yaml
+generators:
+  - sopsgenerator.yaml

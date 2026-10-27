@@ -1,0 +1,13 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: homebox-postgres-18-homebox
+spec:
+  cluster:
+    name: homebox-postgres-18
+  name: homebox          # the existing DB created by initdb
+  owner: homebox
+  databaseReclaimPolicy: retain   # default; deleting this object won't drop the DB
+  extensions:
+    - name: unaccent
+      ensure: present

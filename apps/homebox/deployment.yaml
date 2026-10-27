@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homebox
+  labels:
+    app.kubernetes.io/name: homebox
+    app.kubernetes.io/component: server
+  annotations:
+    secret.reloader.stakater.com/reload: "homebox-env"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homebox
+      app.kubernetes.io/component: server
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "100%"
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homebox
+        app.kubernetes.io/component: server
+    spec:
+      securityContext:
+        fsGroup: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: homebox
+          image: ghcr.io/sysadminsmedia/homebox:0.27.0-hardened
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: homebox-env
+          ports:
+            - name: http
+              containerPort: 7745
+          env:
+            - name: HBOX_MODE
+              value: production
+            - name: HBOX_OTEL_ENABLED
+              value: "true"
+            - name: HBOX_OTEL_INSECURE
+              value: "true"
+            - name: HBOX_OTEL_ENABLE_LOGGING
+              value: "false"
+            # HBOX_OTEL_ENDPOINT var deliberately NOT set so that we can
+            # have metric and trace specific vars here.
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+              value: "http://trace-collector.observability.svc.cluster.local:4317"
+            - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+              value: "http://otlp-collector.observability.svc.cluster.local:4317"
+            # Lets k8s_attributes on the otlp collector match the pod
+            - name: K8S_POD_NAME
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - name: K8S_NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "k8s.pod.name=$(K8S_POD_NAME),k8s.namespace.name=$(K8S_NAMESPACE)"
+            - name: HBOX_LOG_FORMAT
+              value: json
+            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
+              value: "false"
+            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
+              value: "false"
+            - name: HBOX_OPTIONS_GITHUB_RELEASE_CHECK
+              value: "false"
+            - name: HBOX_DATABASE_PORT
+              value: "5432"
+            - name: HBOX_DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: homebox-postgres-18-app
+            - name: HBOX_DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: homebox-postgres-18-app
+            - name: HBOX_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: homebox-postgres-18-app
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 200
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: tmp
+          emptyDir: {}
