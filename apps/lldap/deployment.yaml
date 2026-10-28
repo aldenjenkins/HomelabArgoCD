@@ -14,6 +14,10 @@ spec:
       labels:
         app: lldap
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "2"
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
