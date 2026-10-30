@@ -23,7 +23,8 @@
 #    --set gatewayAPI.enableAppProtocol=true >! cilium.yaml
 
 resources:
-  - cilium-1.20.1.3.yaml
+  # - cilium-1.20.1.3.yaml
+  - cilium-1.20.4.yaml
   - namespace.yaml
   - grafanafolder.yaml
   # Disabling hubble for now
