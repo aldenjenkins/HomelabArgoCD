@@ -90,7 +90,7 @@ spec:
               drop: [ALL]
       containers:
         - name: alertmanager
-          image: grafana/mimir:3.2.3
+          image: grafana/mimir:3.2.4
           imagePullPolicy: IfNotPresent
           env:
             - name: S3_ACCESS_KEY
