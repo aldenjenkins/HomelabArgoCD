@@ -32,7 +32,6 @@ spec:
               - alloy.home.alden.ai
               - plane.home.alden.ai
               - cockpit.home.alden.ai
-              - adminer.home.alden.ai
               - 2fauth.home.alden.ai
               - hubble.home.alden.ai
               - header-display.home.alden.ai
