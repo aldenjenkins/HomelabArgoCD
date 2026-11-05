@@ -34,7 +34,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: vikunja
-          image: vikunja/vikunja:2.7.1
+          image: vikunja/vikunja:2.8.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
