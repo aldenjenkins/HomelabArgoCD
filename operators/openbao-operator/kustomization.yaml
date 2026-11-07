@@ -1,7 +1,7 @@
 resources:
   # renovate: datasource=github-releases depName=kubebao/openbao-operator
-  - github.com/kubebao/openbao-operator/config/overlays/single-tenant?ref=0.6.0
-  # - https://github.com/kubebao/openbao-operator/releases/download/0.6.0/install.yaml
+  - github.com/kubebao/openbao-operator/config/overlays/single-tenant?ref=0.6.1
+  # - https://github.com/kubebao/openbao-operator/releases/download/0.6.1/install.yaml
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
