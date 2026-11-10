@@ -39,3 +39,7 @@ spec:
         - ports:
             - port: "17170"
               protocol: TCP
+    - fromEndpoints:
+      - matchLabels:
+          k8s-app: kube-dns
+          io.kubernetes.pod.namespace: kube-system
