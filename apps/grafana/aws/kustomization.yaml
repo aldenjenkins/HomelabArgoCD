@@ -8,5 +8,6 @@ resources:
   - billing
   - ec2
   - ses
+  - rds
 generators:
   - sopsgenerator.yaml

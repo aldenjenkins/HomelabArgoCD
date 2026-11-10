@@ -1,0 +1,4 @@
+namespace: grafana
+resources:
+  - grafanafolder.yaml
+  - grafanadashboard.yaml
