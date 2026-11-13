@@ -147,7 +147,7 @@ spec:
         spike_limit_percentage: 20
 
       probabilistic_sampler:
-        sampling_percentage: 1
+        sampling_percentage: 25
 
       # resourcedetection:
       #   detectors: [env, system]
@@ -334,6 +334,7 @@ spec:
             - otlp
           processors:
             - memory_limiter
+            - probabilistic_sampler
             - groupbyattrs
             - k8s_attributes
             # - probabilistic_sampler
