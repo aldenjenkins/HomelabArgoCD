@@ -74,7 +74,8 @@ spec:
 
       # Exporter for sending logs via otlp_http to the logs gateway
       otlp_http:
-        disable_keep_alives: true
+        keepalive:
+          idle_conn_timeout: 30s
         endpoint: http://logs-gateway-collector.observability.svc.cluster.local.:4318
         tls:
           insecure: true
