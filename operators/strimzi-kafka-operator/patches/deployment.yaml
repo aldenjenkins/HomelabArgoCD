@@ -24,10 +24,10 @@ spec:
       #   prometheus.io/port: "8080"
       #   prometheus.io/path: /metrics
     spec:
-      dnsConfig:
-        options:
-          - name: ndots
-            value: "1"
+      # dnsConfig:
+      #   options:
+      #     - name: ndots
+      #       value: "1"
       automountServiceAccountToken: true
       securityContext:
         seccompProfile:
