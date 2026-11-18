@@ -6,7 +6,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   suspend: true
   allowCrossNamespaceImport: true
   datasources:
@@ -24,7 +24,7 @@ spec:
     matchLabels:
       dashboards: "grafana"
   allowCrossNamespaceImport: true
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -40,7 +40,7 @@ spec:
     matchLabels:
       dashboards: "grafana"
   allowCrossNamespaceImport: true
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"

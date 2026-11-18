@@ -7,7 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-bloom-build.json"
   folderUID: loki-uid
 ---
@@ -20,7 +20,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-bloom-gateway.json"
   folderUID: loki-uid
 ---
@@ -33,7 +33,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-chunks.json"
   folderUID: loki-uid
 ---
@@ -46,7 +46,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-deletion.json"
   folderUID: loki-uid
 ---
@@ -59,7 +59,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-logs.json"
   folderUID: loki-uid
 ---
@@ -72,7 +72,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-mixin-recording-rules.json"
   folderUID: loki-uid
 ---
@@ -85,7 +85,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-operational.json"
   folderUID: loki-uid
 ---
@@ -98,7 +98,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-reads-resources.json"
   folderUID: loki-uid
 ---
@@ -111,7 +111,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-reads.json"
   folderUID: loki-uid
 ---
@@ -124,7 +124,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-retention.json"
   folderUID: loki-uid
 ---
@@ -137,7 +137,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-thanos-object-storage.json"
   folderUID: loki-uid
 ---
@@ -150,7 +150,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-writes-resources.json"
   folderUID: loki-uid
 ---
@@ -163,6 +163,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/loki/refs/heads/main/production/loki-mixin-compiled/dashboards/loki-writes.json"
   folderUID: loki-uid

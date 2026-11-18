@@ -5,7 +5,7 @@ metadata:
 spec:
   uid: opentelemetry-uid
   allowCrossNamespaceImport: true
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

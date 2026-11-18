@@ -7,7 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -4238,7 +4238,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"

@@ -7,7 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-alertmanager-resources.json"
   folderUID: mimir-uid
 ---
@@ -20,7 +20,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-alertmanager.json"
   folderUID: mimir-uid
 ---
@@ -33,7 +33,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-compactor-resources.json"
   folderUID: mimir-uid
 ---
@@ -46,7 +46,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-compactor.json"
   folderUID: mimir-uid
 ---
@@ -59,7 +59,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-config.json"
   folderUID: mimir-uid
 ---
@@ -72,7 +72,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-overrides.json"
   folderUID: mimir-uid
 ---
@@ -85,7 +85,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-overview-networking.json"
   folderUID: mimir-uid
 ---
@@ -98,7 +98,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-overview-resources.json"
   folderUID: mimir-uid
 ---
@@ -111,7 +111,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-overview.json"
   folderUID: mimir-uid
 ---
@@ -124,7 +124,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-queries.json"
   folderUID: mimir-uid
 ---
@@ -137,7 +137,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-reads-networking.json"
   folderUID: mimir-uid
 ---
@@ -150,7 +150,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-reads-resources.json"
   folderUID: mimir-uid
 ---
@@ -163,7 +163,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-reads.json"
   folderUID: mimir-uid
 ---
@@ -176,7 +176,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-remote-ruler-reads-networking.json"
   folderUID: mimir-uid
 ---
@@ -189,7 +189,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-remote-ruler-reads-resources.json"
   folderUID: mimir-uid
 ---
@@ -202,7 +202,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-remote-ruler-reads.json"
   folderUID: mimir-uid
 ---
@@ -215,7 +215,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-rollout-progress.json"
   folderUID: mimir-uid
 ---
@@ -228,7 +228,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-ruler.json"
   folderUID: mimir-uid
 ---
@@ -241,7 +241,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-scaling.json"
   folderUID: mimir-uid
 ---
@@ -254,7 +254,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-slow-queries.json"
   folderUID: mimir-uid
 ---
@@ -267,7 +267,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-tenants.json"
   folderUID: mimir-uid
 ---
@@ -280,7 +280,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-top-tenants.json"
   folderUID: mimir-uid
 ---
@@ -293,7 +293,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-writes-networking.json"
   folderUID: mimir-uid
 ---
@@ -306,7 +306,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-writes-resources.json"
   folderUID: mimir-uid
 ---
@@ -319,7 +319,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/mimir-writes.json"
   folderUID: mimir-uid
 ---
@@ -332,6 +332,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/mimir/main/operations/mimir-mixin-compiled/dashboards/rollout-operator.json"
   folderUID: mimir-uid

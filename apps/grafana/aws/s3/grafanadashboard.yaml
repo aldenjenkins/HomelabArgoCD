@@ -7,6 +7,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   folderUID: s3-uid
   url: https://grafana.com/api/dashboards/575/revisions/8/download

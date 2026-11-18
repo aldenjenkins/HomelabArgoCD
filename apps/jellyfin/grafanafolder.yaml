@@ -5,7 +5,7 @@ metadata:
 spec:
   uid: jellyfin-uid
   allowCrossNamespaceImport: true
-  resyncPeriod: 1m
+  resyncPeriod: 30m
   instanceSelector:
     matchLabels:
       dashboards: "grafana"

@@ -12,7 +12,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   folderUID: nats-uid
   datasources:
     - inputName: DS_PROMETHEUS

@@ -6,7 +6,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -39,7 +39,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -54,7 +54,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -69,7 +69,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "prometheus"
@@ -89,7 +89,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  resyncPeriod: 30s
+  resyncPeriod: 30m
   # url: https://raw.githubusercontent.com/brngates98/GrafanaAgents/refs/heads/main/grafana-k8s-monitoring/dashboards/home-kubernetes-integration.json
   json: |-
     {

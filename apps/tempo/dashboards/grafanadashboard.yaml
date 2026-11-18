@@ -7,7 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-backendwork.json"
   folderUID: tempo-uid
 ---
@@ -20,7 +20,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-block-builder.json"
   folderUID: tempo-uid
 ---
@@ -33,7 +33,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-operational.json"
   folderUID: tempo-uid
 ---
@@ -46,7 +46,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-reads.json"
   folderUID: tempo-uid
 ---
@@ -59,7 +59,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-resources.json"
   folderUID: tempo-uid
 ---
@@ -72,7 +72,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-service-graph.json"
   folderUID: tempo-uid
 ---
@@ -85,7 +85,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-tenants.json"
   folderUID: tempo-uid
 ---
@@ -98,6 +98,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   url: "https://raw.githubusercontent.com/grafana/tempo/refs/heads/main/operations/tempo-mixin-compiled/dashboards/tempo-writes.json"
   folderUID: tempo-uid

@@ -7,6 +7,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
-  resyncPeriod: 5m
+  resyncPeriod: 30m
   folderUID: rds-uid
   url: https://grafana.com/api/dashboards/11264/revisions/2/download
