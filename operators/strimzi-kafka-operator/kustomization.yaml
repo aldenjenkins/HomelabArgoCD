@@ -16,11 +16,16 @@ patches:
   - patch: |-
       - op: remove
         path: /spec/template/spec/containers/0/resources
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0
-        value:
-          name: STRIMZI_NAMESPACE
-          value: "mimir,tempo,kafka"
+      # - op: replace
+      #   path: /spec/template/spec/containers/0/env/0
+      #   value:
+      #     name: STRIMZI_NAMESPACE
+      #     value: "mimir,tempo,kafka"
+      # - op: add
+      #   path: /spec/template/spec/containers/0/env/-
+      #   value:
+      #     name: JAVA_OPTS
+      #     value: "-Dsun.net.inetaddr.stale.ttl=300"
     target:
       group: apps
       version: v1

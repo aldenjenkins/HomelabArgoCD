@@ -57,6 +57,12 @@ spec:
       #         app.kubernetes.io/name: strimzi-cluster-operator
       containers:
         - name: strimzi-cluster-operator
+          env:
+            - name: STRIMZI_NAMESPACE
+              value: "kafka"
+              valueFrom: null   # drop the upstream fieldRef
+            - name: JAVA_OPTS
+              value: "-Dsun.net.inetaddr.stale.ttl=300"
           securityContext:
             privileged: false
             allowPrivilegeEscalation: false
