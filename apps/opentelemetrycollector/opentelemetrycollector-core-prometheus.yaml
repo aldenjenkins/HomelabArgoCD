@@ -494,6 +494,21 @@ spec:
               - action: aggregate_labels
                 aggregation_type: sum
                 label_set: *istio_tcp_labels
+          # istio gRPC streaming message counters (were exceeding Mimir's 30-label limit)
+          - include: istio_request_messages_total
+            action: update
+            new_name: workload:istio_request_messages_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_common_labels
+          - include: istio_response_messages_total
+            action: update
+            new_name: workload:istio_response_messages_total
+            operations:
+              - action: aggregate_labels
+                aggregation_type: sum
+                label_set: *istio_common_labels
       resource/set_known_attributes:
         attributes:
           - action: upsert
