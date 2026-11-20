@@ -32,4 +32,4 @@ resources:
   - networking.yaml
   # Disabling due to the annotation length being too big, can probably re-enable and just remember to always do the --server-side force conflicts things when running k apply -k .
   # - grafanadashboard.yaml
-  - gateway.yaml
+  # - gateway.yaml
