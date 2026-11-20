@@ -83,6 +83,12 @@ spec:
                 secretKeyRef:
                   name: immich-postgres-18-app
                   key: password
+            # 2026-11-20
+            # TODO: remove once an Immich release ships immich-app/immich#33480.
+            # v3.4.2 binds the metrics exporter to IMMICH_HOST (default "::"),
+            # which makes it 400 every scrape (immich-app/immich#33466).
+            - name: IMMICH_HOST
+              value: "0.0.0.0"
           envFrom:
             - secretRef:
                 name: immich-env
