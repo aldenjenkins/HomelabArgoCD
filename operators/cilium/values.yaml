@@ -32,14 +32,19 @@ enableIPv4BIGTCP: true
 endpointRoutes:
   enabled: true
 envoy:
-  # Gateway API needs the L7 proxy. Run Envoy as its own DaemonSet rather than
-  # embedded in the agent (the 1.20 default for fresh installs) so that Envoy
-  # config churn from HTTPRoutes doesn't restart cilium-agent.
-  enabled: true
-  rollOutPods: true
-  prometheus:
-    serviceMonitor:
-      enabled: true
+  # # Gateway API needs the L7 proxy. Run Envoy as its own DaemonSet rather than
+  # # embedded in the agent (the 1.20 default for fresh installs) so that Envoy
+  # # config churn from HTTPRoutes doesn't restart cilium-agent.
+  # enabled: true
+  # rollOutPods: true
+  # prometheus:
+  #   serviceMonitor:
+  #     enabled: true
+  # ---
+  # 2026-11-20 Cilium envoy Gateway API removed . Envoy DaemonSet caused stalled xDS ACKs on
+  # control-plane-02 -> L7 policy updates timed out -> DNS replies dropped.
+  # With l7Proxy on, Envoy runs embedded in the agent, only if an L7 rule needs it.
+  enabled: false
 hubble:
   enabled: false
   relay:
@@ -113,9 +118,13 @@ socketLB:
   # hostNamespaceOnly: true
   hostNamespaceOnly: false
 gatewayAPI:
-  enabled: true
+  enabled: false
   enableAlpn: true
   enableAppProtocol: true
-  # 2026-09-06 setup cilium envoy ingresses within cilium agents as a first attempt while switching from istio ingress gateways.
+  # # 2026-09-06 setup cilium envoy ingresses within cilium agents as a first attempt while switching from istio ingress gateways.
+  # gatewayClass:
+  #   create: "true"
+  # 2026-11-20 removing gatewayclass since we're still using istio for auth
   gatewayClass:
-    create: "true"
+    create: "false"
+
