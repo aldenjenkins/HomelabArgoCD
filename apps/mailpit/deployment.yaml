@@ -42,7 +42,7 @@ spec:
               drop:
                 - ALL
           args:
-            - --db-file
+            - --database
             - /var/lib/mailpit/mailpit.db
             - --webroot
             - "/"
