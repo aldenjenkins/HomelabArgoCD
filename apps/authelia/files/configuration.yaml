@@ -253,6 +253,7 @@ identity_providers:
         scopes:
           - 'openid'
           - 'offline_access'
+          - 'profile'
           - 'groups'
           - 'email'
         response_types:
