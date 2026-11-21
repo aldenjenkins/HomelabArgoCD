@@ -7,6 +7,9 @@ spec:
   image: ghcr.io/openbao/openbao:2.7.2  # renovate: github-releases=openbao/openbao
   replicas: 3
   profile: Hardened
+  upgrade:
+    requests:
+      retry: "2026-11-20-1"
   configuration:
     # Structured logging for better log aggregation
     logging:
