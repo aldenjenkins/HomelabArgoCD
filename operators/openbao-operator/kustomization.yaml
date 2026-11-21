@@ -27,4 +27,4 @@ patches:
                 - name: OPERATOR_VERSION
                   value: 0.6.3
                 - name: OPERATOR_UPGRADE_IMAGE
-                  value: ghcr.io/kubebao/openbao-upgrade:0.6.3
+                  value: ghcr.io/kubebao/openbao-upgrade:0.6.3@sha256:0e776f90bd52da7172de4177c9b3bf09fb8e647f7ee882052cf18349fc4adea2
