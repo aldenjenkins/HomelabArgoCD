@@ -1,4 +1,4 @@
-ARG NAUTOBOT_VERSION=3.2.9
+ARG NAUTOBOT_VERSION=3.2.10
 FROM ghcr.io/nautobot/nautobot:${NAUTOBOT_VERSION}
 ARG NAUTOBOT_VERSION
 RUN pip3 install --no-cache-dir \
