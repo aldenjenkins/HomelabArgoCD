@@ -79,6 +79,13 @@ search:
   autocomplete_min: 4
   default_lang: "en"
   favicon_resolver: "duckduckgo"
+  # Shorten SearXNG penalty box so one throttled burst does not bench an engine for hours
+  # (root cause of the ddg-only concentration). Private loopback instance (limiter:false).
+  suspended_times:
+    SearxEngineCaptcha: 900
+    SearxEngineTooManyRequests: 300
+    SearxEngineAccessDenied: 900
+    recaptcha_SearxEngineCaptcha: 3600
   # max_page: 0
   # ban_time_on_fail: 5
   # max_ban_time_on_fail: 120
