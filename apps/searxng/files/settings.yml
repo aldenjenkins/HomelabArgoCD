@@ -77,7 +77,7 @@ search:
   safe_search: 2
   autocomplete: "duckduckgo"
   autocomplete_min: 4
-  default_lang: "en"
+  default_lang: "auto"
   favicon_resolver: "duckduckgo"
   # Shorten SearXNG penalty box so one throttled burst does not bench an engine for hours
   # (root cause of the ddg-only concentration). Private loopback instance (limiter:false).
