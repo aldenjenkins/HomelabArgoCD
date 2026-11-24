@@ -51,7 +51,7 @@ general:
   instance_name: "SearXNG"
   privacypolicy_url: false
   donation_url: false
-  contact_url: false
+  contact_url: "testytest@testytest.com"
   enable_metrics: true
 
 # brand:
